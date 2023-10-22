@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="1">
+        <record id="1" model="konfigurasi.solar.uang.makan">
+            <field name="name">Konfigurasi Solar Uang Makan</field>
+            <field name="harga_solar">0</field>
+            <field name="uang_makan">0</field>
+        </record>
+    </data>
+
+</odoo>
