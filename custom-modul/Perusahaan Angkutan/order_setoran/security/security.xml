@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Group Category -->
+    <record model="ir.module.category" id="order_setoran.module_order_setoran">
+        <field name="name">Order Setoran</field>
+        <field name="sequence">19</field>
+    </record>
+
+    <!-- Group -->
+    <record model="res.groups" id ="group_order_setoran">
+        <field name="name">Kelola Setoran</field>
+        <field name="category_id" ref="order_setoran.module_order_setoran"/>
+    </record>
+
+</odoo>
