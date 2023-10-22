@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="delivery_driver_report" inherit_id="stock.report_delivery_document">
+        <xpath expr="//div[@name='div_origin']" position="before">
+            <t t-if="o.sopir">
+                <t t-if="o.picking_type_id.code == 'outgoing'">
+                    <div class="col-auto" name="div_sopir">
+                        <strong>Sopir :</strong>
+                        <p t-field="o.sopir"/>
+                    </div>
+                </t>
+            </t>
+        </xpath>
+
+        <xpath expr="//div[@name='div_sopir']" position="after">
+            <t t-if="o.kenek">
+                <t t-if="o.picking_type_id.code == 'outgoing'">
+                    <div class="col-auto" name="div_kenek">
+                        <strong>Kenek :</strong>
+                        <p t-field="o.kenek"/>
+                    </div>
+                </t>
+            </t>
+        </xpath>
+
+        <xpath expr="//div[@name='div_kenek']" position="after">
+            <t t-if="o.kendaraan.license_plate">
+                <t t-if="o.picking_type_id.code == 'outgoing'">
+                    <div class="col-auto" name="div_nomor_kendaraan">
+                        <strong>No. Kendaraan :</strong>
+                        <p t-field="o.kendaraan.license_plate"/>
+                    </div>
+                </t>
+            </t>
+        </xpath>
+
+
+<!--        <xpath expr="//div[@name='div_origin']" position="before">-->
+<!--        <t t-if="o.client_ref">-->
+<!--            <div class="col-auto" name="div_client_ref">-->
+<!--                <strong>Customer Reference:</strong>-->
+<!--                <p t-field="o.client_ref"/>-->
+<!--            </div>-->
+<!--        </t>-->
+<!--    </xpath>-->
+
+<!--            <div t-if="o.picking_type_id.code == 'outgoing'" class="col-auto">-->
+<!--                <strong>Kenek:</strong>-->
+<!--                <p t-field="o.kenek"/>-->
+<!--            </div>-->
+<!--            <div t-if="o.picking_type_id.code == 'outgoing'" class="col-auto">-->
+<!--                <strong>No. Kendaraan:</strong>-->
+<!--                <p t-esc="o.kendaraan.license_plate"/> &lt;!&ndash; Use t-esc to output the field value directly &ndash;&gt;-->
+<!--            </div>-->
+
+    </template>
+</odoo>
+
+
