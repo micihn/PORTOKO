@@ -16,7 +16,7 @@
         <field name="name">oper.order.tree</field>
         <field name="model">oper.order</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree default_order="oper_order_name desc">
                 <field name="oper_order_name" string="No Oper Order" optional="show"/>
                 <field name="create_date" string="Tanggal" optional="show"/>
                 <field name="vendor_pa" string="Vendor PA" optional="show"/>
@@ -42,6 +42,8 @@
                     </header>
 
                 <sheet>
+                    <field name="active" invisible="1"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
 
                     <div class="oe_title">
                         <h1>
@@ -69,7 +71,6 @@
                                     <field name="muat" width="20%" optional="show"/>
                                     <field name="bongkar" width="20%" optional="show"/>
                                     <field name="keterangan" width="20%" optional="show"/>
-                                    <field name="subtotal_biaya" width="20%" force_save="1" optional="show"/>
                                     <field name="subtotal_biaya" width="20%" force_save="1" optional="show"/>
                                 </tree>
                             </field>

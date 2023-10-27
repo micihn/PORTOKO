@@ -11,13 +11,16 @@ class KonfigurasiUangJalan(models.Model):
 
     kode_uang_jalan = fields.Char('Kode Uang Jalan', store=True)
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+
     @api.model
     def create(self, vals):
         # Check if a record with the same tipe, lokasi_muat, and lokasi_bongkar exists
         existing_record = self.search([
             ('tipe', '=', vals.get('tipe')),
             ('lokasi_muat', '=', vals.get('lokasi_muat')),
-            ('lokasi_bongkar', '=', vals.get('lokasi_bongkar'))
+            ('lokasi_bongkar', '=', vals.get('lokasi_bongkar')),
+            ('company_id', '=', int(self.env.company.id))
         ])
 
 
@@ -37,7 +40,8 @@ class KonfigurasiUangJalan(models.Model):
             existing_record = self.search([
                 ('tipe', '=', vals.get('tipe', self.tipe)),
                 ('lokasi_muat', '=', vals.get('lokasi_muat', self.lokasi_muat.id)),
-                ('lokasi_bongkar', '=', vals.get('lokasi_bongkar', self.lokasi_bongkar.id))
+                ('lokasi_bongkar', '=', vals.get('lokasi_bongkar', self.lokasi_bongkar.id)),
+                ('company_id', '=', int(self.env.company.id))
             ])
 
             if existing_record:
@@ -82,13 +86,13 @@ class KonfigurasiUangJalan(models.Model):
 
     @api.depends('jarak')
     def _calculate_uang_solar_per_liter(self):
-        active_uang_solar = self.env['konfigurasi.solar.uang.makan'].search([('id', '=', 1)]).harga_solar
+        active_uang_solar = self.env['konfigurasi.solar.uang.makan'].search([('company_id', '=', int(self.env.company.id))]).harga_solar
         for record in self:
             record.uang_solar_per_liter = active_uang_solar
 
     @api.depends('jarak')
     def _calculate_uang_makan_per_hari(self):
-        active_uang_makan = self.env['konfigurasi.solar.uang.makan'].search([('id', '=', 1)]).uang_makan
+        active_uang_makan = self.env['konfigurasi.solar.uang.makan'].search([('company_id', '=', int(self.env.company.id))]).uang_makan
         for record in self:
             record.uang_makan_per_hari = active_uang_makan
 

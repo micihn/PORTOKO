@@ -8,6 +8,9 @@ class OperOrder(models.Model):
     _inherit = ['mail.thread']
     _rec_name = 'oper_order_name'
 
+    active = fields.Boolean('Archive', default=True, tracking=True)
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+
     # Method untuk auto name assignment
     @api.model
     def create(self, vals):
@@ -27,16 +30,13 @@ class OperOrder(models.Model):
                 raise ValidationError('Harap isi Vendor PA sebelum mengkonfirmasi!')
             elif bool(record.kendaraan) == False:
                 raise ValidationError('Harap isi Kendaraan sebelum mengkonfirmasi!')
+            elif not record.oper_order_line:
+                raise ValidationError('Anda belum memasukkan nomor Order Pengiriman!')
             else:
                 record.state = 'requested'
 
     def validate(self):
         for record in self.oper_order_line:
-
-            # parts = str(self.kendaraan).split(' / ')
-            # nomor_kendaraan = parts[0]
-            # model_kendaraan = parts[1]
-
             record.order_pengiriman.write({
                 'is_sudah_disetor': False,
                 'is_oper_order': True,
@@ -44,7 +44,6 @@ class OperOrder(models.Model):
                 'oper_order': self.id,
                 'vendor_pa': self.vendor_pa.id,
                 'nomor_kendaraan': self.kendaraan,
-                # 'model_kendaraan': model_kendaraan,
             })
         self.state = 'confirmed'
 
@@ -113,8 +112,9 @@ class OperOrderLine(models.Model):
     _name = 'oper.order.line'
     _description = 'Oper Order Line'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     oper_order = fields.Many2one('oper.order', invisible=True)
-    order_pengiriman = fields.Many2one('order.pengiriman', 'No Order', domain=[('uang_jalan', '=', False)])
+    order_pengiriman = fields.Many2one('order.pengiriman', 'No Order', domain=[('state', '=', 'order_baru')])
     muat = fields.Many2one('konfigurasi.lokasi', 'Muat', compute='_compute_muat_and_bongkar', store=True)
     bongkar = fields.Many2one('konfigurasi.lokasi', 'Bongkar', compute='_compute_muat_and_bongkar', store=True)
     keterangan = fields.Text('Keterangan')

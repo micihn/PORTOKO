@@ -6,3 +6,4 @@ class Plant(models.Model):
     _rec_name = 'plant'
 
     plant = fields.Char('Plant',ondelete='restrict')
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)

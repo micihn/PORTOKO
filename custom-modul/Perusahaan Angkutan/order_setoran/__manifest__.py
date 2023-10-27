@@ -14,11 +14,11 @@
         'mail',
         'fleet',
         'hr',
+        'om_account_accountant',
+        'stock',
         'order_pengiriman',
         'web_notify',
         'hr_expense',
-        'stock',
-        'om_account_accountant',
     ],
     'data': [
         'security/security.xml',

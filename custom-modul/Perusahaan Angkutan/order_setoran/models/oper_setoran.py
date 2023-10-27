@@ -9,6 +9,7 @@ class OperSetoran(models.Model):
     _rec_name = 'kode_oper_setoran'
 
     kode_oper_setoran = fields.Char(readonly=True, required=True, copy=False, default='New')
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     total_jumlah = fields.Float(compute='_compute_jumlah', digits=(6, 0))
     total_bayar_dimuka = fields.Float(compute='_compute_total_bayar_dimuka', digits=(6, 0))
     total_pendapatan = fields.Float(digits=(6, 0))
@@ -17,8 +18,8 @@ class OperSetoran(models.Model):
     total_oper_order = fields.Float(compute='_compute_jumlah_oper_order', digits=(6, 0))
     total_list_pembelian = fields.Float(compute='_compute_jumlah_list_pembelian', digits=(6, 0))
     sisa = fields.Float(compute='_calculate_sisa', digits=(6, 0))
-    # komisi_sopir = fields.Float(compute='_compute_komisi_sopir', digits=(6, 0))
-    # komisi_kenek = fields.Float(compute='_compute_komisi_kenek', digits=(6, 0))
+    active = fields.Boolean('Archive', default=True, tracking=True)
+
 
     vendor_pa = fields.Many2one('res.partner', 'Vendor PA', required=True, states={
         'draft': [('readonly', False)],
@@ -84,17 +85,6 @@ class OperSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    # komisi_sopir_percentage = fields.Float(digits=(6, 0), tracking=True, states={
-    #     'draft': [('readonly', False)],
-    #     'done': [('readonly', True)],
-    #     'cancel': [('readonly', True)],
-    # })
-
-    # komisi_kenek_percentage = fields.Float(digits=(6, 0), tracking=True, states={
-    #     'draft': [('readonly', False)],
-    #     'done': [('readonly', True)],
-    #     'cancel': [('readonly', True)],
-    # })
 
     total_ongkos = fields.Integer('Total Ongkos', default=90, tracking=True, states={
         'draft': [('readonly', False)],
@@ -102,23 +92,34 @@ class OperSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    # expense_count = fields.Integer(compute='_compute_expense_count')
     invoice_count = fields.Integer(compute='_compute_invoice_count')
     vendor_bills_count = fields.Integer(compute='_compute_bills_count')
 
     def _compute_bills_count(self):
-        vendor_bills = self.env['account.move'].search([('nomor_setoran', '=', self.kode_oper_setoran), ('move_type', '=', 'in_invoice')])
-        self.vendor_bills_count = len(vendor_bills)
+        try:
+            vendor_bills = self.env['account.move'].search([
+                ('nomor_setoran', '=', self.kode_oper_setoran),
+                ('move_type', '=', 'in_invoice'),
+                ('company_id', '=', self.env.company.id),
+            ])
+            self.vendor_bills_count = len(vendor_bills)
+        except:
+            self.vendor_bills_count = 0
 
     def _compute_invoice_count(self):
-        for record in self.detail_order:
-            invoices = self.env['account.move'].search([('nomor_setoran', '=', str(self.kode_oper_setoran)), ('move_type', '=', 'out_invoice')])
-            inv_count = len(invoices)
-            self.invoice_count = inv_count
+        self.invoice_count = 0
 
-    # def _compute_expense_count(self):
-    #     expenses = self.env['hr.expense'].search([('reference', '=', self.kode_oper_setoran)])
-    #     self.expense_count = len(expenses)
+        try:
+            for record in self.detail_order:
+                invoices = self.env['account.move'].search([
+                    ('nomor_setoran', '=', str(self.kode_oper_setoran)),
+                    ('move_type', '=', 'out_invoice'),
+                    ('company_id', '=', self.env.company.id),
+                ])
+                inv_count = len(invoices)
+                self.invoice_count = inv_count
+        except:
+            self.invoice_count = 0
 
     def action_get_invoice_view(self):
         self.ensure_one()
@@ -130,7 +131,7 @@ class OperSetoran(models.Model):
             'domain': [['nomor_setoran', '=', str(self.kode_oper_setoran)], ['move_type', '=', 'out_invoice']],
             'context': {
                 'create': False,
-                'edit': False,  # Prevent record editing
+                'edit': False,
                 'delete': False
             }
         }
@@ -145,7 +146,7 @@ class OperSetoran(models.Model):
             'domain': [('reference', '=', str(self.kode_oper_setoran))],
             'context': {
                 'create': False,
-                'edit': False,  # Prevent record editing
+                'edit': False,
                 'delete': False
             }
         }
@@ -160,7 +161,7 @@ class OperSetoran(models.Model):
             'domain': [['nomor_setoran', '=', str(self.kode_oper_setoran)], ['move_type', '=', 'in_invoice']],
             'context': {
                 'create': False,
-                'edit': False,  # Prevent record editing
+                'edit': False,
                 'delete': False
             }
         }
@@ -182,9 +183,21 @@ class OperSetoran(models.Model):
 
         kendaraan_orm = str(vals['kendaraan']).replace(" ", "").lower()
 
-        for record in self.env['oper.order'].search([('vendor_pa', '=', vals['vendor_pa']), ('kendaraan_orm','=', kendaraan_orm), ('state', '=', 'confirmed')]):
+        for record in self.env['oper.order'].search([
+            ('vendor_pa', '=', vals['vendor_pa']),
+            ('kendaraan_orm','=', kendaraan_orm),
+            ('state', '=', 'confirmed'),
+            ('company_id', '=', self.env.company.id)
+        ]):
         ############################## Membuat Dictionary-List Oper Order ###########################
             oper_order_detail_list_ids += record.mapped('oper_order_line.order_pengiriman').ids
+
+            for order_pengiriman_id in oper_order_detail_list_ids:
+                order_pengiriman = self.env['order.pengiriman'].browse(order_pengiriman_id)
+                order_pengiriman.oper_setoran = result.kode_oper_setoran
+
+            # Meng-assign nomor setoran ke dalam order pengiriman meskipun statusnya masih draft
+            # Untuk membantu proses perubahan atau update biaya fee (jika ada)
 
             list_oper_order_dict = {
                 'oper_order': record.id,
@@ -233,7 +246,8 @@ class OperSetoran(models.Model):
         oper_order_model = self.env['oper.order'].search([
             ('vendor_pa', '=', vals.get('vendor_pa', self.vendor_pa.id)),
             ('kendaraan_orm', '=', kendaraan_orm),
-            ('state', '=', 'confirmed')
+            ('state', '=', 'confirmed'),
+            ('company_id', '=', self.env.company.id),
         ])
 
         if not oper_order_model:
@@ -276,10 +290,11 @@ class OperSetoran(models.Model):
                 ('state', '=', 'confirmed'),
                 ('vendor_pa', '=', vals.get('vendor_pa', self.vendor_pa.id)),
                 ('kendaraan_orm', '=', kendaraan_orm),
+                ('company_id', '=', self.env.company.id),
             ]):
 
             ############################## Membuat Dictionary-List Oper Order ###########################
-                oper_order_detail_list_ids.append(int(record.mapped('oper_order_line.order_pengiriman')))
+                oper_order_detail_list_ids += record.mapped('oper_order_line.order_pengiriman').ids
 
                 list_oper_order_dict = {
                     'oper_order': record.id,
@@ -327,7 +342,8 @@ class OperSetoran(models.Model):
             oper_order_model = self.env['oper.order'].search([
                 ('vendor_pa', '=', vals.get('vendor_pa', self.vendor_pa.id)),
                 ('kendaraan_orm', '=', kendaraan_orm),
-                ('state', '=', 'confirmed')
+                ('state', '=', 'confirmed'),
+                ('company_id', '=', self.env.company.id)
             ])
 
             if not oper_order_model:
@@ -348,6 +364,15 @@ class OperSetoran(models.Model):
         elif bool(self.list_oper_order) == False:
             raise ValidationError('List Oper Order Belum Terisi!')
 
+        # Cek Nomor Surat Jalan & Tanggal
+        for order in self.detail_order:
+            if order.nomor_surat_jalan == False:
+                raise ValidationError('Nomor Surat Jalan belum terisi ' + str(order.order_pengiriman.order_pengiriman_name))
+
+            if order.tanggal_surat_jalan == False:
+                raise ValidationError('Tanggal Surat Jalan belum terisi! ' + str(order.order_pengiriman.order_pengiriman_name))
+
+
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'account.invoice.oper.payment',
@@ -355,36 +380,6 @@ class OperSetoran(models.Model):
             'target': 'new',
             'name': 'Create Invoice',
         }
-
-        # def find_external_id(self):
-        #     # Mengambil ID Database Produk berdasarkan external ID
-        #     external_id = self.env.ref('order_setoran.product_jasa_pengiriman')
-        #     product_id = self.env['product.product'].search([('product_tmpl_id', '=', int(external_id))]).id
-        #     return product_id
-
-        # tanggal_oper_order = []
-        # for rec in self.list_oper_order:
-        #     tanggal_oper_order.append(rec.list_oper_order.oper_order.create_date)
-        #
-        # formatted_dates = [date.strftime('%d/%m/%Y') for date in tanggal_oper_order]
-        # formatted_dates_str = ', '.join(formatted_dates)
-        #
-        #
-        #
-        # # Write Nomor Surat Jalan
-        # for record in self.detail_order:
-        #     record.order_pengiriman.write({
-        #         'is_sudah_disetor': True,
-        #         'state': 'sudah_setor',
-        #         'nomor_surat_jalan': record.nomor_surat_jalan or None,
-        #         'nomor_tanggal_uang_jalan': record.surat_uang_jalan or None,
-        #     })
-
-        # # Perhitungan & pembuatan expenses
-        # if self.total_uang_jalan - self.total_pengeluaran < 0:
-        #     pass
-
-        # self.state = 'done'
 
     def cancel(self):
         # Update Order Pengiriman
@@ -397,35 +392,25 @@ class OperSetoran(models.Model):
             })
 
         # Cancel Invoice
-        for invoices in self.env['account.move'].search([('nomor_setoran', '=', str(self.kode_oper_setoran)), ('move_type', '=', 'out_invoice')]):
-            if invoices.state == 'posted':
-                raise ValidationError(
-                    "Anda tidak dapat membatalkan setoran ini karena invoice sudah lunas.")
-            elif invoices.state == 'draft':
+        for invoices in self.env['account.move'].search([
+            ('nomor_setoran', '=', str(self.kode_oper_setoran)),
+            ('move_type', '=', 'out_invoice'),
+            ('company_id', '=', self.env.company.id),
+        ]):
                 invoices.state = 'cancel'
 
        # Cancel Vendor Bill
-        for vendor_bills in self.env['account.move'].search([('nomor_setoran', '=', self.kode_oper_setoran), ('move_type', '=', 'in_invoice')]):
-            if vendor_bills.state == 'posted':
-                raise ValidationError(
-                    "Anda tidak dapat membatalkan setoran ini karena vendor bill sudah lunas.")
-            elif vendor_bills.state == 'draft':
-                vendor_bills.state = 'cancel'
+        for vendor_bills in self.env['account.move'].search([
+            ('nomor_setoran', '=', self.kode_oper_setoran),
+            ('move_type', '=', 'in_invoice'),
+            ('company_id', '=', self.env.company.id),
+        ]):
+            vendor_bills.state = 'cancel'
 
         self.state = 'cancel'
 
     def set_to_draft(self):
         self.state = 'draft'
-
-    # @api.depends('sisa', 'komisi_kenek_percentage')
-    # def _compute_komisi_kenek(self):
-    #     for record in self:
-    #         record.komisi_kenek = (record.komisi_kenek_percentage * record.sisa) / 100
-
-    # @api.depends('sisa', 'komisi_sopir_percentage')
-    # def _compute_komisi_sopir(self):
-    #     for record in self:
-    #         record.komisi_sopir = (record.komisi_sopir_percentage * record.sisa) / 100
 
     @api.depends('total_jumlah', 'total_oper_order', 'total_list_pembelian', 'total_biaya_fee')
     def _calculate_sisa(self):
@@ -472,6 +457,7 @@ class DetailOrder(models.Model):
     _name = 'detail.order.setoran'
     _description = 'Detail Order'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'Nomor Order', )
     tanggal_order = fields.Datetime('Tanggal Order')
@@ -487,6 +473,7 @@ class ListOperOrder(models.Model):
     _name = 'list.oper.order.setoran'
     _description = 'List Oper Order'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
     oper_order = fields.Many2one('oper.order', 'No. Oper Order')
     vendor_pa = fields.Many2one('res.partner', 'Vendor PA')
@@ -498,6 +485,7 @@ class ListPembelian(models.Model):
     _name = 'list.pembelian.setoran'
     _description = 'List Pembelian'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'Nomor Order', )
     nominal = fields.Float('Nominal', digits=(6, 0))
@@ -506,6 +494,7 @@ class BiayaFee(models.Model):
     _name = 'biaya.fee.setoran'
     _description = 'Biaya Fee'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'Nomor Order', )
     nominal = fields.Float('Nominal', digits=(6, 0))

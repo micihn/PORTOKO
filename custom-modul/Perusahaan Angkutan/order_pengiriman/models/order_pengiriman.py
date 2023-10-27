@@ -10,6 +10,8 @@ class OrderPengiriman(models.Model):
     _inherit = ['mail.thread']
     _rec_name = 'order_pengiriman_name'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+
     state = fields.Selection([
         ('order_baru', "Order Baru"),
         ('dalam_perjalanan', "Dalam Perjalanan"),
@@ -17,6 +19,8 @@ class OrderPengiriman(models.Model):
         ('sudah_setor', "Sudah Setor"),
         ('batal', "Batal"),
     ], default='order_baru', string="State", group_expand='_expand_states', index=True, hide=True, tracking=True)
+
+    active = fields.Boolean('Archive', default=True, tracking=True)
 
     def buat_uang_jalan(self, records):
         uang_jalan_records = []
@@ -111,7 +115,122 @@ class OrderPengiriman(models.Model):
         else:
             pass
 
-        return super(OrderPengiriman, self).write(vals)
+        res = super(OrderPengiriman, self).write(vals)
+
+        if 'biaya_fee' in vals:
+            if self.nomor_setoran:
+                # Rewriting Biaya Fee di dalam order pengiriman
+                biaya_fee_list = []
+                for record in self.biaya_fee:
+                    fee_dict = {
+                        'order_pengiriman': self.id,
+                        'fee_contact': record.fee_contact.id,
+                        'nominal': record.nominal,
+                    }
+
+                    biaya_fee_list.append(fee_dict)
+
+                    record.unlink()
+
+                for item in biaya_fee_list:
+                    self.env['biaya.fee'].create({
+                        'company_id': self.env.company.id,
+                        'order_pengiriman': item['order_pengiriman'],
+                        'fee_contact': item['fee_contact'],
+                        'nominal': item['nominal'],
+                    })
+
+                # Rewriting Biaya Fee di order setoran
+                biaya_fee_setoran_list = []
+                for item in self.env['order.setoran'].search([('kode_order_setoran', '=', self.nomor_setoran)]).biaya_fee:
+                    fee_dict = {
+                        'order_pengiriman': item.order_pengiriman.id,
+                        'fee_contact': item.fee_contact.id,
+                        'nominal': item.nominal,
+                    }
+
+                    biaya_fee_setoran_list.append(fee_dict)
+
+                for record in self.env['order.setoran'].search([('kode_order_setoran', '=', self.nomor_setoran)]).biaya_fee:
+                    if str(record.order_pengiriman.order_pengiriman_name) == str(self.order_pengiriman_name):
+                        record.unlink()
+
+                for item in biaya_fee_list:
+                    self.env['detail.biaya.fee'].create({
+                        'company_id': self.env.company.id,
+                        'order_setoran': self.env['order.setoran'].search([('kode_order_setoran', '=', self.nomor_setoran)]).id,
+                        'order_pengiriman': item['order_pengiriman'],
+                        'fee_contact': item['fee_contact'],
+                        'nominal': item['nominal'],
+                    })
+
+            elif self.oper_setoran:
+                # Rewriting Biaya Fee di dalam order pengiriman
+                biaya_fee_list = []
+                for record in self.biaya_fee:
+                    fee_dict = {
+                        'order_pengiriman': self.id,
+                        'fee_contact': record.fee_contact.id,
+                        'nominal': record.nominal,
+                    }
+
+                    biaya_fee_list.append(fee_dict)
+
+                    record.unlink()
+
+                for item in biaya_fee_list:
+                    self.env['biaya.fee'].create({
+                        'company_id': self.env.company.id,
+                        'order_pengiriman': item['order_pengiriman'],
+                        'fee_contact': item['fee_contact'],
+                        'nominal': item['nominal'],
+                    })
+
+                # Rewriting Biaya Fee di oper setoran
+                biaya_fee_setoran_list = []
+                for item in self.env['oper.setoran'].search([('kode_oper_setoran', '=', self.oper_setoran)]).biaya_fee_setoran:
+                    fee_dict = {
+                        'order_pengiriman': item.order_pengiriman.id,
+                        'nominal': item.nominal,
+                    }
+
+                    biaya_fee_setoran_list.append(fee_dict)
+
+                for record in self.env['oper.setoran'].search([('kode_oper_setoran', '=', self.oper_setoran)]).biaya_fee_setoran:
+                    if record.order_pengiriman.id == self.id:
+                        record.unlink()
+
+                self.env['biaya.fee.setoran'].create({
+                    'company_id': self.env.company.id,
+                    'oper_setoran': self.env['oper.setoran'].search([('kode_oper_setoran', '=', self.oper_setoran)]).id,
+                    'order_pengiriman': self.id,
+                    'nominal': self.total_biaya_fee,
+                })
+
+
+        # try:
+        #     for item in vals['biaya_fee']:
+        #         if item[0] == 0 and isinstance(item[2], dict):
+        #             fee_contact = item[2].get('fee_contact')
+        #             nominal = item[2].get('nominal')
+        #             if fee_contact is not None:
+        #                 for record in self.nomor_setoran.biaya_fee:
+        #                     pass
+        #                 print("fee_contact:", fee_contact)
+        #             elif nominal is not None:
+        #                 print("nominal:", nominal)
+        #         elif item[0] == 2:
+        #             print(item[1])
+        #             print("begin")
+        #             a = self.env['biaya.fee'].search([('id', '=', item[1])])
+        #             print(a)
+        #         elif item[0] == 1:
+        #             print(item[1]) # Get ID Fee Person
+        #             print(item[2].get('nominal')) # Get ID Nominal yang diubah
+        # except:
+        #     pass
+
+        return res
 
     def unlink(self):
         if any(record.state not in ('order_baru', 'batal') for record in self):
@@ -125,9 +244,16 @@ class OrderPengiriman(models.Model):
     # Method untuk auto name assignment
     @api.model
     def create(self, vals):
-        if vals.get('order_pengiriman_name', 'New') == 'New':
-            vals['order_pengiriman_name'] = self.env['ir.sequence'].next_by_code('order.pengiriman.sequence') or 'New'
+        vals['order_pengiriman_name'] = self.env['ir.sequence'].next_by_code('order.pengiriman.sequence')
+
+        # print(vals)
+        # if vals.get('order_pengiriman_name', 'New') == 'New':
+        #     vals['order_pengiriman_name'] = self.env['ir.sequence'].next_by_code('order.pengiriman.sequence') or 'New'
+        # print(vals['order_pengiriman_name'])
+
         result = super(OrderPengiriman, self).create(vals)
+        print(result.order_pengiriman_name)
+
         return result
 
     # Method untuk menampilkan kanban
@@ -182,8 +308,6 @@ class OrderPengiriman(models.Model):
     is_sudah_disetor = fields.Boolean()
     is_uang_jalan_terbit = fields.Boolean()
     is_oper_order = fields.Boolean(store=True)
-
-
     order_pengiriman_name = fields.Char(readonly=True, required=True, copy=False, default='New')
     customer = fields.Many2one('res.partner', 'Customer', required=True, ondelete='restrict', tracking=True, states={
         'order_baru': [('readonly', False)],
@@ -235,7 +359,7 @@ class OrderPengiriman(models.Model):
     })
 
     total_biaya_fee = fields.Float(compute='_compute_total_biaya_fee', store=True, tracking=True, digits=(6, 0), states={
-        'order_baru': [('readonly', False)],
+        'order_baru': [('readonly', True)],
         'dalam_perjalanan': [('readonly', True)],
         'selesai': [('readonly', True)],
         'sudah_setor': [('readonly', True)],
@@ -304,9 +428,9 @@ class OrderPengiriman(models.Model):
 
     biaya_fee = fields.One2many('biaya.fee', 'order_pengiriman', copy=True, states={
         'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
     })
 
     plant = fields.Many2one('konfigurasi.plant', 'PLANT', ondelete='restrict', tracking=True, copy=True, states={
@@ -317,6 +441,10 @@ class OrderPengiriman(models.Model):
     })
 
     uang_jalan = fields.Many2one('uang.jalan', 'No. Uang Jalan', readonly=True, store=True, copy=False)
+    nomor_setoran = fields.Char('Nomor Setoran')
+    oper_setoran = fields.Char('Oper Setoran')
+
+    oper_order = fields.Many2one('oper.order', 'No. Oper Order', readonly=True, store=True, copy=False)
     sopir = fields.Many2one('hr.employee', 'Sopir', readonly=True, store=True, copy=False)
     kenek = fields.Many2one('hr.employee', 'Kenek', readonly=True, store=True, copy=False)
     kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', readonly=True, store=True, copy=False)
@@ -324,8 +452,6 @@ class OrderPengiriman(models.Model):
     nomor_kendaraan = fields.Char(string='Nomor Kendaraan',readonly=True, store=True, copy=False)
     nomor_surat_jalan = fields.Char('No Surat Jalan', copy=False)
     tanggal_uang_jalan = fields.Date('Tanggal Uang Jalan', copy=False, readonly=True)
-
-    oper_order = fields.Many2one('oper.order', 'No. Oper Order', readonly=True, store=True, copy=False)
     vendor_pa = fields.Many2one('res.partner', 'Vendor PA', readonly=True, store=True, copy=False)
 
 
@@ -333,6 +459,7 @@ class DetailOrderDO(models.Model):
     _name = 'detail.order.do'
     _description = 'Detail Order DO'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
     nama_barang = fields.Text('Nama Barang')
     keterangan_barang = fields.Text('Keterangan')
@@ -349,6 +476,7 @@ class DetailOrderReguler(models.Model):
     _name = 'detail.order.reguler'
     _description = 'Detail Order Reguler'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
     nama_barang = fields.Text('Nama Barang')
     keterangan_barang = fields.Text('Keterangan')
@@ -367,6 +495,7 @@ class BiayaPembelian(models.Model):
     _name = 'biaya.pembelian'
     _description = 'Biaya Pembelian'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
     supplier = fields.Many2one('res.partner', 'Supplier', ondelete='restrict')
     nama_barang = fields.Char('Nama Barang')
@@ -377,6 +506,7 @@ class BiayaFee(models.Model):
     _name = 'biaya.fee'
     _description = 'Biaya Fee'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
     fee_contact = fields.Many2one('res.partner', 'Name', ondelete='restrict')
     nominal = fields.Float('Nominal', digits=(6, 0))

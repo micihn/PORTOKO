@@ -5,3 +5,4 @@ from . import uang_jalan, konfigurasi_plant
 from . import konfigurasi_plant
 from . import konfigurasi_solar_uang_makan
 from . import konfigurasi_uang_jalan
+from . import res_company

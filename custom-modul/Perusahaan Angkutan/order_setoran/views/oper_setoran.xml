@@ -16,7 +16,7 @@
         <field name="name">oper.setoran.tree</field>
         <field name="model">oper.setoran</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree default_order="kode_oper_setoran desc">
                 <field name="kode_oper_setoran" string="No. Oper Setoran" optional="show"/>
                 <field name="vendor_pa" string="Vendor PA" optional="show"/>
                 <field name="kendaraan" string="Kendaraan" optional="show"/>
@@ -32,7 +32,7 @@
         <field name="name">oper.setoran.form</field>
         <field name="model">oper.setoran</field>
         <field name="arch" type="xml">
-            <form delete="1">
+            <form delete="1" duplicate="0">
                 <header>
                     <field name="state" widget="statusbar" statusbar_visible="draft, done"/>
                     <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('cancel', 'done'))]}"/>
@@ -42,6 +42,7 @@
                 </header>
 
                 <sheet>
+
                     <div class="oe_button_box" name="button_box">
                         <button
                                 name="action_get_vendor_bill_view"
@@ -64,6 +65,9 @@
                             <field name="invoice_count" widget="statinfo" string="Invoice"/>
                         </button>
                     </div>
+
+                    <field name="active" invisible="1"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
 
                     <div class="oe_title">
                         <h1>

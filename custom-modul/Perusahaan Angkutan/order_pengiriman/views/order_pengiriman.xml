@@ -42,7 +42,7 @@
         <field name="name">order.pengiriman.tree</field>
         <field name="model">order.pengiriman</field>
         <field name="arch" type="xml">
-            <tree decoration-muted="state=='cancel'">
+            <tree decoration-muted="state=='cancel'" default_order="order_pengiriman_name desc">
                 <field name="order_pengiriman_name" optional="show"/>
                 <field name="customer" optional="show"/>
                 <field name="sopir" optional="show"/>
@@ -58,7 +58,7 @@
         <field name="name">order.pengiriman.kanban</field>
         <field name="model">order.pengiriman</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="state" class="o_kanban_small_column" quick_create="false" default_order="create_date desc">
+            <kanban default_group_by="state" class="o_kanban_small_column" quick_create="false" default_order="order_pengiriman_name desc">
 
                 <field name="state" />
                 <progressbar field="state" colors='{"order_baru": "info", "dalam_perjalanan": "warning", "selesai": "success", "sudah_setor": "success"}'/>
@@ -141,6 +141,9 @@
                 </header>
 
                 <sheet>
+                    <field name="active" invisible="1"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+
                     <div class="oe_title">
                         <h1>
                             <field name="order_pengiriman_name"/>
@@ -154,6 +157,7 @@
                             <field name="detail_alamat_muat" />
                             <field name="tanggal_estimasi_muat" />
                             <field name="create_uid" string="Dibuat Oleh" readonly="1"/>
+
                         </group>
 
                         <group>
@@ -290,6 +294,7 @@
                                     <field name="kenek" />
                                     <field name="nomor_kendaraan" />
                                     <field name="model_kendaraan" />
+                                    <field name="oper_setoran" />
                                 </group>
 
                                 <group attrs="{'invisible': [('is_oper_order', '=', False)]}">
@@ -299,6 +304,7 @@
                                     <field name="oper_order" />
                                     <field name="vendor_pa" />
                                     <field name="nomor_kendaraan" />
+                                    <field name="oper_setoran" />
                                 </group>
                             </group>
                         </page>
