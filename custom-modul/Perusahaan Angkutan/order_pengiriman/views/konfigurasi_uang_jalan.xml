@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_konfigurasi_uang_jalan" model="ir.actions.act_window">
+        <field name="name">Konfigurasi Uang Jalan</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">konfigurasi.uang.jalan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            </p>
+        </field>
+    </record>
+
+    <record id="konfigurasi_uang_jalan_tree_view" model="ir.ui.view">
+        <field name="name">konfigurasi.uang.jalan.tree</field>
+        <field name="model">konfigurasi.uang.jalan</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="kode_uang_jalan" string="Kode Uang Jalan" optional="show"/>
+                <field name="tipe_muatan" string="Tipe Muatan" optional="show" />
+                <field name="lokasi_muat" string="Kota Muat" optional="show"/>
+                <field name="lokasi_bongkar" string="Kota Bongkar" optional="show"/>
+                <field name="jarak" string="Jarak (Km)" optional="show"/>
+                <field name="solar" string="Solar (L)" optional="show"/>
+                <field name="kuli" string="Biaya Kuli" optional="show"/>
+                <field name="tol" string="Biaya Tol" optional="show"/>
+                <field name="tonase" string="Biaya Tonase" optional="show"/>
+                <field name="lain_lain" string="Biaya Lain-Lain" optional="show"/>
+                <field name="uang_jalan" string="Uang Jalan (Dibulatkan)" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="konfigurasi_uang_jalan_form_view" model="ir.ui.view">
+        <field name="name">konfigurasi.uang.jalan.form</field>
+        <field name="model">konfigurasi.uang.jalan</field>
+        <field name="arch" type="xml">
+            <form duplicate="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <separator string="Detail Pengiriman" />
+                                <field name="tipe_muatan" string="Tipe Muatan" />
+                                <field name="lokasi_muat" />
+                                <field name="lokasi_bongkar" />
+                                <field name="jarak" />
+
+                            <separator string="Detail Biaya Tambahan" />
+                                <field name="kuli" />
+                                <field name="tol" />
+                                <field name="tonase" />
+                                <field name="lain_lain" />
+                        </group>
+
+                        <group>
+                        <separator string="Bahan bakar" />
+                            <field name="uang_solar_per_liter" string="Harga Solar Per Liter" />
+                            <field name="solar"/>
+
+                        <separator string="Uang Makan" />
+                            <field name="uang_makan_per_hari" string="Uang Makan Per Hari" optional="show"/>
+
+                        <separator string="Kalkulasi Hari Tempuh Dan Biaya" />
+                            <field name="hari" string="Hari Tempuh" optional="show"/>
+                            <field name="uang_makan" string="Total Uang Makan" optional="show"/>
+                            <field name="uang_solar" string="Total Uang Solar" optional="show"/>
+                            <field name="uang_jalan" string="Total Uang Jalan" optional="show"/>
+
+<!--                        <group>-->
+<!--                            <field name="hari"/>-->
+
+<!--&lt;!&ndash;                            <field name="uang_jalan_pembulatan" string="Uang Jalan (Dibulatkan)" optional="show"/>&ndash;&gt;-->
+<!--                        </group>-->
+
+                            </group>
+                    </group>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <!-- Followers view -->
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <!-- Chatter view -->
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>

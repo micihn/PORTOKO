@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Group Category -->
+    <record model="ir.module.category" id="order_setoran.module_order_setoran">
+        <field name="name">Order Setoran</field>
+        <field name="sequence">19</field>
+    </record>
+
+    <!-- Group -->
+    <record model="res.groups" id ="group_order_setoran">
+        <field name="name">Kelola Setoran</field>
+        <field name="category_id" ref="order_setoran.module_order_setoran"/>
+    </record>
+
+    <!-- Record rules -->
+        <!-- Multi-company : Order Setoran -->
+            <record model="ir.rule" id="order_setoran_multicompany_rule">
+                <field name="name">Order Setoran Multi-Company rule</field>
+                <field name="model_id" search="[('model','=','order.setoran')]" model="ir.model"/>
+                <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            </record>
+
+        <!-- Multi-company : Oper Setoran -->
+        <record model="ir.rule" id="oper_setoran_multicompany_rule">
+            <field name="name">Oper Setoran Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','oper.setoran')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+</odoo>

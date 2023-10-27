@@ -1,0 +1,69 @@
+<odoo>
+
+        <record id="account_invoice_payment_form" model="ir.ui.view">
+             <field name="name">account.invoice.payment.form</field>
+             <field name="model">account.invoice.payment</field>
+             <field name="arch" type="xml">
+                 <form string="Account Invoice Payment">
+
+                         <field name="invoice" nolabel="1">
+                            <tree editable="top" create="0" delete="0">
+                                <field name="invoice_id" invisible="1"/>
+                                <field name="order_pengiriman" options="{'no_create': True, 'no_open': True}" force_save="1" readonly="1"/>
+                                <field name="customer" force_save="1" readonly="1"/>
+                                <field name="pembayaran" />
+                                <field name="tanggal_surat_jalan" force_save="1" readonly="1"/>
+                                <field name="nominal_invoice" force_save="1" readonly="1"/>
+                                <field name="bayar_dimuka" force_save="1" readonly="1" />
+                            </tree>
+                        </field>
+
+
+                     <footer>
+                         <button string="Create Invoice" type="object" class="btn-primary" name="create_invoice" />
+                         <button string="Cancel" special="cancel" class="btn btn-secondary" />
+                     </footer>
+                 </form>
+             </field>
+        </record>
+
+        <record id="action_accounting_invoice_payment" model="ir.actions.act_window">
+            <field name="name">Accounting Invoice Payment</field>
+            <field name="res_model">account.invoice.payment</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+<!--        <record id="account_journal_selection_form" model="ir.ui.view">-->
+<!--             <field name="name">account.journal.selection.form</field>-->
+<!--             <field name="model">account.journal.selection</field>-->
+<!--             <field name="arch" type="xml">-->
+<!--                 <form string="Accounting Journal Selection">-->
+<!--                     <div>-->
+<!--                            <p>Total uang jalan telah dikurangi oleh total pengeluaran yang diisi, namun masih terdapat sisa saldo.-->
+<!--                                Di manakah sisa saldo tersebut akan dimasukkan?-->
+<!--                            </p><br/>-->
+<!--                        </div>-->
+<!--                     <group>-->
+<!--                         <group>-->
+<!--                             <field name="journal_name"/>-->
+<!--                         </group>-->
+<!--                     </group>-->
+
+<!--                     <footer>-->
+<!--                         <button string="Validate" type="object" name="confirm_imburse" />-->
+<!--                         <button string="Cancel" special="cancel" class="btn btn-secondary" />-->
+<!--                     </footer>-->
+<!--                 </form>-->
+<!--             </field>-->
+<!--        </record>-->
+
+<!--        <record id="action_show_journal_selection" model="ir.actions.act_window">-->
+<!--            <field name="name">Accounting Journal Information</field>-->
+<!--            <field name="res_model">account.journal.selection</field>-->
+<!--            <field name="view_mode">form</field>-->
+<!--            <field name="target">new</field>-->
+<!--        </record>-->
+
+</odoo>
+

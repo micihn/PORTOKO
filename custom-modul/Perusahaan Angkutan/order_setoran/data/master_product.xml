@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_jasa_pengiriman" model="product.template">
+        <field name="name">Jasa Pengiriman</field>
+        <field name="default_code">DEL</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="product.product_category_all"/>
+        <field name="sale_ok" eval="False"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="can_be_expensed" eval="True"/>
+        <field name="list_price">0.0</field>
+    </record>
+
+    <record id="product_down_payment" model="product.template">
+        <field name="name">Down Payment</field>
+        <field name="default_code">DP</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="product.product_category_all"/>
+        <field name="sale_ok" eval="False"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="can_be_expensed" eval="True"/>
+        <field name="list_price">0.0</field>
+    </record>
+
+    <record id="product_vendor_product_service" model="product.template">
+        <field name="name">Vendor Product Services</field>
+        <field name="default_code">VS</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="product.product_category_all"/>
+        <field name="sale_ok" eval="False"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="can_be_expensed" eval="True"/>
+        <field name="list_price">0.0</field>
+    </record>
+
+    <record id="product_vendor_service_delivery" model="product.template">
+        <field name="name">Vendor Delivery Services</field>
+        <field name="default_code">DS</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="product.product_category_all"/>
+        <field name="sale_ok" eval="False"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="can_be_expensed" eval="True"/>
+        <field name="list_price">0.0</field>
+    </record>
+
+    <record id="product_biaya_fee" model="product.template">
+        <field name="name">Biaya Fee</field>
+        <field name="default_code">FEE</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="product.product_category_all"/>
+        <field name="sale_ok" eval="False"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="can_be_expensed" eval="True"/>
+        <field name="list_price">0.0</field>
+    </record>
+</odoo>

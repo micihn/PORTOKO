@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Group Category -->
+    <record model="ir.module.category" id="order_pengiriman.module_order_pengiriman">
+        <field name="name">Order Pengiriman</field>
+        <field name="sequence">17</field>
+    </record>
+
+    <!-- Group -->
+        <!-- Order Pengiriman Full -->
+            <record model="res.groups" id ="group_order_pengiriman">
+                <field name="name">Kelola Order Pengiriman</field>
+                <field name="category_id" ref="order_pengiriman.module_order_pengiriman"/>
+            </record>
+
+        <!-- Approver uang Jalan -->
+            <record model="res.groups" id ="group_order_approver_uang_jalan">
+                <field name="name">Approve Uang Jalan</field>
+                <field name="category_id" ref="order_pengiriman.module_order_pengiriman"/>
+            </record>
+
+    <!-- Record rules -->
+        <!-- Multi-company : Order Pengiriman -->
+            <record model="ir.rule" id="order_pengiriman_multicompany_rule">
+                <field name="name">Order Pengiriman Multi-Company rule</field>
+                <field name="model_id" search="[('model','=','order.pengiriman')]" model="ir.model"/>
+                <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            </record>
+
+        <!-- Multi-company : Oper Order -->
+            <record model="ir.rule" id="oper_order_multicompany_rule">
+                <field name="name">Oper Order Multi-Company rule</field>
+                <field name="model_id" search="[('model','=','oper.order')]" model="ir.model"/>
+                <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            </record>
+
+        <!-- Multi-company : Uang Jalan -->
+            <record model="ir.rule" id="uang_jalan_multicompany_rule">
+                <field name="name">Uang Jalan Multi-Company rule</field>
+                <field name="model_id" search="[('model','=','uang.jalan')]" model="ir.model"/>
+                <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            </record>
+
+        <!-- Multi-company : Konfigurasi Uang Jalan -->
+        <record model="ir.rule" id="konfigurasi_lokasi_multicompany_rule">
+            <field name="name">Konfigurasi Lokasi Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','konfigurasi.lokasi')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Multi-company : Konfigurasi Plant -->
+        <record model="ir.rule" id="konfigurasi_plant_multicompany_rule">
+            <field name="name">Konfigurasi Plant Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','konfigurasi.plant')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Multi-company : Konfigurasi Solar Uang Makan -->
+        <record model="ir.rule" id="konfigurasi_solar_uang_makan_multicompany_rule">
+            <field name="name">Konfigurasi Solar Uang Makan Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','konfigurasi.solar.uang.makan')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Multi-company : Konfigurasi Uang Jalan -->
+        <record model="ir.rule" id="konfigurasi_uang_jalan_multicompany_rule">
+            <field name="name">Konfigurasi Uang Jalan Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','konfigurasi.uang.jalan')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Multi-company : Konfigurasi Tipe Muatan -->
+        <record model="ir.rule" id="konfigurasi_tipe_muatan_multicompany_rule">
+            <field name="name">Konfigurasi Tipe Muatan Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','konfigurasi.tipe.muatan')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+</odoo>

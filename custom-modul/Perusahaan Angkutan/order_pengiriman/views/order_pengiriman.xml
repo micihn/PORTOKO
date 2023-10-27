@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_order_pengiriman" model="ir.actions.act_window">
+        <field name="name">Order Pengiriman</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">order.pengiriman</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{}</field>
+        <field name="limit">3</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            </p>
+        </field>
+    </record>
+
+    <!-- Define the server action (multi button in employee) -->
+    <record id="multiple_oper_order" model="ir.actions.server">
+        <field name="sequence">0</field>
+        <field name="name">Buat Oper Order</field>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="order_pengiriman.model_order_pengiriman"/>
+        <field name="binding_model_id" ref="order_pengiriman.model_order_pengiriman"/>
+        <field name="code">
+            action = model.buat_oper_order(records)
+        </field>
+    </record>
+
+    <record id="multiple_uang_jalan" model="ir.actions.server">
+        <field name="name">Buat Uang Jalan</field>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="order_pengiriman.model_order_pengiriman"/>
+        <field name="binding_model_id" ref="order_pengiriman.model_order_pengiriman"/>
+        <field name="code">
+            action = model.buat_uang_jalan(records)
+        </field>
+    </record>
+
+    <record id="order_pengiriman_tree_view" model="ir.ui.view">
+        <field name="name">order.pengiriman.tree</field>
+        <field name="model">order.pengiriman</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="state=='cancel'" default_order="order_pengiriman_name desc">
+                <field name="order_pengiriman_name" optional="show"/>
+                <field name="customer" optional="show"/>
+                <field name="sopir" optional="show"/>
+                <field name="kenek" optional="hide"/>
+                <field name="kendaraan" optional="hide"/>
+                <field name="total_ongkos" optional="show"/>
+                <field name="state" optional="show" widget="badge" decoration-info="state=='order_baru'" decoration-warning="state=='dalam_perjalanan'" decoration-success="state in ['selesai', 'sudah_setor']"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="order_pengiriman_kanban_view" model="ir.ui.view">
+        <field name="name">order.pengiriman.kanban</field>
+        <field name="model">order.pengiriman</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column" quick_create="false" default_order="order_pengiriman_name desc">
+
+                <field name="state" />
+                <progressbar field="state" colors='{"order_baru": "info", "dalam_perjalanan": "warning", "selesai": "success", "sudah_setor": "success"}'/>
+                <templates>
+                    <t t-name="kanban-box" >
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click" style="margin-bottom:10px;">
+                            <!-- Tampilan jika uang jalan sudah divalidate -->
+                            <div attrs="{'invisible': [('sopir', '=', False)]}">
+                                <div class="o_kanban_record_top mb16">
+                                    <div class="o_kanban_record_headings mt4">
+                                        <strong style="font-weight:450">
+                                            Order No. <br />
+                                            <field name="order_pengiriman_name" style="font-weight:450"/>
+                                        </strong>
+                                        <hr />
+                                        <field name="is_oper_order" invisible="1"/>
+                                        <field name="sopir" /><br/>
+                                        <field name="nomor_kendaraan" widget="kanban_label_selection"/> •
+                                        <field name="model_kendaraan" />
+                                    </div>
+                                </div>
+                                    <field name="customer" style="font-weight:450"/><br />
+
+                                    <div class="o_kanban_record_details" style="float: left;">
+                                        <div style="width: 10px; height: 10px; background-color: #3fae0f; border-radius: 50%; display: inline-block; margin-right: 5px"> </div>
+                                        <field name="alamat_muat" style="font-weight:450"/><br/>
+                                        <div style="width: 10px; height: 10px; background-color: #e63763; border-radius: 50%; display: inline-block; margin-right: 5px"> </div>
+                                        <field name="alamat_bongkar" style="font-weight:450"/>
+                                    </div>
+
+                                    <div class="o_kanban_record_details" style="float: right;">
+                                        <field name="tanggal_estimasi_muat" /><br/>
+                                        <field name="tanggal_estimasi_bongkar" />
+                                    </div>
+
+                            </div>
+
+                            <!-- Tampilan default sebelum uang jalan divalidate -->
+                            <div attrs="{'invisible': [('sopir', '!=', False)]}">
+                                <div class="o_kanban_record_top ">
+                                        <div class="o_kanban_record_headings ">
+                                            <strong style="font-weight:450">
+                                                Order No. <br />
+                                                <field name="order_pengiriman_name" style="font-weight:450"/>
+                                            </strong>
+                                            <hr />
+                                            <field name="customer" style="font-weight:450"/><br />
+                                        </div>
+                                    </div>
+
+                                        <div class="o_kanban_record_details" style="float: left;">
+                                            <div style="width: 10px; height: 10px; background-color: #3fae0f; border-radius: 50%; display: inline-block; margin-right: 5px"> </div>
+                                            <field name="alamat_muat" style="font-weight:450"/><br/>
+                                            <div style="width: 10px; height: 10px; background-color: #e63763; border-radius: 50%; display: inline-block; margin-right: 5px"> </div>
+                                            <field name="alamat_bongkar" style="font-weight:450"/>
+                                        </div>
+
+                                        <div class="o_kanban_record_details" style="float: right;">
+                                            <field name="tanggal_estimasi_muat" /><br/>
+                                            <field name="tanggal_estimasi_bongkar" />
+                                        </div>
+                                    </div>
+                        </div>
+                    </t>
+                </templates>
+                <fold name="batal">1</fold>
+            </kanban>
+        </field>
+    </record>
+
+
+    <record id="order_pengiriman_form_view" model="ir.ui.view">
+        <field name="name">order.pengiriman.form</field>
+        <field name="model">order.pengiriman</field>
+        <field name="arch" type="xml">
+            <form delete="1">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="order_baru, dalam_perjalanan, selesai"/>
+                    <button name="konfirmasi_pengiriman" type="object" string="Konfirmasi Pengiriman" class="btn-primary" attrs="{'invisible': [('state', 'in', ('order_baru', 'selesai', 'sudah_setor', 'batal'))]}"/>
+                </header>
+
+                <sheet>
+                    <field name="active" invisible="1"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="order_pengiriman_name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="customer" />
+                            <field name="plant" options="{'not_delete': True}" attrs="{'invisible': [('jenis_order', '=', 'do')]}" />
+                            <field name="alamat_muat" />
+                            <field name="detail_alamat_muat" />
+                            <field name="tanggal_estimasi_muat" />
+                            <field name="create_uid" string="Dibuat Oleh" readonly="1"/>
+
+                        </group>
+
+                        <group>
+                            <field name="jenis_order" />
+                            <field name="create_date" string="Tanggal Order" />
+                            <field name="alamat_bongkar" />
+                            <field name="detail_alamat_bongkar" />
+                            <field name="tanggal_estimasi_bongkar" />
+                            <field name="nomor_surat_jalan" force_save="1" readonly="1"/>
+
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Detail Order D/O" attrs="{'invisible': [('jenis_order', '=', 'regular')]}">
+                            <field name="detail_order_do">
+                                <tree editable="bottom">
+                                    <field name="order_pengiriman" invisible="1"/>
+                                    <field name="nama_barang" width="20%" optional="show"/>
+                                    <field name="keterangan_barang" width="20%" optional="show"/>
+                                    <field name="ongkos_per_kg" width="20%" optional="show"/>
+                                    <field name="jumlah_per_kg" width="20%" optional="show"/>
+                                    <field name="subtotal_ongkos" width="20%" force_save="1" optional="show"/>
+                                </tree>
+                            </field>
+
+                        <div class="oe_right" >
+                            <!-- Uang Ongkos -->
+                            <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000">
+                                <label for="total_ongkos_do" string="Total Ongkos : "/>
+                            </div>
+                            <div class="oe_total_field" style="display: inline-block;">
+                                <field name="total_ongkos_do" style="text-align:right" force_save="1" readonly="1"/>
+                            </div>
+                        </div>
+
+                        <div class="oe_right" style="display: inline-block; margin-right: 150px;">
+                            <!-- Uang Jalan -->
+                            <div class="oe_total_label" style="display: inline-block; margin-right: 10px;">
+                                <label for="total_uang_jalan" string="Uang Jalan : "/>
+                            </div>
+                            <div class="oe_total_field" style="display: inline-block;">
+                                <field name="total_uang_jalan" style="text-align:right" force_save="1" readonly="1"/>
+                            </div>
+                        </div>
+                        </page>
+
+                        <page string="Detail Order Reguler" attrs="{'invisible': [('jenis_order', '=', 'do')]}">
+                            <field name="detail_order_reguler">
+                                <tree editable="bottom">
+                                    <field name="order_pengiriman" invisible="1"/>
+                                    <field name="nama_barang" width="20%" optional="show"/>
+                                    <field name="keterangan_barang" width="20%" optional="show"/>
+                                    <field name="panjang_barang" width="20%" optional="show"/>
+                                    <field name="lebar_barang" width="20%" optional="show"/>
+                                    <field name="tinggi_barang" width="20%" optional="show"/>
+                                    <field name="ongkos_volume" width="20%" optional="show"/>
+                                    <field name="subtotal_ongkos" width="20%" force_save="1" optional="show"/>
+                                </tree>
+                            </field>
+
+                            <div class="oe_right" >
+                                <!-- Uang Ongkos -->
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000">
+                                    <label for="total_ongkos_reguler" string="Total Ongkos : "/>
+                                </div>
+                                <div class="oe_total_field" style="display: inline-block;">
+                                    <field name="total_ongkos_reguler" style="text-align:right" force_save="1" readonly="1"/>
+                                </div>
+                            </div>
+
+                            <div class="oe_right" style="display: inline-block; margin-right: 150px;">
+                                <!-- Uang Jalan -->
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 10px;">
+                                    <label for="total_uang_jalan" string="Uang Jalan : "/>
+                                </div>
+                                <div class="oe_total_field" style="display: inline-block;">
+                                    <field name="total_uang_jalan" style="text-align:right"/>
+                                </div>
+                            </div>
+
+                        </page>
+
+                        <page string="Biaya Pembelian" attrs="{'invisible': [('jenis_order', '=', 'do')]}">
+                            <field name="biaya_pembelian">
+                                <tree editable="bottom">
+                                    <field name="supplier" />
+                                    <field name="nama_barang" />
+                                    <field name="ukuran" />
+                                    <field name="nominal" />
+                                </tree>
+                            </field>
+
+                            <div class="oe_right" >
+                                <!-- Total Biaya Fee -->
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000">
+                                    <label for="total_biaya_pembelian" string="Total Biaya Pembelian : "/>
+                                </div>
+                                <div class="oe_total_field" style="display: inline-block;">
+                                    <field name="total_biaya_pembelian" style="text-align:right"/>
+                                </div>
+                            </div>
+
+                        </page>
+
+                        <page string="Biaya Fee">
+                            <field name="biaya_fee">
+                                <tree editable="bottom">
+                                    <field name="fee_contact" />
+                                    <field name="nominal" />
+                                </tree>
+                            </field>
+
+                            <div class="oe_right" >
+                                <!-- Total Biaya Fee -->
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000">
+                                    <label for="total_biaya_fee" string="Total Biaya Fee : "/>
+                                </div>
+                                <div class="oe_total_field" style="display: inline-block;">
+                                    <field name="total_biaya_fee" style="text-align:right"/>
+                                </div>
+                            </div>
+
+                        </page>
+
+                        <page string="Info Pengiriman">
+                            <group>
+                                <group attrs="{'invisible': [('is_oper_order', '=', True)]}">
+                                    <separator string="Info Pengiriman" />
+                                    <field name="is_oper_order" invisible="1"/>
+                                    <field name="tanggal_uang_jalan" />
+                                    <field name="uang_jalan" />
+                                    <field name="sopir" />
+                                    <field name="kenek" />
+                                    <field name="nomor_kendaraan" />
+                                    <field name="model_kendaraan" />
+                                </group>
+
+                                <group attrs="{'invisible': [('is_oper_order', '=', False)]}">
+                                    <separator string="Info Pengiriman (Oper Order)" />
+                                    <field name="is_oper_order" invisible="1"/>
+                                    <field name="tanggal_uang_jalan" />
+                                    <field name="oper_order" />
+                                    <field name="vendor_pa" />
+                                    <field name="nomor_kendaraan" />
+                                </group>
+                            </group>
+                        </page>
+
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <!-- Followers view -->
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <!-- Chatter view -->
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_order_pengiriman_search" model="ir.ui.view">
+        <field name="name">order.pengiriman.search</field>
+        <field name="model">order.pengiriman</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="order_pengiriman_name" string="Nomor Order Pengiriman"/>
+                <field name="customer" string="Customer"/>
+                <field name="sopir" string="Sopir"/>
+            </search>
+        </field>
+    </record>
+</odoo>
