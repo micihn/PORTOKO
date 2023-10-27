@@ -294,7 +294,6 @@
                                     <field name="kenek" />
                                     <field name="nomor_kendaraan" />
                                     <field name="model_kendaraan" />
-                                    <field name="oper_setoran" />
                                 </group>
 
                                 <group attrs="{'invisible': [('is_oper_order', '=', False)]}">
@@ -304,7 +303,6 @@
                                     <field name="oper_order" />
                                     <field name="vendor_pa" />
                                     <field name="nomor_kendaraan" />
-                                    <field name="oper_setoran" />
                                 </group>
                             </group>
                         </page>

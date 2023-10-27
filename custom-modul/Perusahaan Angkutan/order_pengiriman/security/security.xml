@@ -69,4 +69,11 @@
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
         </record>
 
+        <!-- Multi-company : Konfigurasi Tipe Muatan -->
+        <record model="ir.rule" id="konfigurasi_tipe_muatan_multicompany_rule">
+            <field name="name">Konfigurasi Tipe Muatan Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','konfigurasi.tipe.muatan')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
 </odoo>

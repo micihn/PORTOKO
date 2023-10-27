@@ -71,6 +71,14 @@
         parent="order_pengiriman.menu_konfigurasi">
     </menuitem>
 
+    <menuitem id="menu_konfigurasi_tipe_muatan"
+        groups="order_pengiriman.group_order_pengiriman"
+        sequence="15"
+        name="Tipe Muatan"
+        action="action_konfigurasi_tipe_muatan"
+        parent="order_pengiriman.menu_konfigurasi">
+    </menuitem>
+
     <menuitem id="menu_uang_jalan"
       groups="order_pengiriman.group_order_approver_uang_jalan"
       sequence="3"

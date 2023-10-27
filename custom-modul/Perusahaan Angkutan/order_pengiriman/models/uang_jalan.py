@@ -31,7 +31,7 @@ class UangJalan(models.Model):
         for record in self.uang_jalan_line:
             if record.nominal_uang_jalan == 0:
                 nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([
-                    ('tipe', '=', str(record.tipe)),
+                    ('tipe_muatan', '=', int(self.tipe_muatan.id)),
                     ('lokasi_muat', '=', int(record.muat.id)),
                     ('lokasi_bongkar', '=', int(record.bongkar.id)),
                     ('company_id', '=', int(self.env.company.id))
@@ -57,8 +57,8 @@ class UangJalan(models.Model):
                 raise ValidationError('Anda belum memasukkan nomor Order Pengiriman!')
             elif record.uang_jalan_line:
                 for item in record.uang_jalan_line:
-                    if item.tipe == 'none':
-                        raise ValidationError('Harap isi kolom tipe pada Detail Uang Jalan!')
+                    if item.tipe_muatan == 'none':
+                        raise ValidationError('Harap isi kolom tipe muatan pada Detail Uang Jalan!')
 
         self.state = 'submitted'
 
@@ -102,7 +102,7 @@ class UangJalan(models.Model):
         for record in self.uang_jalan_line:
 
             nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].sudo().search([
-                ('tipe', '=', str(record.sudo().tipe)),
+                ('tipe_muatan', '=', int(record.tipe_muatan.id)),
                 ('lokasi_muat', '=', int(record.sudo().muat.id)),
                 ('lokasi_bongkar', '=', int(record.sudo().bongkar.id)),
                 ('company_id', '=', int(record.env.company.id))
@@ -177,15 +177,7 @@ class UangJalanLine(models.Model):
 
     uang_jalan = fields.Many2one('uang.jalan', invisible=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
-    tipe = fields.Selection([
-            ('none', ''),
-            ('tronton_isi','Tronton Isi'),
-            ('tronton_kosong','Tronton Kosong'),
-            ('tronton_dedicated', 'Tronton Dedicated'),
-            ('trailer_isi', 'Trailer Isi'),
-            ('trailer_kosong', 'Trailer Kosong'),
-            ('trailer_dedicated', 'Trailer Dedicated'),
-    ], string='Tipe', required=True)
+    tipe_muatan = fields.Many2one('konfigurasi.tipe.muatan', 'Tipe Muatan', required=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order', domain=[('state', '=', 'order_baru')], ondelete='restrict',)
     muat = fields.Many2one('konfigurasi.lokasi', 'Muat', compute='_compute_muat_and_bongkar')
     bongkar = fields.Many2one('konfigurasi.lokasi', 'Bongkar', compute='_compute_muat_and_bongkar')
@@ -198,10 +190,10 @@ class UangJalanLine(models.Model):
             record.muat = record.order_pengiriman.alamat_muat
             record.bongkar = record.order_pengiriman.alamat_bongkar
 
-    @api.onchange('order_pengiriman')
+    @api.depends('order_pengiriman')
     def _calculate_nominal_uang_jalan(self):
         nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([
-            ('tipe', '=', str(self.tipe)),
+            ('tipe_muatan', '=', int(self.tipe_muatan.id)),
             ('lokasi_muat', '=', int(self.muat.id)),
             ('lokasi_bongkar', '=', int(self.bongkar.id)),
             ('company_id', '=', int(self.env.company.id))
@@ -211,13 +203,13 @@ class UangJalanLine(models.Model):
         else:
             self.nominal_uang_jalan = 0
 
-    @api.onchange('tipe')
-    def _calculate_nominal_uang_jalan_with_tipe(self):
-        if self.tipe == False:
+    @api.onchange('tipe_muatan')
+    def _calculate_nominal_uang_jalan_with_tipe_muatan(self):
+        if self.tipe_muatan == False:
             pass
         else:
             nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([
-                ('tipe', '=', str(self.tipe)),
+                ('tipe_muatan', '=', int(self.tipe_muatan.id)),
                 ('lokasi_muat', '=', int(self.muat.id)),
                 ('lokasi_bongkar', '=', int(self.bongkar.id)),
                 ('company_id', '=', int(self.env.company.id))
@@ -226,5 +218,9 @@ class UangJalanLine(models.Model):
                 self.nominal_uang_jalan = nominal_uang_jalan
             else:
                 self.nominal_uang_jalan = 0
-                self.env.user.notify_warning(message='Konfigurasi Uang Jalan untuk lokasi muat di ' + str(self.muat.lokasi) + ' dan bongkar di ' + str(self.bongkar.lokasi) + ' tidak ditemukan. Harap isi pengaturan di Konfigurasi > Uang Jalan', sticky=True, title='Konfigurasi Uang Jalan Tidak Ditemukan')
+                self.env.user.notify_warning(message='Konfigurasi Uang Jalan untuk lokasi muat di ' + str(
+                    self.muat.lokasi) + ' dan bongkar di ' + str(
+                    self.bongkar.lokasi) + ' tidak ditemukan. Harap isi pengaturan di Konfigurasi > Uang Jalan',
+                                             sticky=True, title='Konfigurasi Uang Jalan Tidak Ditemukan')
+
 

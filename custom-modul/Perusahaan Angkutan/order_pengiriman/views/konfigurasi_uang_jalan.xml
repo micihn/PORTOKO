@@ -18,7 +18,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="kode_uang_jalan" string="Kode Uang Jalan" optional="show"/>
-                <field name="tipe" string="Tipe" optional="show"/>
+                <field name="tipe_muatan" string="Tipe Muatan" optional="show" />
                 <field name="lokasi_muat" string="Kota Muat" optional="show"/>
                 <field name="lokasi_bongkar" string="Kota Bongkar" optional="show"/>
                 <field name="jarak" string="Jarak (Km)" optional="show"/>
@@ -41,7 +41,7 @@
                     <group>
                         <group>
                             <separator string="Detail Pengiriman" />
-                                <field name="tipe" string="Tipe" />
+                                <field name="tipe_muatan" string="Tipe Muatan" />
                                 <field name="lokasi_muat" />
                                 <field name="lokasi_bongkar" />
                                 <field name="jarak" />

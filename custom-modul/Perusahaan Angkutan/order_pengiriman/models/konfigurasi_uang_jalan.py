@@ -15,9 +15,8 @@ class KonfigurasiUangJalan(models.Model):
 
     @api.model
     def create(self, vals):
-        # Check if a record with the same tipe, lokasi_muat, and lokasi_bongkar exists
         existing_record = self.search([
-            ('tipe', '=', vals.get('tipe')),
+            ('tipe_muatan', '=', vals.get('tipe_muatan')),
             ('lokasi_muat', '=', vals.get('lokasi_muat')),
             ('lokasi_bongkar', '=', vals.get('lokasi_bongkar')),
             ('company_id', '=', int(self.env.company.id))
@@ -36,9 +35,9 @@ class KonfigurasiUangJalan(models.Model):
         return result
 
     def write(self, vals):
-        if 'tipe' in vals or 'lokasi_muat' in vals or 'lokasi_bongkar' in vals:
+        if 'tipe_muatan' in vals or 'lokasi_muat' in vals or 'lokasi_bongkar' in vals:
             existing_record = self.search([
-                ('tipe', '=', vals.get('tipe', self.tipe)),
+                ('tipe_muatan', '=', vals.get('tipe_muatan', self.tipe_muatan)),
                 ('lokasi_muat', '=', vals.get('lokasi_muat', self.lokasi_muat.id)),
                 ('lokasi_bongkar', '=', vals.get('lokasi_bongkar', self.lokasi_bongkar.id)),
                 ('company_id', '=', int(self.env.company.id))
@@ -49,19 +48,20 @@ class KonfigurasiUangJalan(models.Model):
                 # You can raise an exception or handle it as per your business logic
                 raise ValidationError(
                     "Konfigurasi Uang Jalan yang saat ini anda buat sudah pernah dibuat sebelumnya (" + str(
-                        existing_record.kode_uang_jalan) + "). Harap pastikan kembali Tipe, Lokasi Muat dan Lokasi Bongkar memiliki input yang berbeda")
+                        existing_record.kode_uang_jalan) + "). Harap pastikan kembali Tipe Muatan, Lokasi Muat dan Lokasi Bongkar memiliki input yang berbeda")
 
         result = super(KonfigurasiUangJalan, self).write(vals)
         return result
 
-    tipe = fields.Selection([
-            ('tronton_isi','Tronton Isi'),
-            ('tronton_kosong','Tronton Kosong'),
-            ('tronton_dedicated', 'Tronton Dedicated'),
-            ('trailer_isi', 'Trailer Isi'),
-            ('trailer_kosong', 'Trailer Kosong'),
-            ('trailer_dedicated', 'Trailer Dedicated'),
-    ], string='Tipe', required=True)
+    tipe_muatan = fields.Many2one('konfigurasi.tipe.muatan', 'Tipe Muatan', required=True)
+    # tipe = fields.Selection([
+    #         ('tronton_isi','Tronton Isi'),
+    #         ('tronton_kosong','Tronton Kosong'),
+    #         ('tronton_dedicated', 'Tronton Dedicated'),
+    #         ('trailer_isi', 'Trailer Isi'),
+    #         ('trailer_kosong', 'Trailer Kosong'),
+    #         ('trailer_dedicated', 'Trailer Dedicated'),
+    # ], string='Tipe', required=True)
 
     lokasi_muat = fields.Many2one('konfigurasi.lokasi', 'Lokasi Muat', ondelete='restrict', required=True)
     lokasi_bongkar = fields.Many2one('konfigurasi.lokasi', 'Lokasi Bongkar', ondelete='restrict', required=True)
