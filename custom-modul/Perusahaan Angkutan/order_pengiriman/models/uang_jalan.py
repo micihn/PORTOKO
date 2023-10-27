@@ -7,6 +7,9 @@ class UangJalan(models.Model):
     _inherit = ['mail.thread']
     _rec_name = 'uang_jalan_name'
 
+    active = fields.Boolean('Archive', default=True, tracking=True)
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+
     # Method untuk auto name assignment
     @api.model
     def create(self, vals):
@@ -27,7 +30,12 @@ class UangJalan(models.Model):
         result = super(UangJalan, self).write(vals)
         for record in self.uang_jalan_line:
             if record.nominal_uang_jalan == 0:
-                nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([('tipe', '=', str(record.tipe)), ('lokasi_muat', '=', int(record.muat.id)), ('lokasi_bongkar', '=', int(record.bongkar.id))]).uang_jalan
+                nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([
+                    ('tipe', '=', str(record.tipe)),
+                    ('lokasi_muat', '=', int(record.muat.id)),
+                    ('lokasi_bongkar', '=', int(record.bongkar.id)),
+                    ('company_id', '=', int(self.env.company.id))
+                ]).uang_jalan
                 if nominal_uang_jalan:
                     record.nominal_uang_jalan = nominal_uang_jalan
             else:
@@ -45,18 +53,18 @@ class UangJalan(models.Model):
                 raise ValidationError('Harap isi Sopir sebelum mengkonfirmasi!')
             elif bool(record.kenek) == False:
                 raise ValidationError('Harap isi Kenek sebelum mengkonfirmasi!')
+            elif not record.uang_jalan_line:
+                raise ValidationError('Anda belum memasukkan nomor Order Pengiriman!')
             elif record.uang_jalan_line:
                 for item in record.uang_jalan_line:
                     if item.tipe == 'none':
                         raise ValidationError('Harap isi kolom tipe pada Detail Uang Jalan!')
-            else:
-                record.state = 'requested'
 
         self.state = 'submitted'
 
     def paid(self):
         for record in self.uang_jalan_line:
-            record.order_pengiriman.write({
+            record.sudo().order_pengiriman.write({
                 'is_uang_jalan_terbit': True,
                 'state': 'dalam_perjalanan',
                 'uang_jalan': self.id,
@@ -68,13 +76,13 @@ class UangJalan(models.Model):
             })
 
             message = "Uang jalan untuk pengiriman ini telah terbit dengan nomor " + str(self.uang_jalan_name)
-            record.order_pengiriman.message_post(body=message)
+            record.sudo().order_pengiriman.message_post(body=message)
 
         self.state = 'paid'
 
     def cancel(self):
         for record in self.uang_jalan_line:
-            record.order_pengiriman.write({
+            record.sudo().order_pengiriman.write({
                 'is_uang_jalan_terbit': False,
                 'state': 'order_baru',
                 'uang_jalan': None,
@@ -86,18 +94,22 @@ class UangJalan(models.Model):
             })
 
             message = "Uang jalan nomor " + str(self.uang_jalan_name) + " untuk pengiriman ini dibatalkan."
-            record.order_pengiriman.message_post(body=message)
+            record.sudo().order_pengiriman.message_post(body=message)
 
         self.state = 'cancel'
 
     def hitung_ulang_nominal_uj(self):
         for record in self.uang_jalan_line:
-            if record.nominal_uang_jalan == 0:
-                nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([('tipe', '=', str(record.tipe)), ('lokasi_muat', '=', int(record.muat.id)), ('lokasi_bongkar', '=', int(record.bongkar.id))]).uang_jalan
-                if nominal_uang_jalan:
-                    record.nominal_uang_jalan = nominal_uang_jalan
-            else:
-                pass
+
+            nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].sudo().search([
+                ('tipe', '=', str(record.sudo().tipe)),
+                ('lokasi_muat', '=', int(record.sudo().muat.id)),
+                ('lokasi_bongkar', '=', int(record.sudo().bongkar.id)),
+                ('company_id', '=', int(record.env.company.id))
+            ]).uang_jalan
+
+            if nominal_uang_jalan:
+                record.sudo().nominal_uang_jalan = nominal_uang_jalan
 
     uang_jalan_name = fields.Char(readonly=True, required=True, copy=False, default='New')
     kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', copy=True, ondelete='restrict', states={
@@ -156,13 +168,15 @@ class UangJalan(models.Model):
     @api.depends('uang_jalan_line.nominal_uang_jalan', 'biaya_tambahan')
     def _compute_total(self):
         for record in self:
-            record.total = sum(record.uang_jalan_line.mapped('nominal_uang_jalan')) + record.biaya_tambahan
+            uang_jalan_line = record.sudo().uang_jalan_line
+            record.total = sum(uang_jalan_line.sudo().mapped('nominal_uang_jalan')) + record.biaya_tambahan
 
 class UangJalanLine(models.Model):
     _name = 'uang.jalan.line'
     _description = 'Uang Jalan Line'
 
     uang_jalan = fields.Many2one('uang.jalan', invisible=True)
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     tipe = fields.Selection([
             ('none', ''),
             ('tronton_isi','Tronton Isi'),
@@ -172,7 +186,7 @@ class UangJalanLine(models.Model):
             ('trailer_kosong', 'Trailer Kosong'),
             ('trailer_dedicated', 'Trailer Dedicated'),
     ], string='Tipe', required=True)
-    order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order', domain=[('uang_jalan', '=', False)], ondelete='restrict',)
+    order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order', domain=[('state', '=', 'order_baru')], ondelete='restrict',)
     muat = fields.Many2one('konfigurasi.lokasi', 'Muat', compute='_compute_muat_and_bongkar')
     bongkar = fields.Many2one('konfigurasi.lokasi', 'Bongkar', compute='_compute_muat_and_bongkar')
     keterangan = fields.Text('Keterangan')
@@ -186,7 +200,12 @@ class UangJalanLine(models.Model):
 
     @api.onchange('order_pengiriman')
     def _calculate_nominal_uang_jalan(self):
-        nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([('tipe', '=', str(self.tipe)), ('lokasi_muat', '=', int(self.muat.id)), ('lokasi_bongkar', '=', int(self.bongkar.id))]).uang_jalan
+        nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([
+            ('tipe', '=', str(self.tipe)),
+            ('lokasi_muat', '=', int(self.muat.id)),
+            ('lokasi_bongkar', '=', int(self.bongkar.id)),
+            ('company_id', '=', int(self.env.company.id))
+        ]).uang_jalan
         if nominal_uang_jalan:
             self.nominal_uang_jalan = nominal_uang_jalan
         else:
@@ -197,7 +216,12 @@ class UangJalanLine(models.Model):
         if self.tipe == False:
             pass
         else:
-            nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([('tipe', '=', str(self.tipe)), ('lokasi_muat', '=', int(self.muat.id)), ('lokasi_bongkar', '=', int(self.bongkar.id))]).uang_jalan
+            nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([
+                ('tipe', '=', str(self.tipe)),
+                ('lokasi_muat', '=', int(self.muat.id)),
+                ('lokasi_bongkar', '=', int(self.bongkar.id)),
+                ('company_id', '=', int(self.env.company.id))
+            ]).uang_jalan
             if nominal_uang_jalan:
                 self.nominal_uang_jalan = nominal_uang_jalan
             else:

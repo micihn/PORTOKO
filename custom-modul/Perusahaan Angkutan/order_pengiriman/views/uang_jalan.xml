@@ -16,7 +16,7 @@
         <field name="name">uang.jalan.tree</field>
         <field name="model">uang.jalan</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree default_order="uang_jalan_name desc">
                 <field name="uang_jalan_name" string="No Uang Jalan" optional="show"/>
                 <field name="create_date" string="Tanggal" optional="show"/>
                 <field name="kendaraan" string="Kendaraan" optional="show"/>
@@ -44,6 +44,9 @@
                 </header>
 
                 <sheet>
+                    <field name="active" invisible="1"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+
                     <div class="oe_title">
                         <h1>
                             <field name="uang_jalan_name"/>
@@ -68,7 +71,7 @@
                             <field name="uang_jalan_line">
                                 <tree editable="bottom">
                                     <field name="uang_jalan" invisible="1"/>
-                                    <field name="order_pengiriman" string="No Order" width="20%" optional="show"/>
+                                    <field name="order_pengiriman" string="No Order" width="20%" optional="show" options="{'no_create': True}"/>
                                     <field name="tipe" width="20%" optional="show"/>
                                     <field name="muat" width="20%" optional="show"/>
                                     <field name="bongkar" width="20%" optional="show"/>

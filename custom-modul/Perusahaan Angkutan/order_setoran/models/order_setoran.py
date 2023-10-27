@@ -21,6 +21,10 @@ class OrderSetoran(models.Model):
     total_ongkos_calculated = fields.Float(compute='_compute_total_ongkos_calculated', digits=(6, 0))
     komisi_sopir = fields.Float(compute='_compute_komisi_sopir', digits=(6, 0))
     komisi_kenek = fields.Float(compute='_compute_komisi_kenek', digits=(6, 0))
+    active = fields.Boolean('Archive', default=True, tracking=True)
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+
+
 
     kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', tracking=True, required=True, states={
         'draft': [('readonly', False)],
@@ -107,8 +111,11 @@ class OrderSetoran(models.Model):
     vendor_bills_count = fields.Integer(compute='_compute_bills_count')
 
     def _compute_bills_count(self):
-        vendor_bills = self.env['account.move'].search([('nomor_setoran', '=', self.kode_order_setoran), ('move_type', '=', 'in_invoice')])
-        self.vendor_bills_count = len(vendor_bills)
+        try:
+            vendor_bills = self.env['account.move'].search([('nomor_setoran', '=', self.kode_order_setoran), ('move_type', '=', 'in_invoice')])
+            self.vendor_bills_count = len(vendor_bills)
+        except:
+            self.vendor_bills_count = 0
 
     def _compute_invoice_count(self):
         for record in self:
@@ -121,8 +128,11 @@ class OrderSetoran(models.Model):
                 record.invoice_count = 0
 
     def _compute_expense_count(self):
-        expenses = self.env['hr.expense'].search([('reference', '=', self.kode_order_setoran)])
-        self.expense_count = len(expenses)
+        try:
+            expenses = self.env['hr.expense'].search([('reference', '=', self.kode_order_setoran)])
+            self.expense_count = len(expenses)
+        except:
+            self.expense_count = 0
 
     def action_get_vendor_bill_view(self):
         self.ensure_one()
@@ -283,37 +293,22 @@ class OrderSetoran(models.Model):
                 'state': 'selesai',
                 'nomor_surat_jalan': None,
                 'tanggal_uang_jalan': None,
+                'nomor_setoran': None,
             })
 
         # Batalkan Expenses
         for expense in self.env['hr.expense'].search([('reference', '=', self.kode_order_setoran)]):
-            if expense.state == 'draft':
-                expense.unlink()
-            elif expense.state == 'reported':
-                expense.state = 'draft'
-                expense.unlink()
-            else:
-                raise ValidationError(
-                    "Anda tidak dapat membatalkan setoran ini karena expenses sudah dibayarkan.")
+            expense.state = 'refused'
 
         # Batalkan Invoice
         for invoice in self.env['account.move'].search([('nomor_setoran', '=', str(self.kode_order_setoran)), ('move_type', '=', 'out_invoice')]):
-            if invoice.state == 'posted':
-                raise ValidationError(
-                    "Anda tidak dapat membatalkan setoran ini karena invoice sudah lunas.")
-            elif invoice.state == 'draft':
-                invoice.state = 'cancel'
-
-        self.state = 'cancel'
+            invoice.state = 'cancel'
 
         # Cancel Vendor Bill
-        for vendor_bills in self.env['account.move'].search(
-                [('nomor_setoran', '=', self.kode_order_setoran), ('move_type', '=', 'in_invoice')]):
-            if vendor_bills.state == 'posted':
-                raise ValidationError(
-                    "Anda tidak dapat membatalkan setoran ini karena vendor bill sudah lunas.")
-            elif vendor_bills.state == 'draft':
-                vendor_bills.state = 'cancel'
+        for vendor_bills in self.env['account.move'].search([('nomor_setoran', '=', self.kode_order_setoran), ('move_type', '=', 'in_invoice')]):
+            vendor_bills.state = 'cancel'
+
+        self.state = 'cancel'
 
     def set_to_draft(self):
         self.state = 'draft'
@@ -388,7 +383,11 @@ class OrderSetoran(models.Model):
 
         ############################## Membuat Dictionary-List Detail Order ###########################
 
-        for record in self.env['order.pengiriman'].search([('kendaraan', '=', vals['kendaraan']), ('sopir','=', vals['sopir']), ('kenek','=', vals['kenek']), ('state', '=', 'selesai')]):
+        for record in self.env['order.pengiriman'].search([('kendaraan', '=', vals['kendaraan']), ('sopir','=', vals['sopir']), ('kenek','=', vals['kenek']), ('state', '=', 'selesai'), ('company_id', '=', int(self.env.company))]):
+
+            # Meng-assign nomor setoran ke dalam order pengiriman meskipun statusnya masih draft
+            # Untuk membantu proses perubahan atau update biaya fee (jika ada)
+            record.nomor_setoran = result.kode_order_setoran
 
             detail_order_dict = {
                 'order_pengiriman': record.id,
@@ -443,6 +442,7 @@ class OrderSetoran(models.Model):
         # Membuat detail order
         for item in detail_order:
             self.env['detail.order'].create([{
+                'company_id': self.env.company.id,
                 'order_setoran': result.id,
                 'order_pengiriman': item['order_pengiriman'],
                 'tanggal_order': item['create_date'],
@@ -455,6 +455,7 @@ class OrderSetoran(models.Model):
         # Membuat detail list uang jalan
         for item in list_uang_jalan:
             self.env['detail.list.uang.jalan'].create([{
+                'company_id': self.env.company.id,
                 'order_setoran': result.id,
                 'tanggal': item['tanggal'],
                 'uang_jalan_name': item['uang_jalan_name'],
@@ -465,6 +466,7 @@ class OrderSetoran(models.Model):
         # Membuat list pembelian
         for item in list_pembelian:
             self.env['detail.list.pembelian'].create([{
+                'company_id': self.env.company.id,
                 'order_setoran': result.id,
                 'order_pengiriman': item['order_pengiriman'],
                 'supplier': item['supplier'],
@@ -476,6 +478,7 @@ class OrderSetoran(models.Model):
         # Membuat list biaya fee
         for item in list_biaya_fee:
             self.env['detail.biaya.fee'].create([{
+                'company_id': self.env.company.id,
                 'order_setoran': result.id,
                 'order_pengiriman': item['order_pengiriman'],
                 'fee_contact': item['fee_contact'],
@@ -486,7 +489,8 @@ class OrderSetoran(models.Model):
             ('kendaraan', '=', vals.get('kendaraan', self.kendaraan.id)),
             ('sopir', '=', vals.get('sopir', self.sopir.id)),
             ('kenek', '=', vals.get('kenek', self.kenek.id)),
-            ('state', '=', 'selesai')
+            ('state', '=', 'selesai'),
+            ('company_id', '=', int(self.env.company.id))
         ])
 
         if not order_pengiriman_model:
@@ -527,7 +531,8 @@ class OrderSetoran(models.Model):
                 ('kendaraan', '=', vals.get('kendaraan', self.kendaraan.id)),
                 ('sopir', '=', vals.get('sopir', self.sopir.id)),
                 ('kenek', '=', vals.get('kenek', self.kenek.id)),
-                ('state', '=', 'selesai')
+                ('state', '=', 'selesai'),
+                ('company_id', '=', int(self.env.company.id))
             ])
 
             if not order_pengiriman_model:
@@ -589,6 +594,7 @@ class OrderSetoran(models.Model):
 
             for record in detail_order:
                 self.env['detail.order'].create([{
+                    'company_id': self.env.company.id,
                     'order_setoran': self.id,
                     'order_pengiriman': record['order_pengiriman'],
                     'tanggal_order': record['create_date'],
@@ -600,6 +606,7 @@ class OrderSetoran(models.Model):
 
             for record in list_uang_jalan:
                 self.env['detail.list.uang.jalan'].create([{
+                    'company_id': self.env.company.id,
                     'order_setoran': self.id,
                     'tanggal': record['tanggal'],
                     'uang_jalan_name': record['uang_jalan_name'],
@@ -609,6 +616,7 @@ class OrderSetoran(models.Model):
 
             for record in list_pembelian:
                 self.env['detail.list.pembelian'].create([{
+                    'company_id': self.env.company.id,
                     'order_setoran': self.id,
                     'order_pengiriman': record['order_pengiriman'],
                     'supplier': record['supplier'],
@@ -619,6 +627,7 @@ class OrderSetoran(models.Model):
 
             for record in list_biaya_fee:
                 self.env['detail.biaya.fee'].create([{
+                    'company_id': self.env.company.id,
                     'order_setoran': self.id,
                     'order_pengiriman': record['order_pengiriman'],
                     'fee_contact': record['fee_contact'],
@@ -631,6 +640,7 @@ class DetailOrder(models.Model):
     _name = 'detail.order'
     _description = 'Detail Order'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_setoran = fields.Many2one('order.setoran', invisible=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
     tanggal_order = fields.Datetime('Tanggal Order')
@@ -655,6 +665,7 @@ class ListUangJalan(models.Model):
     _name = 'detail.list.uang.jalan'
     _description = 'List Uang Jalan'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_setoran = fields.Many2one('order.setoran', invisible=True)
     tanggal = fields.Date('Tanggal')
     uang_jalan_name = fields.Many2one('uang.jalan', 'No Uang Jalan')
@@ -665,6 +676,7 @@ class ListPembelian(models.Model):
     _name = 'detail.list.pembelian'
     _description = 'List Pembelian'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_setoran = fields.Many2one('order.setoran', invisible=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
     supplier = fields.Many2one('res.partner', 'Supplier')
@@ -676,6 +688,7 @@ class BiayaFee(models.Model):
     _name = 'detail.biaya.fee'
     _description = 'Biaya Fee'
 
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_setoran = fields.Many2one('order.setoran', invisible=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
     fee_contact = fields.Many2one('res.partner', 'Nama')
@@ -685,3 +698,4 @@ class AccountMoveInvoice(models.Model):
     _inherit = 'account.move'
 
     nomor_setoran = fields.Char('No. Setoran')
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)

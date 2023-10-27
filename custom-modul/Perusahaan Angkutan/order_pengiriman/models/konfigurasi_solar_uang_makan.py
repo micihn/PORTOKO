@@ -10,6 +10,7 @@ class KonfigurasiSolarUangMakan(models.Model):
     harga_solar = fields.Float(decimal=0)
     uang_makan = fields.Float(decimal=0)
     riwayat = fields.One2many('konfigurasi.solar.uang.makan.riwayat', 'konfigurasi_solar_uang_makan')
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 
     def write(self, vals):
         result = super(KonfigurasiSolarUangMakan, self).write(vals)

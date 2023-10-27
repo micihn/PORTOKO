@@ -71,4 +71,19 @@
         parent="order_pengiriman.menu_konfigurasi">
     </menuitem>
 
+    <menuitem id="menu_uang_jalan"
+      groups="order_pengiriman.group_order_approver_uang_jalan"
+      sequence="3"
+      name="Uang Jalan"
+      action="action_uang_jalan"
+      parent="order_pengiriman.menu_order_pengiriman_root">
+    </menuitem>
+
+    <menuitem id="menu_oper_order"
+      groups="order_pengiriman.group_order_approver_uang_jalan"
+      sequence="2"
+      name="Oper Order"
+      action="action_oper_order"
+      parent="order_pengiriman.menu_order_pengiriman_root">
+    </menuitem>
 </odoo>

@@ -28,11 +28,13 @@
         'views/uang_jalan.xml',
         'views/menu.xml',
         'views/sequences.xml',
-        'data/konfigurasi_solar_uang_makan_data.xml',
+        # 'data/konfigurasi_solar_uang_makan_data.xml',
     ],
     'demo': [],
+    'post_init_hook': 'post_init_hook',
     'qweb': [],
     'installable': True,
     'application': True,
     'auto_install': False,
+
 }
