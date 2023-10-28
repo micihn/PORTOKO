@@ -28,7 +28,7 @@
         'views/oper_order.xml',
         'views/uang_jalan.xml',
         'views/menu.xml',
-        'views/sequences.xml',
+        # 'views/sequences.xml',
     ],
     'demo': [],
     'post_init_hook': 'post_init_hook',
