@@ -26,7 +26,6 @@
         'views/oper_setoran.xml',
         'views/order_setoran.xml',
         'views/menu.xml',
-        'views/sequences.xml',
         'data/master_product.xml',
         'wizard/order_setoran_create_invoice.xml',
         'wizard/oper_setoran_create_invoice.xml',
@@ -36,4 +35,5 @@
     'installable': True,
     'application': True,
     'auto_install': False,
+    'post_init_hook': 'post_init_hook',
 }
