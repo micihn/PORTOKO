@@ -369,7 +369,7 @@ class OrderSetoran(models.Model):
         ####################### AUTO ASSIGN RECORD NAME ##############################
 
         if vals.get('kode_order_setoran', 'New') == 'New':
-            vals['kode_order_setoran'] = self.env['ir.sequence'].next_by_code('order.setoran.sequence') or 'New'
+            vals['kode_order_setoran'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('order.setoran.sequence') or 'New'
         result = super(OrderSetoran, self).create(vals)
 
         # list utama untuk membuat record pada tiap notebook

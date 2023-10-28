@@ -30,7 +30,7 @@ class KonfigurasiUangJalan(models.Model):
 
         # Method untuk auto name assignment
         if vals.get('kode_uang_jalan', 'New') == 'New':
-            vals['kode_uang_jalan'] = self.env['ir.sequence'].next_by_code('konfigurasi.uang.jalan.sequence') or 'New'
+            vals['kode_uang_jalan'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('konfigurasi.uang.jalan.sequence') or 'New'
         result = super(KonfigurasiUangJalan, self).create(vals)
         return result
 

@@ -244,15 +244,9 @@ class OrderPengiriman(models.Model):
     # Method untuk auto name assignment
     @api.model
     def create(self, vals):
-        vals['order_pengiriman_name'] = self.env['ir.sequence'].next_by_code('order.pengiriman.sequence')
-
-        # print(vals)
-        # if vals.get('order_pengiriman_name', 'New') == 'New':
-        #     vals['order_pengiriman_name'] = self.env['ir.sequence'].next_by_code('order.pengiriman.sequence') or 'New'
-        # print(vals['order_pengiriman_name'])
+        vals['order_pengiriman_name'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('order.pengiriman.sequence')
 
         result = super(OrderPengiriman, self).create(vals)
-        print(result.order_pengiriman_name)
 
         return result
 

@@ -14,7 +14,7 @@ class UangJalan(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('uang_jalan_name', 'New') == 'New':
-            vals['uang_jalan_name'] = self.env['ir.sequence'].next_by_code('uang.jalan.sequence') or 'New'
+            vals['uang_jalan_name'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('uang.jalan.sequence') or 'New'
         result = super(UangJalan, self).create(vals)
         return result
 

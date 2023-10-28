@@ -15,7 +15,7 @@ class OperOrder(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('oper_order_name', 'New') == 'New':
-            vals['oper_order_name'] = self.env['ir.sequence'].next_by_code('oper.order.sequence') or 'New'
+            vals['oper_order_name'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('oper.order.sequence') or 'New'
         result = super(OperOrder, self).create(vals)
         return result
 
