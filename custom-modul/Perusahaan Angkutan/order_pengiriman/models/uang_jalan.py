@@ -205,7 +205,7 @@ class UangJalanLine(models.Model):
 
     @api.onchange('tipe_muatan')
     def _calculate_nominal_uang_jalan_with_tipe_muatan(self):
-        if self.tipe_muatan == False:
+        if bool(self.tipe_muatan) == False:
             pass
         else:
             nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([
