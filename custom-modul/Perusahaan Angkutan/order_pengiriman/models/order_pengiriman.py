@@ -459,7 +459,7 @@ class DetailOrderDO(models.Model):
     keterangan_barang = fields.Text('Keterangan')
     ongkos_per_kg = fields.Float('Ongkos/Kg', digits=(6, 0))
     jumlah_per_kg = fields.Float('Jumlah(Kg)')
-    subtotal_ongkos = fields.Float('Subtotal Ongkos', compute='_compute_subtotal_ongkos_do', store=True, readonly=True, digits=(6, 0))
+    subtotal_ongkos = fields.Float('Subtotal Ongkos', compute='_compute_subtotal_ongkos_do', store=True, readonly=False, digits=(6, 0))
 
     @api.depends('ongkos_per_kg', 'jumlah_per_kg')
     def _compute_subtotal_ongkos_do(self):
