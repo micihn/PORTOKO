@@ -64,55 +64,58 @@ class UangJalan(models.Model):
         self.state = 'to_submit'
 
     def submit(self):
-        for record in self:
-            if bool(record.kendaraan) == False:
-                raise ValidationError('Harap isi Kendaraan sebelum mengkonfirmasi!')
-            elif bool(record.sopir) == False:
-                raise ValidationError('Harap isi Sopir sebelum mengkonfirmasi!')
-            elif bool(record.kenek) == False:
-                raise ValidationError('Harap isi Kenek sebelum mengkonfirmasi!')
-            elif not record.uang_jalan_line:
-                raise ValidationError('Anda belum memasukkan nomor Order Pengiriman!')
-            elif record.uang_jalan_line:
-                for item in record.uang_jalan_line:
-                    if item.tipe_muatan == 'none':
-                        raise ValidationError('Harap isi kolom tipe muatan pada Detail Uang Jalan!')
+        if self.tipe_uang_jalan == 'standar':
+            for record in self:
+                if bool(record.kendaraan) == False:
+                    raise ValidationError('Harap isi Kendaraan sebelum mengkonfirmasi!')
+                elif bool(record.sopir) == False:
+                    raise ValidationError('Harap isi Sopir sebelum mengkonfirmasi!')
+                elif bool(record.kenek) == False:
+                    raise ValidationError('Harap isi Kenek sebelum mengkonfirmasi!')
+                elif not record.uang_jalan_line:
+                    raise ValidationError('Anda belum memasukkan nomor Order Pengiriman!')
+                elif record.uang_jalan_line:
+                    for item in record.uang_jalan_line:
+                        if item.tipe_muatan == 'none':
+                            raise ValidationError('Harap isi kolom tipe muatan pada Detail Uang Jalan!')
 
         self.state = 'submitted'
 
     def paid(self):
-        for record in self.uang_jalan_line:
-            record.sudo().order_pengiriman.write({
-                'is_uang_jalan_terbit': True,
-                'state': 'dalam_perjalanan',
-                'uang_jalan': self.id,
-                'kendaraan': self.kendaraan.id,
-                'sopir': self.sopir,
-                'kenek': self.kenek or None,
-                'nomor_kendaraan': self.kendaraan.license_plate,
-                'model_kendaraan': self.kendaraan.model_id.name,
-            })
+        if self.tipe_uang_jalan == 'standar':
+            for record in self.uang_jalan_line:
+                record.sudo().order_pengiriman.write({
+                    'is_uang_jalan_terbit': True,
+                    'state': 'dalam_perjalanan',
+                    'uang_jalan': self.id,
+                    'kendaraan': self.kendaraan.id,
+                    'sopir': self.sopir,
+                    'kenek': self.kenek or None,
+                    'nomor_kendaraan': self.kendaraan.license_plate,
+                    'model_kendaraan': self.kendaraan.model_id.name,
+                })
 
-            message = "Uang jalan untuk pengiriman ini telah terbit dengan nomor " + str(self.uang_jalan_name)
-            record.sudo().order_pengiriman.message_post(body=message)
+                message = "Uang jalan untuk pengiriman ini telah terbit dengan nomor " + str(self.uang_jalan_name)
+                record.sudo().order_pengiriman.message_post(body=message)
 
         self.state = 'paid'
 
     def cancel(self):
-        for record in self.uang_jalan_line:
-            record.sudo().order_pengiriman.write({
-                'is_uang_jalan_terbit': False,
-                'state': 'order_baru',
-                'uang_jalan': None,
-                'kendaraan': None,
-                'sopir': None,
-                'kenek': None,
-                'nomor_kendaraan': None,
-                'model_kendaraan': None,
-            })
+        if self.tipe_uang_jalan == 'standar':
+            for record in self.uang_jalan_line:
+                record.sudo().order_pengiriman.write({
+                    'is_uang_jalan_terbit': False,
+                    'state': 'order_baru',
+                    'uang_jalan': None,
+                    'kendaraan': None,
+                    'sopir': None,
+                    'kenek': None,
+                    'nomor_kendaraan': None,
+                    'model_kendaraan': None,
+                })
 
-            message = "Uang jalan nomor " + str(self.uang_jalan_name) + " untuk pengiriman ini dibatalkan."
-            record.sudo().order_pengiriman.message_post(body=message)
+                message = "Uang jalan nomor " + str(self.uang_jalan_name) + " untuk pengiriman ini dibatalkan."
+                record.sudo().order_pengiriman.message_post(body=message)
 
         self.state = 'cancel'
 
