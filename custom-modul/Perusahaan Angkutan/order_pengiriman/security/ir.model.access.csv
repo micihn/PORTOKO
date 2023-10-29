@@ -8,6 +8,10 @@ access_oper_order,access.oper_order,order_pengiriman.model_oper_order,group_orde
 access_oper_order_line,access.oper_order_line,order_pengiriman.model_oper_order_line,group_order_pengiriman,1,1,1,1
 access_uang_jalan,access.uang_jalan,order_pengiriman.model_uang_jalan,group_order_pengiriman,1,1,1,1
 access_uang_jalan_line,access.uang_jalan_line,order_pengiriman.model_uang_jalan_line,group_order_pengiriman,1,1,1,1
+
+access_uang_jalan_nominal_saja,access.uang_jalan_nominal_saja,order_pengiriman.model_uang_jalan_nominal_saja,group_order_pengiriman,1,1,1,1
+
+
 access_konfigurasi_lokasi,access.konfigurasi.lokasi,order_pengiriman.model_konfigurasi_lokasi,group_order_pengiriman,1,1,1,1
 access_plant,access.plant,order_pengiriman.model_konfigurasi_plant,group_order_pengiriman,1,1,1,1
 access_konfigurasi_solar_uang_makan,access.konfigurasi_solar_uang_makan,order_pengiriman.model_konfigurasi_solar_uang_makan,group_order_pengiriman,1,1,1,1
