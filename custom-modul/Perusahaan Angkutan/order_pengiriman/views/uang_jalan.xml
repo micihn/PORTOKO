@@ -36,7 +36,7 @@
                 <header>
                     <field name="state" widget="statusbar" statusbar_visible="to_submit, submitted, validated, paid"/>
                     <button name="submit" type="object" string="Submit" class="btn-primary" attrs="{'invisible': [('state', 'in', ('submitted', 'validated', 'paid', 'cancel'))]}"/>
-                    <button name="hitung_ulang_nominal_uj" type="object" string="Hitung Ulang Uang Jalan" attrs="{'invisible': [('state', 'in', ('submitted', 'validated', 'paid', 'cancel'))]}"/>
+                    <button name="hitung_ulang_nominal_uj" type="object" string="Hitung Ulang Uang Jalan" attrs="{'invisible': ['|', ('state', 'in', ('submitted', 'validated', 'paid', 'cancel')), ('tipe_uang_jalan', '=', 'nominal_saja')]}"/>
                     <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'validated', 'paid', 'cancel'))]}"/>
                     <button name="paid" type="object" string="Submit Payment" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', 'cancel'))]}"/>
                     <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', ))]}"/>
