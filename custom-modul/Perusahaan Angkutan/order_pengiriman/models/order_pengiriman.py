@@ -317,11 +317,11 @@ class OrderPengiriman(models.Model):
         'sudah_setor': [('readonly', True)],
     })
 
-    detail_alamat_muat = fields.Text('Detail Alamat Muat', placeholder='Contoh : Jalan Mangga RT 50 No 2', states={
+    detail_alamat_muat = fields.Text('Detail Alamat Muat', placeholder='Contoh : Jalan Mangga RT 50 No 2', tracking=True, states={
         'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
     })
 
     tanggal_estimasi_muat = fields.Date(string='Estimasi Tanggal Muat', tracking=True, states={
@@ -333,16 +333,16 @@ class OrderPengiriman(models.Model):
 
     alamat_bongkar = fields.Many2one('konfigurasi.lokasi', required=True, ondelete='restrict', tracking=True, states={
         'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
     })
 
-    detail_alamat_bongkar = fields.Text('Detail Alamat Bongkar', placeholder='Contoh : Jalan Bersama Blok C No 23', states={
+    detail_alamat_bongkar = fields.Text('Detail Alamat Bongkar', placeholder='Contoh : Jalan Bersama Blok C No 23', tracking=True, states={
         'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
     })
 
     tanggal_estimasi_bongkar = fields.Date(string='Estimasi Tanggal Bongkar', tracking=True, digits=(6, 0), states={
