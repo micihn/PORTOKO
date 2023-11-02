@@ -177,7 +177,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Cash')], limit=1).id,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Kas')], limit=1).id,
                             'company_id': setoran.company_id.id,
                             'credit': setoran.total_pengeluaran - setoran.total_uang_jalan,
                         }),
@@ -185,7 +185,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Advanced Pihut')], limit=1).id,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
                             'company_id': setoran.company_id.id,
                             'debit': setoran.total_pengeluaran - setoran.total_uang_jalan,
                         }),
@@ -211,7 +211,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Advanced Pihut')], limit=1).id,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
                             'company_id': setoran.company_id.id,
                             'credit': setoran.total_pengeluaran,
                         }),
@@ -231,7 +231,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Cash')], limit=1).id,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Kas')], limit=1).id,
                             'company_id': setoran.company_id.id,
                             'debit': setoran.total_uang_jalan - setoran.total_pengeluaran,
                         }),
@@ -239,7 +239,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Advanced Pihut')], limit=1).id,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
                             'company_id': setoran.company_id.id,
                             'credit': setoran.total_uang_jalan - setoran.total_pengeluaran,
                         }),
@@ -265,7 +265,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Advanced Pihut')], limit=1).id,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
                             'company_id': setoran.company_id.id,
                             'credit': setoran.total_pengeluaran,
                         }),

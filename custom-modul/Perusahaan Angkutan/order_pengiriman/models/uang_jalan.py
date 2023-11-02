@@ -110,7 +110,7 @@ class UangJalan(models.Model):
                     (0, 0, {
                         'name': self.uang_jalan_name,
                         'date': self.create_date,
-                        'account_id': self.env['account.account'].search([('name', '=', 'Cash')], limit=1).id,
+                        'account_id': self.env['account.account'].search([('name', '=', 'Kas')], limit=1).id,
                         'company_id': self.company_id.id,
                         'credit': self.total,
                     }),
@@ -118,7 +118,7 @@ class UangJalan(models.Model):
                     (0, 0, {
                         'name': self.uang_jalan_name,
                         'date': self.create_date,
-                        'account_id': self.env['account.account'].search([('name', '=', 'Advanced Pihut')], limit=1).id,
+                        'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
                         'company_id': self.company_id.id,
                         'debit': self.total,
                     }),
