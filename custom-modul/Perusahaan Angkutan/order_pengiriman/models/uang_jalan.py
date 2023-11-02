@@ -100,7 +100,7 @@ class UangJalan(models.Model):
                 message = "Uang jalan untuk pengiriman ini telah terbit dengan nomor " + str(self.uang_jalan_name)
                 record.sudo().order_pengiriman.message_post(body=message)
 
-            self.env['account.move'].create({
+            journal_entry = self.env['account.move'].create({
                 'company_id': self.company_id.id,
                 'move_type': 'entry',
                 'date': self.create_date,
@@ -123,6 +123,8 @@ class UangJalan(models.Model):
                     }),
                 ],
             })
+
+            journal_entry.action_post()
 
         self.state = 'paid'
 
