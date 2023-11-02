@@ -146,6 +146,12 @@ class UangJalan(models.Model):
                 message = "Uang jalan nomor " + str(self.uang_jalan_name) + " untuk pengiriman ini dibatalkan."
                 record.sudo().order_pengiriman.message_post(body=message)
 
+        # Batalkan journal entry (Jika ada)
+        if self.state == 'paid':
+            for record in self.env['account.move'].search([('ref', '=', str(self.uang_jalan_name))]):
+                record.button_draft()
+                record.button_cancel()
+
         self.state = 'cancel'
 
     def hitung_ulang_nominal_uj(self):
