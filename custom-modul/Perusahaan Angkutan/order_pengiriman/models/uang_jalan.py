@@ -95,8 +95,34 @@ class UangJalan(models.Model):
                     'model_kendaraan': self.kendaraan.model_id.name,
                 })
 
+                # Buat Pengurangan Kas Pada Journal Entry
+
                 message = "Uang jalan untuk pengiriman ini telah terbit dengan nomor " + str(self.uang_jalan_name)
                 record.sudo().order_pengiriman.message_post(body=message)
+
+            self.env['account.move'].create({
+                'company_id': self.company_id.id,
+                'move_type': 'entry',
+                'date': self.create_date,
+                'ref': self.uang_jalan_name,
+                'line_ids': [
+                    (0, 0, {
+                        'name': self.uang_jalan_name,
+                        'date': self.create_date,
+                        'account_id': self.env['account.account'].search([('name', '=', 'Cash')], limit=1).id,
+                        'company_id': self.company_id.id,
+                        'credit': self.total,
+                    }),
+
+                    (0, 0, {
+                        'name': self.uang_jalan_name,
+                        'date': self.create_date,
+                        'account_id': self.env['account.account'].search([('name', '=', 'Advanced Pihutang')], limit=1).id,
+                        'company_id': self.company_id.id,
+                        'debit': self.total,
+                    }),
+                ],
+            })
 
         self.state = 'paid'
 

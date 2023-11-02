@@ -70,6 +70,7 @@ class AccountInvoicePayment(models.TransientModel):
                     'nomor_setoran': setoran.kode_order_setoran or None,
                 })
 
+            # Membuat Invoice
             for order in self.invoice:
                 if order.pembayaran == 'dp':
                     product_id = find_master_down_payment(self)
