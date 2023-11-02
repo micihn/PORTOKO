@@ -36,7 +36,7 @@
                 <header>
                     <field name="state" widget="statusbar" statusbar_visible="to_submit, submitted, validated, paid"/>
                     <button name="submit" type="object" string="Submit" class="btn-primary" attrs="{'invisible': [('state', 'in', ('submitted', 'validated', 'paid', 'cancel'))]}"/>
-                    <button name="hitung_ulang_nominal_uj" type="object" string="Hitung Ulang Uang Jalan" attrs="{'invisible': [('state', 'in', ('submitted', 'validated', 'paid', 'cancel'))]}"/>
+                    <button name="hitung_ulang_nominal_uj" type="object" string="Hitung Ulang Uang Jalan" attrs="{'invisible': ['|', ('state', 'in', ('submitted', 'validated', 'paid', 'cancel')), ('tipe_uang_jalan', '=', 'nominal_saja')]}"/>
                     <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'validated', 'paid', 'cancel'))]}"/>
                     <button name="paid" type="object" string="Submit Payment" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', 'cancel'))]}"/>
                     <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', ))]}"/>
@@ -55,6 +55,7 @@
 
                     <group>
                         <group>
+                            <field name="tipe_uang_jalan" />
                             <field name="kendaraan" />
                             <field name="sopir" />
                             <field name="kenek" />
@@ -67,7 +68,7 @@
                     </group>
 
                     <notebook>
-                        <page string="Detail Uang Jalan">
+                        <page string="Uang Jalan (Standar)" attrs="{'invisible': [('tipe_uang_jalan', '=', 'nominal_saja')]}">
                             <field name="uang_jalan_line">
                                 <tree editable="bottom">
                                     <field name="uang_jalan" invisible="1"/>
@@ -80,28 +81,62 @@
                                 </tree>
                             </field>
 
-                            <div class="oe_left">
-                                <!-- Total -->
-                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000">
-                                    <label for="biaya_tambahan" string="Biaya Tambahan "/>
+                        <div class="oe_left">
+                                <!-- Biaya Tambahan Nominal Saja -->
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000" attrs="{'invisible': [('tipe_uang_jalan', '=', 'nominal_saja')]}">
+                                    <label for="biaya_tambahan_standar" string="Biaya Tambahan "/>
                                 </div>
-                                <div class="oe_total_field" style="display: inline-block;">
-                                    <field name="biaya_tambahan" />
+                                <div class="oe_total_field" style="display: inline-block;" attrs="{'invisible': [('tipe_uang_jalan', '=', 'nominal_saja')]}">
+                                    <field name="biaya_tambahan_standar" />
                                 </div>
                             </div>
 
                             <div class="oe_right">
-                                <!-- Total -->
-                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000">
-                                    <label for="total" string="Total : "/>
+                                <!-- Total Uang Jalan Nominal Saja-->
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000" attrs="{'invisible': [('tipe_uang_jalan', '=', 'nominal_saja')]}">
+                                    <label for="total_uang_jalan_standar" string="Total : "/>
                                 </div>
-                                <div class="oe_total_field" style="display: inline-block;">
-                                    <field name="total" />
+                                <div class="oe_total_field" style="display: inline-block;" attrs="{'invisible': [('tipe_uang_jalan', '=', 'nominal_saja')]}">
+                                    <field name="total_uang_jalan_standar" />
+                                </div>
+                            </div>
+
+
+                        </page >
+
+                        <page string="Uang Jalan (Nominal Saja)" attrs="{'invisible': [('tipe_uang_jalan', '=', 'standar')]}">
+                            <field name="uang_jalan_nominal_tree">
+                                <tree editable="bottom">
+                                    <field name="uang_jalan_nominal_saja" invisible="1"/>
+                                    <field name="muat" width="100%" optional="show"/>
+                                    <field name="bongkar" width="100%" optional="show"/>
+                                    <field name="nominal_uang_jalan" width="100%" optional="show"/>
+                                </tree>
+                            </field>
+
+                            <div class="oe_left">
+                                <!-- Biaya Tambahan Nominal Saja -->
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000" attrs="{'invisible': [('tipe_uang_jalan', '=', 'standar')]}">
+                                    <label for="biaya_tambahan_nominal_saja" string="Biaya Tambahan "/>
+                                </div>
+                                <div class="oe_total_field" style="display: inline-block;" attrs="{'invisible': [('tipe_uang_jalan', '=', 'standar')]}">
+                                    <field name="biaya_tambahan_nominal_saja" />
+                                </div>
+                            </div>
+
+                            <div class="oe_right">
+                                <!-- Total Uang Jalan Nominal Saja-->
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000" attrs="{'invisible': [('tipe_uang_jalan', '=', 'standar')]}">
+                                    <label for="total_uang_jalan_nominal_saja" string="Total : "/>
+                                </div>
+                                <div class="oe_total_field" style="display: inline-block;" attrs="{'invisible': [('tipe_uang_jalan', '=', 'standar')]}">
+                                    <field name="total_uang_jalan_nominal_saja" />
                                 </div>
                             </div>
 
                         </page>
                     </notebook>
+
                 </sheet>
 
                 <div class="oe_chatter">

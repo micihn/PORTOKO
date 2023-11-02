@@ -244,15 +244,9 @@ class OrderPengiriman(models.Model):
     # Method untuk auto name assignment
     @api.model
     def create(self, vals):
-        vals['order_pengiriman_name'] = self.env['ir.sequence'].next_by_code('order.pengiriman.sequence')
-
-        # print(vals)
-        # if vals.get('order_pengiriman_name', 'New') == 'New':
-        #     vals['order_pengiriman_name'] = self.env['ir.sequence'].next_by_code('order.pengiriman.sequence') or 'New'
-        # print(vals['order_pengiriman_name'])
+        vals['order_pengiriman_name'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('order.pengiriman.sequence')
 
         result = super(OrderPengiriman, self).create(vals)
-        print(result.order_pengiriman_name)
 
         return result
 
@@ -323,11 +317,11 @@ class OrderPengiriman(models.Model):
         'sudah_setor': [('readonly', True)],
     })
 
-    detail_alamat_muat = fields.Text('Detail Alamat Muat', placeholder='Contoh : Jalan Mangga RT 50 No 2', states={
+    detail_alamat_muat = fields.Text('Detail Alamat Muat', placeholder='Contoh : Jalan Mangga RT 50 No 2', tracking=True, states={
         'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
     })
 
     tanggal_estimasi_muat = fields.Date(string='Estimasi Tanggal Muat', tracking=True, states={
@@ -339,16 +333,16 @@ class OrderPengiriman(models.Model):
 
     alamat_bongkar = fields.Many2one('konfigurasi.lokasi', required=True, ondelete='restrict', tracking=True, states={
         'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
     })
 
-    detail_alamat_bongkar = fields.Text('Detail Alamat Bongkar', placeholder='Contoh : Jalan Bersama Blok C No 23', states={
+    detail_alamat_bongkar = fields.Text('Detail Alamat Bongkar', placeholder='Contoh : Jalan Bersama Blok C No 23', tracking=True, states={
         'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
     })
 
     tanggal_estimasi_bongkar = fields.Date(string='Estimasi Tanggal Bongkar', tracking=True, digits=(6, 0), states={
@@ -465,7 +459,7 @@ class DetailOrderDO(models.Model):
     keterangan_barang = fields.Text('Keterangan')
     ongkos_per_kg = fields.Float('Ongkos/Kg', digits=(6, 0))
     jumlah_per_kg = fields.Float('Jumlah(Kg)')
-    subtotal_ongkos = fields.Float('Subtotal Ongkos', compute='_compute_subtotal_ongkos_do', store=True, readonly=True, digits=(6, 0))
+    subtotal_ongkos = fields.Float('Subtotal Ongkos', compute='_compute_subtotal_ongkos_do', store=True, readonly=False, digits=(6, 0))
 
     @api.depends('ongkos_per_kg', 'jumlah_per_kg')
     def _compute_subtotal_ongkos_do(self):

@@ -175,7 +175,7 @@ class OperSetoran(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('kode_oper_setoran', 'New') == 'New':
-            vals['kode_oper_setoran'] = self.env['ir.sequence'].next_by_code('oper.setoran.sequence') or 'New'
+            vals['kode_oper_setoran'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('oper.setoran.sequence') or 'New'
         result = super(OperSetoran, self).create(vals)
 
         oper_order_detail_list_ids = []
