@@ -308,6 +308,12 @@ class OrderSetoran(models.Model):
         for vendor_bills in self.env['account.move'].search([('nomor_setoran', '=', self.kode_order_setoran), ('move_type', '=', 'in_invoice')]):
             vendor_bills.state = 'cancel'
 
+        # Batalkan journal entry pembuatan advanced pihut (Jika ada)
+        if self.state == 'done':
+            for record in self.env['account.move'].search([('ref', '=', str(self.kode_order_setoran))]):
+                record.button_draft()
+                record.button_cancel()
+
         self.state = 'cancel'
 
     def set_to_draft(self):
