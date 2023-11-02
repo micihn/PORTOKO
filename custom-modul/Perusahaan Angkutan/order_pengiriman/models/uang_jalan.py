@@ -146,7 +146,7 @@ class UangJalan(models.Model):
                 message = "Uang jalan nomor " + str(self.uang_jalan_name) + " untuk pengiriman ini dibatalkan."
                 record.sudo().order_pengiriman.message_post(body=message)
 
-        # Batalkan journal entry (Jika ada)
+        # Batalkan journal entry pembuatan advanced pihut (Jika ada)
         if self.state == 'paid':
             for record in self.env['account.move'].search([('ref', '=', str(self.uang_jalan_name))]):
                 record.button_draft()
