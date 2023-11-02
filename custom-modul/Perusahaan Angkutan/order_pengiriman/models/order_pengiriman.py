@@ -37,12 +37,12 @@ class OrderPengiriman(models.Model):
             uang_jalan_line_values.append({
                 'uang_jalan':uang_jalan.id,
                 'order_pengiriman': item.id,
-                'tipe': 'none',
+                'tipe_muatan': 1,
                 'muat': item.alamat_muat.id,
                 'bongkar': item.alamat_bongkar.id,
             })
-
         uang_jalan_lines = self.env['uang.jalan.line'].create(uang_jalan_line_values)
+
         self.env.user.notify_success(message='Pembuatan Uang Jalan Berhasil', title='Sukses')
 
         return {
