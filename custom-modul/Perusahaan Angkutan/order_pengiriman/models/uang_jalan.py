@@ -74,20 +74,22 @@ class UangJalan(models.Model):
                     raise ValidationError('Harap isi Kenek sebelum mengkonfirmasi!')
                 elif not record.uang_jalan_line:
                     raise ValidationError('Anda belum memasukkan nomor Order Pengiriman!')
-                elif record.uang_jalan_line:
-                    for item in record.uang_jalan_line:
-                        if item.tipe_muatan == 'none':
-                            raise ValidationError('Harap isi kolom tipe muatan pada Detail Uang Jalan!')
 
         self.state = 'submitted'
 
     def paid(self):
         if self.tipe_uang_jalan == 'standar':
+
+            uang_jalan_list = []
+            for rec in self.uang_jalan_line:
+                for uang_jalan in rec.sudo().order_pengiriman.uang_jalan:
+                    uang_jalan_list.append((6, 0, [uang_jalan.id]))
+
             for record in self.uang_jalan_line:
                 record.sudo().order_pengiriman.write({
                     'is_uang_jalan_terbit': True,
                     'state': 'dalam_perjalanan',
-                    'uang_jalan': self.id,
+                    'uang_jalan': uang_jalan_list + [(4, self.id, 0)],
                     'kendaraan': self.kendaraan.id,
                     'sopir': self.sopir,
                     'kenek': self.kenek or None,
@@ -130,12 +132,21 @@ class UangJalan(models.Model):
         self.state = 'paid'
 
     def cancel(self):
+
+        uang_jalan_list = []
+        for rec in self.uang_jalan_line:
+            for uang_jalan in rec.sudo().order_pengiriman.uang_jalan:
+                if uang_jalan.id != self.id:
+                    uang_jalan_list.append((6, 0, [uang_jalan.id]))
+                else:
+                    pass
+
         if self.tipe_uang_jalan == 'standar':
             for record in self.uang_jalan_line:
                 record.sudo().order_pengiriman.write({
                     'is_uang_jalan_terbit': False,
                     'state': 'order_baru',
-                    'uang_jalan': None,
+                    'uang_jalan': uang_jalan_list,
                     'kendaraan': None,
                     'sopir': None,
                     'kenek': None,

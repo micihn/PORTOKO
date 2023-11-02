@@ -289,7 +289,7 @@
                                     <separator string="Info Pengiriman" />
                                     <field name="is_oper_order" invisible="1"/>
                                     <field name="tanggal_uang_jalan" />
-                                    <field name="uang_jalan" />
+                                    <field name="uang_jalan" widget="many2many_tags" />
                                     <field name="sopir" />
                                     <field name="kenek" />
                                     <field name="nomor_kendaraan" />

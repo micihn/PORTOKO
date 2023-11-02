@@ -295,7 +295,11 @@ class OrderPengiriman(models.Model):
 
     @api.depends('uang_jalan')
     def _compute_total_uang_jalan(self):
-        self.total_uang_jalan = self.uang_jalan.total
+        for rec in self:
+            total = 0.0
+            for uang_jalan in rec.uang_jalan:
+                total += uang_jalan.total
+            rec.total_uang_jalan = total
 
 
     # field definition
@@ -434,7 +438,7 @@ class OrderPengiriman(models.Model):
         'sudah_setor': [('readonly', True)],
     })
 
-    uang_jalan = fields.Many2one('uang.jalan', 'No. Uang Jalan', readonly=True, store=True, copy=False)
+    uang_jalan = fields.Many2many('uang.jalan', string='No. Uang Jalan', readonly=True, store=True, copy=False)
     nomor_setoran = fields.Char('Nomor Setoran')
     oper_setoran = fields.Char('Oper Setoran')
 
