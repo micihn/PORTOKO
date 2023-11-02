@@ -163,6 +163,116 @@ class AccountInvoicePayment(models.TransientModel):
                     'reference': setoran.kode_order_setoran,
                 })
 
+            # Buat dan Validate Journal Entry pencatatan pengeluaran
+            # Jika 'Total Pengeluaran' > 'Total Uang Jalan', maka hasil pengurangan akan dibuatkan journal
+            # entry tambahan
+            if setoran.total_pengeluaran > setoran.total_uang_jalan:
+                # Journal Entry untuk selisih
+                journal_entry_selisih = self.env['account.move'].create({
+                    'company_id': setoran.company_id.id,
+                    'move_type': 'entry',
+                    'date': setoran.create_date,
+                    'ref': setoran.kode_order_setoran,
+                    'line_ids': [
+                        (0, 0, {
+                            'name': setoran.kode_order_setoran,
+                            'date': setoran.create_date,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Cash')], limit=1).id,
+                            'company_id': setoran.company_id.id,
+                            'credit': setoran.total_pengeluaran - setoran.total_uang_jalan,
+                        }),
+
+                        (0, 0, {
+                            'name': setoran.kode_order_setoran,
+                            'date': setoran.create_date,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Advanced Pihut')], limit=1).id,
+                            'company_id': setoran.company_id.id,
+                            'debit': setoran.total_pengeluaran - setoran.total_uang_jalan,
+                        }),
+                    ],
+                })
+                journal_entry_selisih.action_post()
+
+                # Journal Entry untuk pemindahan account
+                journal_entry_total_pengeluaran = self.env['account.move'].create({
+                    'company_id': setoran.company_id.id,
+                    'move_type': 'entry',
+                    'date': setoran.create_date,
+                    'ref': setoran.kode_order_setoran,
+                    'line_ids': [
+                        (0, 0, {
+                            'name': setoran.kode_order_setoran,
+                            'date': setoran.create_date,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Biaya UJT')], limit=1).id,
+                            'company_id': setoran.company_id.id,
+                            'debit': setoran.total_pengeluaran,
+                        }),
+
+                        (0, 0, {
+                            'name': setoran.kode_order_setoran,
+                            'date': setoran.create_date,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Advanced Pihut')], limit=1).id,
+                            'company_id': setoran.company_id.id,
+                            'credit': setoran.total_pengeluaran,
+                        }),
+                    ],
+                })
+                journal_entry_total_pengeluaran.action_post()
+
+            # Jika 'Total Uang Jalan' > 'Total Pengeluaran', maka kelebihan dana akan dibuatkan journal
+            elif setoran.total_uang_jalan > setoran.total_pengeluaran:
+                # Journal Entry untuk selisih
+                journal_entry_selisih = self.env['account.move'].create({
+                    'company_id': setoran.company_id.id,
+                    'move_type': 'entry',
+                    'date': setoran.create_date,
+                    'ref': setoran.kode_order_setoran,
+                    'line_ids': [
+                        (0, 0, {
+                            'name': setoran.kode_order_setoran,
+                            'date': setoran.create_date,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Cash')], limit=1).id,
+                            'company_id': setoran.company_id.id,
+                            'debit': setoran.total_uang_jalan - setoran.total_pengeluaran,
+                        }),
+
+                        (0, 0, {
+                            'name': setoran.kode_order_setoran,
+                            'date': setoran.create_date,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Advanced Pihut')], limit=1).id,
+                            'company_id': setoran.company_id.id,
+                            'credit': setoran.total_uang_jalan - setoran.total_pengeluaran,
+                        }),
+                    ],
+                })
+                journal_entry_selisih.action_post()
+
+                # Journal Entry untuk pemindahan account
+                journal_entry_total_pengeluaran = self.env['account.move'].create({
+                    'company_id': setoran.company_id.id,
+                    'move_type': 'entry',
+                    'date': setoran.create_date,
+                    'ref': setoran.kode_order_setoran,
+                    'line_ids': [
+                        (0, 0, {
+                            'name': setoran.kode_order_setoran,
+                            'date': setoran.create_date,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Biaya UJT')], limit=1).id,
+                            'company_id': setoran.company_id.id,
+                            'debit': setoran.total_pengeluaran,
+                        }),
+
+                        (0, 0, {
+                            'name': setoran.kode_order_setoran,
+                            'date': setoran.create_date,
+                            'account_id': self.env['account.account'].search([('name', '=', 'Advanced Pihut')], limit=1).id,
+                            'company_id': setoran.company_id.id,
+                            'credit': setoran.total_pengeluaran,
+                        }),
+                    ],
+                })
+                journal_entry_total_pengeluaran.action_post()
+
             setoran.state = 'done'
 
 class AccountInvoicePaymentLine(models.TransientModel):
