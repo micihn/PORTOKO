@@ -77,7 +77,7 @@
                                     <field name="muat" width="20%" optional="show"/>
                                     <field name="bongkar" width="20%" optional="show"/>
                                     <field name="keterangan" width="20%" optional="show"/>
-                                    <field name="nominal_uang_jalan" width="20%" force_save="1" readonly="1" optional="show"/>
+                                    <field name="nominal_uang_jalan" width="20%" optional="show"/>
                                 </tree>
                             </field>
 

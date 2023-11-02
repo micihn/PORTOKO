@@ -407,15 +407,16 @@ class OrderSetoran(models.Model):
 
         ############################## Membuat Dictionary-List Uang Jalan ###########################
 
-            if record.uang_jalan.id not in record_uang_jalan:
-                list_uang_jalan_dict = {
-                    'tanggal': record.uang_jalan.create_date,
-                    'uang_jalan_name': record.uang_jalan.id,
-                    'total': record.uang_jalan.total,
-                    'keterangan': record.uang_jalan.keterangan,
-                }
-                list_uang_jalan.append(list_uang_jalan_dict)
-                record_uang_jalan.append(int(record.uang_jalan.id))
+            for uang_jalan in record.uang_jalan:
+                if uang_jalan.id not in record_uang_jalan:
+                    list_uang_jalan_dict = {
+                        'tanggal': uang_jalan.create_date,
+                        'uang_jalan_name': uang_jalan.id,
+                        'total': uang_jalan.total,
+                        'keterangan': uang_jalan.keterangan,
+                    }
+                    list_uang_jalan.append(list_uang_jalan_dict)
+                    record_uang_jalan.append(int(uang_jalan.id))
 
         ############################## Membuat Dictionary-List Pembelian ###########################
 
@@ -560,15 +561,16 @@ class OrderSetoran(models.Model):
 
             ############################## Rewrite Dictionary-List List Uang Jalan ###########################
 
-                if record.uang_jalan.id not in record_uang_jalan:
-                    list_uang_jalan_dict = {
-                        'tanggal': record.uang_jalan.create_date,
-                        'uang_jalan_name': record.uang_jalan.id,
-                        'total': record.uang_jalan.total,
-                        'keterangan': record.uang_jalan.keterangan,
-                    }
-                    list_uang_jalan.append(list_uang_jalan_dict)
-                    record_uang_jalan.append(int(record.uang_jalan.id))
+                for uang_jalan in record.uang_jalan:
+                    if uang_jalan.id not in record_uang_jalan:
+                        list_uang_jalan_dict = {
+                            'tanggal': uang_jalan.create_date,
+                            'uang_jalan_name': uang_jalan.id,
+                            'total': uang_jalan.total,
+                            'keterangan': uang_jalan.keterangan,
+                        }
+                        list_uang_jalan.append(list_uang_jalan_dict)
+                        record_uang_jalan.append(int(uang_jalan.id))
 
             ############################## Rewrite Dictionary-List List Pembelian ###########################
 
