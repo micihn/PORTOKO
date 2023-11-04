@@ -129,6 +129,34 @@ class UangJalan(models.Model):
 
             journal_entry.action_post()
 
+        elif self.tipe_uang_jalan == 'nominal_saja':
+            # Buat dan Validate Journal Entry untuk mengurangi nilai pada saldo
+            journal_entry = self.env['account.move'].create({
+                'company_id': self.company_id.id,
+                'move_type': 'entry',
+                'date': self.create_date,
+                'ref': self.uang_jalan_name,
+                'line_ids': [
+                    (0, 0, {
+                        'name': self.uang_jalan_name,
+                        'date': self.create_date,
+                        'account_id': self.env['account.account'].search([('name', '=', 'Kas')], limit=1).id,
+                        'company_id': self.company_id.id,
+                        'credit': self.total,
+                    }),
+
+                    (0, 0, {
+                        'name': self.uang_jalan_name,
+                        'date': self.create_date,
+                        'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
+                        'company_id': self.company_id.id,
+                        'debit': self.total,
+                    }),
+                ],
+            })
+
+            journal_entry.action_post()
+
         self.state = 'paid'
 
     def cancel(self):
@@ -146,7 +174,7 @@ class UangJalan(models.Model):
                 record.sudo().order_pengiriman.write({
                     'is_uang_jalan_terbit': False,
                     'state': 'order_baru',
-                    'uang_jalan': uang_jalan_list,
+                    'uang_jalan': uang_jalan_list or None,
                     'kendaraan': None,
                     'sopir': None,
                     'kenek': None,
@@ -259,18 +287,6 @@ class UangJalan(models.Model):
     def _compute_total(self):
         for record in self:
             record.total = record.total_uang_jalan_standar + record.total_uang_jalan_nominal_saja
-
-    # total = fields.Float('Total', compute='_compute_total', digits=(6, 0))
-    # # Method untuk menghitung subtotal ongkos jenis order DO
-    # @api.depends('uang_jalan_line.nominal_uang_jalan', 'uang_jalan_nominal_tree.nominal_uang_jalan', 'biaya_tambahan')
-    # def _compute_total(self):
-    #     for record in self:
-    #         if record.tipe_uang_jalan == 'standar':
-    #             uang_jalan_line = record.sudo().uang_jalan_line
-    #             record.total = sum(uang_jalan_line.sudo().mapped('nominal_uang_jalan')) + record.biaya_tambahan
-    #         elif record.tipe_uang_jalan == 'nominal_saja':
-    #             uang_jalan_nominal_tree = record.sudo().uang_jalan_nominal_tree
-    #             record.total = sum(uang_jalan_nominal_tree.sudo().mapped('nominal_uang_jalan')) + record.biaya_tambahan
 
     def validate(self):
         self.state = 'validated'
