@@ -98,7 +98,7 @@ class OrderSetoran(models.Model):
 
     list_pembelian = fields.One2many('detail.list.pembelian', 'order_setoran', states={
         'draft': [('readonly', False)],
-        'done': [('readonly', True)],
+        'done': [('readonly', False)],
     })
 
     biaya_fee = fields.One2many('detail.biaya.fee', 'order_setoran', states={
@@ -687,6 +687,57 @@ class OrderSetoran(models.Model):
                     'company_id': self.env.company.id,
                     'order_pengiriman': item['order_pengiriman'],
                     'fee_contact': item['fee_contact'],
+                    'nominal': item['nominal'],
+                })
+
+        # Cek apakah ada penambahan atau perubahan List Pembelian
+        if 'list_pembelian' in vals:
+            list_pembelian_before_updated = []
+            # Rewriting List Pembelian di dalam order setoran
+            for record in self.list_pembelian:
+                list_pembelian_before_update_dict = {
+                    'order_setoran': self.id,
+                    'order_pengiriman': record.order_pengiriman.id,
+                    'supplier': record.supplier.id,
+                    'nama_barang': record.nama_barang,
+                    'nominal': record.nominal,
+                }
+
+                list_pembelian_before_updated.append(list_pembelian_before_update_dict)
+
+                record.unlink()
+
+            for item in list_pembelian_before_updated:
+                self.env['detail.list.pembelian'].create({
+                    'company_id': self.env.company.id,
+                    'order_setoran': self.id,
+                    'order_pengiriman': item['order_pengiriman'],
+                    'supplier': item['supplier'],
+                    'nama_barang': item['nama_barang'],
+                    'nominal': item['nominal'],
+                })
+
+            # Rewriting Biaya Fee di order pengiriman
+            list_pembelian_order_pengiriman = []
+            for item in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_pembelian:
+                list_pembelian_dict = {
+                    'order_pengiriman': item.order_pengiriman.id,
+                    'supplier': item.supplier.id,
+                    'nama_barang': item.nama_barang,
+                    'nominal': item.nominal,
+                }
+
+                list_pembelian_order_pengiriman.append(list_pembelian_dict)
+
+            for record in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_pembelian:
+                record.unlink()
+
+            for item in list_pembelian_before_updated:
+                self.env['biaya.pembelian'].create({
+                    'company_id': self.env.company.id,
+                    'order_pengiriman': item['order_pengiriman'],
+                    'supplier': item['supplier'],
+                    'nama_barang': item['nama_barang'],
                     'nominal': item['nominal'],
                 })
 
