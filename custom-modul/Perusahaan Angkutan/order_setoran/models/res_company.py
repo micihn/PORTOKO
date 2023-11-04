@@ -39,7 +39,6 @@ class ResCompanySetoranInherit(models.Model):
                 'number_next_actual': data['number_next_actual'],
             })
 
-
     @api.model
     def create(self, values):
         company = super(ResCompanySetoranInherit, self).create(values)

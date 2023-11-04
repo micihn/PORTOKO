@@ -11,6 +11,37 @@ class OperOrder(models.Model):
     active = fields.Boolean('Archive', default=True, tracking=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 
+    oper_order_name = fields.Char(readonly=True, required=True, copy=False, default='New')
+    vendor_pa = fields.Many2one('res.partner', states={
+        'to_request': [('readonly', False)],
+        'requested': [('readonly', True)],
+        'confirmed': [('readonly', True)],
+        'cancel': [('readonly', True)],
+    })
+    kendaraan = fields.Char('Kendaraan', states={
+        'to_request': [('readonly', False)],
+        'requested': [('readonly', True)],
+        'confirmed': [('readonly', True)],
+        'cancel': [('readonly', True)],
+    })
+
+    kendaraan_orm = fields.Char('Kendaraan (ORM)', compute='_compute_kendaraan_orm', store=True)
+
+    biaya_total = fields.Float('Total', compute='_compute_biaya', store=True)
+    oper_order_line = fields.One2many('oper.order.line', 'oper_order', required = True, states={
+        'to_request': [('readonly', False)],
+        'requested': [('readonly', True)],
+        'confirmed': [('readonly', True)],
+        'cancel': [('readonly', True)],
+    })
+
+    state = fields.Selection([
+        ('to_request', "To Request"),
+        ('requested', "Requested"),
+        ('confirmed', "Confirmed"),
+        ('cancel', "Cancelled"),
+    ], default='to_request', string="State", index=True, hide=True, tracking=True)
+
     # Method untuk auto name assignment
     @api.model
     def create(self, vals):
@@ -64,37 +95,6 @@ class OperOrder(models.Model):
     def set_to_draft(self):
         self.state = 'to_request'
 
-    # fields definition
-    oper_order_name = fields.Char(readonly=True, required=True, copy=False, default='New')
-    vendor_pa = fields.Many2one('res.partner', states={
-        'to_request': [('readonly', False)],
-        'requested': [('readonly', True)],
-        'confirmed': [('readonly', True)],
-        'cancel': [('readonly', True)],
-    })
-    kendaraan = fields.Char('Kendaraan', states={
-        'to_request': [('readonly', False)],
-        'requested': [('readonly', True)],
-        'confirmed': [('readonly', True)],
-        'cancel': [('readonly', True)],
-    })
-
-    kendaraan_orm = fields.Char('Kendaraan (ORM)', compute='_compute_kendaraan_orm', store=True)
-
-    biaya_total = fields.Float('Total', compute='_compute_biaya', store=True)
-    oper_order_line = fields.One2many('oper.order.line', 'oper_order', required = True, states={
-        'to_request': [('readonly', False)],
-        'requested': [('readonly', True)],
-        'confirmed': [('readonly', True)],
-        'cancel': [('readonly', True)],
-    })
-
-    state = fields.Selection([
-        ('to_request', "To Request"),
-        ('requested', "Requested"),
-        ('confirmed', "Confirmed"),
-        ('cancel', "Cancelled"),
-    ], default='to_request', string="State", index=True, hide=True, tracking=True)
 
     def unlink(self):
         if any(record.state not in ('to_request', 'cancel') for record in self):

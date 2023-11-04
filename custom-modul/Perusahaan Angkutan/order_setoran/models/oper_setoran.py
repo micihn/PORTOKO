@@ -1,6 +1,5 @@
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError, UserError
-import re
 
 class OperSetoran(models.Model):
     _name = 'oper.setoran'
@@ -19,7 +18,9 @@ class OperSetoran(models.Model):
     total_list_pembelian = fields.Float(compute='_compute_jumlah_list_pembelian', digits=(6, 0))
     sisa = fields.Float(compute='_calculate_sisa', digits=(6, 0))
     active = fields.Boolean('Archive', default=True, tracking=True)
-
+    invoice_count = fields.Integer(compute='_compute_invoice_count')
+    vendor_bills_count = fields.Integer(compute='_compute_bills_count')
+    total_ongkos_calculated = fields.Float(digits=(6, 0), compute='_compute_total_ongkos_calculated')
 
     vendor_pa = fields.Many2one('res.partner', 'Vendor PA', required=True, states={
         'draft': [('readonly', False)],
@@ -85,15 +86,11 @@ class OperSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-
     total_ongkos = fields.Integer('Total Ongkos', default=90, tracking=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     })
-
-    invoice_count = fields.Integer(compute='_compute_invoice_count')
-    vendor_bills_count = fields.Integer(compute='_compute_bills_count')
 
     def _compute_bills_count(self):
         try:
@@ -271,7 +268,6 @@ class OperSetoran(models.Model):
 
             for record in self.detail_order:
                 record.order_pengiriman.nomor_surat_jalan = None
-                record.order_pengiriman.tanggal_uang_jalan = None
                 record.unlink()
 
             for record in self.list_oper_order:
@@ -372,7 +368,6 @@ class OperSetoran(models.Model):
             if order.tanggal_surat_jalan == False:
                 raise ValidationError('Tanggal Surat Jalan belum terisi! ' + str(order.order_pengiriman.order_pengiriman_name))
 
-
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'account.invoice.oper.payment',
@@ -388,7 +383,6 @@ class OperSetoran(models.Model):
                 'is_sudah_disetor': False,
                 'state': 'selesai',
                 'nomor_surat_jalan': None,
-                'tanggal_uang_jalan': None,
             })
 
         # Cancel Invoice
@@ -417,7 +411,6 @@ class OperSetoran(models.Model):
         for record in self:
             record.sisa = record.total_jumlah - record.total_oper_order - record.total_list_pembelian - record.total_biaya_fee
 
-    total_ongkos_calculated = fields.Float(digits=(6, 0), compute='_compute_total_ongkos_calculated')
     @api.depends('total_ongkos')
     def _compute_total_ongkos_calculated(self):
         for record in self:

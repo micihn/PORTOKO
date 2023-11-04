@@ -14,13 +14,65 @@ class UangJalan(models.Model):
         ('nominal_saja', "Nominal Saja"),
     ], required=True, default='standar')
 
-    # Method untuk auto name assignment
-    @api.model
-    def create(self, vals):
-        if vals.get('uang_jalan_name', 'New') == 'New':
-            vals['uang_jalan_name'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('uang.jalan.sequence') or 'New'
-        result = super(UangJalan, self).create(vals)
-        return result
+    uang_jalan_name = fields.Char(readonly=True, required=True, copy=False, default='New')
+    kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', copy=True, ondelete='restrict', states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+    })
+
+    sopir = fields.Many2one('hr.employee', 'Sopir', copy=True, ondelete='restrict', states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+    })
+
+    kenek = fields.Many2one('hr.employee', 'Kenek', copy=True, ondelete='restrict', states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+    })
+
+    keterangan = fields.Text('Keterangan', copy=False, states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+    })
+
+    uang_jalan_line = fields.One2many('uang.jalan.line', 'uang_jalan', required=True, copy=False, states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+    })
+
+    uang_jalan_nominal_tree = fields.One2many('uang.jalan.nominal.saja', 'uang_jalan_nominal_saja', required=True,
+                                              copy=False, states={
+            'to_submit': [('readonly', False)],
+            'submitted': [('readonly', True)],
+            'validated': [('readonly', True)],
+            'paid': [('readonly', True)],
+        })
+
+    biaya_tambahan_standar = fields.Float('Biaya Tambahan', default=0, copy=False, digits=(6, 0), states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+    })
+
+    biaya_tambahan_nominal_saja = fields.Float('Biaya Tambahan', default=0, copy=False, digits=(6, 0), states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+    })
+
+    total_uang_jalan_standar = fields.Float('Total', compute='_compute_total_uang_jalan_standar', default=0, digits=(6, 0))
 
     state = fields.Selection([
         ('to_submit', "To Submit"),
@@ -29,6 +81,17 @@ class UangJalan(models.Model):
         ('paid', "Paid"),
         ('cancel', "Cancelled"),
     ], default='to_submit', string="State", hide=True, tracking=True)
+
+    total_uang_jalan_nominal_saja = fields.Float('Total', compute='_compute_total_nominal_uang_jalan_saja', copy=False, default=0, store=True, digits=(6, 0))
+    total = fields.Float('Total', default=0, copy=False, compute='_compute_total', store=True, digits=(6, 0))
+
+    # Method untuk auto name assignment
+    @api.model
+    def create(self, vals):
+        if vals.get('uang_jalan_name', 'New') == 'New':
+            vals['uang_jalan_name'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('uang.jalan.sequence') or 'New'
+        result = super(UangJalan, self).create(vals)
+        return result
 
     def write(self, vals):
         if 'tipe_uang_jalan' in vals:
@@ -206,73 +269,11 @@ class UangJalan(models.Model):
             if nominal_uang_jalan:
                 record.sudo().nominal_uang_jalan = nominal_uang_jalan
 
-    uang_jalan_name = fields.Char(readonly=True, required=True, copy=False, default='New')
-    kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', copy=True, ondelete='restrict', states={
-        'to_submit': [('readonly', False)],
-        'submitted': [('readonly', True)],
-        'validated': [('readonly', True)],
-        'paid': [('readonly', True)],
-    })
-
-    sopir = fields.Many2one('hr.employee', 'Sopir', copy=True, ondelete='restrict', states={
-        'to_submit': [('readonly', False)],
-        'submitted': [('readonly', True)],
-        'validated': [('readonly', True)],
-        'paid': [('readonly', True)],
-    })
-
-    kenek = fields.Many2one('hr.employee', 'Kenek', copy=True, ondelete='restrict', states={
-        'to_submit': [('readonly', False)],
-        'submitted': [('readonly', True)],
-        'validated': [('readonly', True)],
-        'paid': [('readonly', True)],
-    })
-
-    keterangan = fields.Text('Keterangan', copy=False, states={
-        'to_submit': [('readonly', False)],
-        'submitted': [('readonly', True)],
-        'validated': [('readonly', True)],
-        'paid': [('readonly', True)],
-    })
-
-    uang_jalan_line = fields.One2many('uang.jalan.line', 'uang_jalan', required=True, copy=False, states={
-        'to_submit': [('readonly', False)],
-        'submitted': [('readonly', True)],
-        'validated': [('readonly', True)],
-        'paid': [('readonly', True)],
-    })
-
-    uang_jalan_nominal_tree = fields.One2many('uang.jalan.nominal.saja', 'uang_jalan_nominal_saja', required=True, copy=False, states={
-        'to_submit': [('readonly', False)],
-        'submitted': [('readonly', True)],
-        'validated': [('readonly', True)],
-        'paid': [('readonly', True)],
-    })
-
-    biaya_tambahan_standar = fields.Float('Biaya Tambahan', default=0, copy=False, digits=(6, 0), states={
-        'to_submit': [('readonly', False)],
-        'submitted': [('readonly', True)],
-        'validated': [('readonly', True)],
-        'paid': [('readonly', True)],
-    })
-
-    biaya_tambahan_nominal_saja = fields.Float('Biaya Tambahan', default=0, copy=False, digits=(6, 0), states={
-        'to_submit': [('readonly', False)],
-        'submitted': [('readonly', True)],
-        'validated': [('readonly', True)],
-        'paid': [('readonly', True)],
-    })
-
-    total_uang_jalan_standar = fields.Float('Total', compute='_compute_total_uang_jalan_standar', default=0, digits=(6, 0))
-
     @api.depends('uang_jalan_line.nominal_uang_jalan', 'biaya_tambahan_standar')
     def _compute_total_uang_jalan_standar(self):
         for record in self:
             uang_jalan_line = record.sudo().uang_jalan_line
             record.total_uang_jalan_standar = sum(uang_jalan_line.mapped('nominal_uang_jalan')) + record.biaya_tambahan_standar
-
-    total_uang_jalan_nominal_saja = fields.Float('Total', compute='_compute_total_nominal_uang_jalan_saja', copy=False,
-                                                 default=0, store=True, digits=(6, 0))
 
     @api.depends('uang_jalan_nominal_tree.nominal_uang_jalan', 'biaya_tambahan_nominal_saja')
     def _compute_total_nominal_uang_jalan_saja(self):
@@ -280,8 +281,6 @@ class UangJalan(models.Model):
             uang_jalan_nominal_tree = record.sudo().uang_jalan_nominal_tree
             record.total_uang_jalan_nominal_saja = sum(
                 uang_jalan_nominal_tree.mapped('nominal_uang_jalan')) + record.biaya_tambahan_nominal_saja
-
-    total = fields.Float('Total', default=0, copy=False, compute='_compute_total', store=True, digits=(6, 0))
 
     @api.depends('total_uang_jalan_standar', 'total_uang_jalan_nominal_saja')
     def _compute_total(self):
@@ -297,7 +296,6 @@ class UangJalan(models.Model):
 
         return super(UangJalan, self).unlink()
 
-
 class UangJalanLine(models.Model):
     _name = 'uang.jalan.line'
     _description = 'Uang Jalan Line'
@@ -310,7 +308,6 @@ class UangJalanLine(models.Model):
     bongkar = fields.Many2one('konfigurasi.lokasi', 'Bongkar', compute='_compute_muat_and_bongkar')
     nominal_uang_jalan = fields.Float('Nominal UJ', default=0, digits=(6, 0))
     keterangan = fields.Text('Keterangan')
-
 
     @api.depends('order_pengiriman.alamat_muat', 'order_pengiriman.alamat_bongkar')
     def _compute_muat_and_bongkar(self):
@@ -350,7 +347,6 @@ class UangJalanLine(models.Model):
                     self.muat.lokasi) + ' dan bongkar di ' + str(
                     self.bongkar.lokasi) + ' tidak ditemukan. Harap isi pengaturan di Konfigurasi > Uang Jalan',
                                              sticky=True, title='Konfigurasi Uang Jalan Tidak Ditemukan')
-
 
 class UangJalanNominalSaja(models.Model):
     _name = 'uang.jalan.nominal.saja'

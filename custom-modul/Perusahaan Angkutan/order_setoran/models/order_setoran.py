@@ -24,8 +24,6 @@ class OrderSetoran(models.Model):
     active = fields.Boolean('Archive', default=True, tracking=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 
-
-
     kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', tracking=True, required=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
@@ -191,6 +189,10 @@ class OrderSetoran(models.Model):
         # Cek Detail Order
         if bool(self.detail_order) == False:
             raise ValidationError('Detail Order Belum Terisi!')
+
+        # Cek Total Pengeluaran
+        if self.total_pengeluaran == 0:
+            raise ValidationError('Total Pengeluaran belum diisi!')
 
         # Cek Nomor Surat Jalan & Tanggal
         for order in self.detail_order:

@@ -293,6 +293,7 @@
                                     <field name="kenek" />
                                     <field name="nomor_kendaraan" />
                                     <field name="model_kendaraan" />
+
                                 </group>
 
                                 <group attrs="{'invisible': [('is_oper_order', '=', False)]}">

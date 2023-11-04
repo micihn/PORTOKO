@@ -22,6 +22,156 @@ class OrderPengiriman(models.Model):
 
     active = fields.Boolean('Archive', default=True, tracking=True)
 
+
+    is_sudah_disetor = fields.Boolean()
+    is_uang_jalan_terbit = fields.Boolean()
+    is_oper_order = fields.Boolean(store=True)
+    order_pengiriman_name = fields.Char(readonly=True, required=True, copy=False, default='New')
+    customer = fields.Many2one('res.partner', 'Customer', required=True, ondelete='restrict', tracking=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    alamat_muat = fields.Many2one('konfigurasi.lokasi', required=True, ondelete='restrict', tracking=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
+    })
+
+    detail_alamat_muat = fields.Text('Detail Alamat Muat', placeholder='Contoh : Jalan Mangga RT 50 No 2', tracking=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
+    })
+
+    tanggal_estimasi_muat = fields.Date(string='Estimasi Tanggal Muat', tracking=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    alamat_bongkar = fields.Many2one('konfigurasi.lokasi', required=True, ondelete='restrict', tracking=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
+    })
+
+    detail_alamat_bongkar = fields.Text('Detail Alamat Bongkar', placeholder='Contoh : Jalan Bersama Blok C No 23', tracking=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
+    })
+
+    tanggal_estimasi_bongkar = fields.Date(string='Estimasi Tanggal Bongkar', tracking=True, digits=(6, 0), states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    total_biaya_fee = fields.Float(compute='_compute_total_biaya_fee', store=True, tracking=True, digits=(6, 0), states={
+        'order_baru': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    total_biaya_pembelian = fields.Float(compute='_compute_total_biaya_pembelian', store=True, tracking=True, digits=(6, 0), states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    total_ongkos_do = fields.Float(compute='_compute_total_ongkos_do', store=True, tracking=True, digits=(6, 0), states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    total_ongkos_reguler = fields.Float(compute='_compute_total_ongkos_reguler', store=True, tracking=True, digits=(6, 0), states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    total_ongkos = fields.Float(compute='_compute_total_ongkos', store=True, digits=(6, 0))
+
+    total_uang_jalan = fields.Float('Uang Jalan', compute='_compute_total_uang_jalan', copy=False, digits=(6, 0), states={
+        'order_baru': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    jenis_order = fields.Selection([
+        ('do', 'DO'),
+        ('regular', 'Regular'),
+    ], required=True, default='do', tracking=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    detail_order_do = fields.One2many('detail.order.do', 'order_pengiriman', copy=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    detail_order_reguler = fields.One2many('detail.order.reguler', 'order_pengiriman', copy=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    biaya_pembelian = fields.One2many('biaya.pembelian', 'order_pengiriman', copy=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
+    })
+
+    biaya_fee = fields.One2many('biaya.fee', 'order_pengiriman', copy=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', False)],
+        'sudah_setor': [('readonly', False)],
+    })
+
+    plant = fields.Many2one('konfigurasi.plant', 'PLANT', ondelete='restrict', tracking=True, copy=True, states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    uang_jalan = fields.Many2many('uang.jalan', string='No. Uang Jalan', readonly=False, store=True, copy=False)
+    nomor_setoran = fields.Char('Nomor Setoran')
+    oper_setoran = fields.Char('Oper Setoran')
+
+    oper_order = fields.Many2one('oper.order', 'No. Oper Order', readonly=True, store=True, copy=False)
+    sopir = fields.Many2one('hr.employee', 'Sopir', readonly=True, store=True, copy=False)
+    kenek = fields.Many2one('hr.employee', 'Kenek', readonly=True, store=True, copy=False)
+    kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', readonly=True, store=True, copy=False)
+    model_kendaraan = fields.Char(string='Model Kendaraan', readonly=True, store=True, copy=False)
+    nomor_kendaraan = fields.Char(string='Nomor Kendaraan',readonly=True, store=True, copy=False)
+    nomor_surat_jalan = fields.Char('No Surat Jalan', copy=False)
+    vendor_pa = fields.Many2one('res.partner', 'Vendor PA', readonly=True, store=True, copy=False)
+
+
     def buat_uang_jalan(self, records):
         uang_jalan_records = []
 
@@ -373,156 +523,6 @@ class OrderPengiriman(models.Model):
             for uang_jalan in rec.uang_jalan:
                 total += uang_jalan.total
             rec.total_uang_jalan = total
-
-
-    # field definition
-    is_sudah_disetor = fields.Boolean()
-    is_uang_jalan_terbit = fields.Boolean()
-    is_oper_order = fields.Boolean(store=True)
-    order_pengiriman_name = fields.Char(readonly=True, required=True, copy=False, default='New')
-    customer = fields.Many2one('res.partner', 'Customer', required=True, ondelete='restrict', tracking=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    alamat_muat = fields.Many2one('konfigurasi.lokasi', required=True, ondelete='restrict', tracking=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    detail_alamat_muat = fields.Text('Detail Alamat Muat', placeholder='Contoh : Jalan Mangga RT 50 No 2', tracking=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', False)],
-        'selesai': [('readonly', False)],
-        'sudah_setor': [('readonly', False)],
-    })
-
-    tanggal_estimasi_muat = fields.Date(string='Estimasi Tanggal Muat', tracking=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    alamat_bongkar = fields.Many2one('konfigurasi.lokasi', required=True, ondelete='restrict', tracking=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', False)],
-        'selesai': [('readonly', False)],
-        'sudah_setor': [('readonly', False)],
-    })
-
-    detail_alamat_bongkar = fields.Text('Detail Alamat Bongkar', placeholder='Contoh : Jalan Bersama Blok C No 23', tracking=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', False)],
-        'selesai': [('readonly', False)],
-        'sudah_setor': [('readonly', False)],
-    })
-
-    tanggal_estimasi_bongkar = fields.Date(string='Estimasi Tanggal Bongkar', tracking=True, digits=(6, 0), states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    total_biaya_fee = fields.Float(compute='_compute_total_biaya_fee', store=True, tracking=True, digits=(6, 0), states={
-        'order_baru': [('readonly', True)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    total_biaya_pembelian = fields.Float(compute='_compute_total_biaya_pembelian', store=True, tracking=True, digits=(6, 0), states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    total_ongkos_do = fields.Float(compute='_compute_total_ongkos_do', store=True, tracking=True, digits=(6, 0), states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    total_ongkos_reguler = fields.Float(compute='_compute_total_ongkos_reguler', store=True, tracking=True, digits=(6, 0), states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    total_ongkos = fields.Float(compute='_compute_total_ongkos', store=True, digits=(6, 0))
-
-    total_uang_jalan = fields.Float('Uang Jalan', compute='_compute_total_uang_jalan', copy=False, digits=(6, 0), states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    jenis_order = fields.Selection([
-        ('do', 'DO'),
-        ('regular', 'Regular'),
-    ], required=True, default='do', tracking=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    detail_order_do = fields.One2many('detail.order.do', 'order_pengiriman', copy=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    detail_order_reguler = fields.One2many('detail.order.reguler', 'order_pengiriman', copy=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    biaya_pembelian = fields.One2many('biaya.pembelian', 'order_pengiriman', copy=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', False)],
-        'selesai': [('readonly', False)],
-        'sudah_setor': [('readonly', False)],
-    })
-
-    biaya_fee = fields.One2many('biaya.fee', 'order_pengiriman', copy=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', False)],
-        'selesai': [('readonly', False)],
-        'sudah_setor': [('readonly', False)],
-    })
-
-    plant = fields.Many2one('konfigurasi.plant', 'PLANT', ondelete='restrict', tracking=True, copy=True, states={
-        'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
-        'selesai': [('readonly', True)],
-        'sudah_setor': [('readonly', True)],
-    })
-
-    uang_jalan = fields.Many2many('uang.jalan', string='No. Uang Jalan', readonly=False, store=True, copy=False)
-    nomor_setoran = fields.Char('Nomor Setoran')
-    oper_setoran = fields.Char('Oper Setoran')
-
-    oper_order = fields.Many2one('oper.order', 'No. Oper Order', readonly=True, store=True, copy=False)
-    sopir = fields.Many2one('hr.employee', 'Sopir', readonly=True, store=True, copy=False)
-    kenek = fields.Many2one('hr.employee', 'Kenek', readonly=True, store=True, copy=False)
-    kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', readonly=True, store=True, copy=False)
-    model_kendaraan = fields.Char(string='Model Kendaraan', readonly=True, store=True, copy=False)
-    nomor_kendaraan = fields.Char(string='Nomor Kendaraan',readonly=True, store=True, copy=False)
-    nomor_surat_jalan = fields.Char('No Surat Jalan', copy=False)
-    vendor_pa = fields.Many2one('res.partner', 'Vendor PA', readonly=True, store=True, copy=False)
 
 
 class DetailOrderDO(models.Model):
