@@ -515,7 +515,7 @@ class OrderPengiriman(models.Model):
         'sudah_setor': [('readonly', True)],
     })
 
-    uang_jalan = fields.Many2many('uang.jalan', string='No. Uang Jalan', readonly=True, store=True, copy=False)
+    uang_jalan = fields.Many2many('uang.jalan', string='No. Uang Jalan', readonly=False, store=True, copy=False)
     nomor_setoran = fields.Char('Nomor Setoran')
     oper_setoran = fields.Char('Oper Setoran')
 
