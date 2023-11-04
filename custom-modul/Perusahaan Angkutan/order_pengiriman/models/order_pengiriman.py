@@ -243,15 +243,11 @@ class OrderPengiriman(models.Model):
                         'nominal': item.nominal,
                     }
                     biaya_pembelian_setoran_list.append(list_pembelian_dict)
-
-                print(biaya_pembelian_setoran_list)
-
                 for record in self.env['order.setoran'].search([('kode_order_setoran', '=', self.nomor_setoran)]).list_pembelian:
                     if str(record.order_pengiriman.order_pengiriman_name) == str(self.order_pengiriman_name):
                         record.unlink()
 
                 for item in biaya_pembelian_list:
-                    print(item)
                     self.env['detail.list.pembelian'].create({
                         'company_id': self.env.company.id,
                         'order_setoran': self.env['order.setoran'].search([('kode_order_setoran', '=', self.nomor_setoran)]).id,
@@ -261,9 +257,8 @@ class OrderPengiriman(models.Model):
                         'nominal': item['nominal'],
                     })
 
-#### BATASAN
             elif self.oper_setoran:
-                # Rewriting Biaya Fee di dalam order pengiriman
+                # Rewriting Biaya Pembelian di dalam order pengiriman
                 biaya_pembelian_list = []
                 for record in self.biaya_pembelian:
                     biaya_pembelian_dict = {
@@ -280,30 +275,31 @@ class OrderPengiriman(models.Model):
                 for item in biaya_pembelian_list:
                     self.env['biaya.pembelian'].create({
                         'company_id': self.env.company.id,
-                        'supplier': record.supplier.id,
-                        'nama_barang': record.nama_barang,
-                        'nominal': record.nominal,
+                        'order_pengiriman': item['order_pengiriman'],
+                        'supplier': item['supplier'],
+                        'nama_barang': item['nama_barang'],
+                        'nominal': item['nominal'],
                     })
 
-                # Rewriting Biaya Fee di oper setoran
+                # Rewriting Biaya Pembelian di oper setoran
                 biaya_pembelian_setoran_list = []
-                for item in self.env['oper.setoran'].search([('kode_oper_setoran', '=', self.oper_setoran)]).biaya_fee_setoran:
-                    fee_dict = {
+                for item in self.env['oper.setoran'].search([('kode_oper_setoran', '=', self.oper_setoran)]).list_pembelian_setoran:
+                    biaya_pembelian_dict = {
                         'order_pengiriman': item.order_pengiriman.id,
                         'nominal': item.nominal,
                     }
 
-                    biaya_fee_setoran_list.append(fee_dict)
+                    biaya_pembelian_setoran_list.append(biaya_pembelian_dict)
 
-                for record in self.env['oper.setoran'].search([('kode_oper_setoran', '=', self.oper_setoran)]).biaya_fee_setoran:
+                for record in self.env['oper.setoran'].search([('kode_oper_setoran', '=', self.oper_setoran)]).list_pembelian_setoran:
                     if record.order_pengiriman.id == self.id:
                         record.unlink()
 
-                self.env['biaya.fee.setoran'].create({
+                self.env['list.pembelian.setoran'].create({
                     'company_id': self.env.company.id,
                     'oper_setoran': self.env['oper.setoran'].search([('kode_oper_setoran', '=', self.oper_setoran)]).id,
                     'order_pengiriman': self.id,
-                    'nominal': self.total_biaya_fee,
+                    'nominal': self.total_biaya_pembelian,
                 })
 
 
