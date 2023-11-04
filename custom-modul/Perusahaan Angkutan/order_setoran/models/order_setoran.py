@@ -56,7 +56,7 @@ class OrderSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    total_pengeluaran = fields.Float(digits=(6, 0), states={
+    total_pengeluaran = fields.Float(digits=(6, 0), required=True,states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
@@ -292,7 +292,6 @@ class OrderSetoran(models.Model):
                 'is_sudah_disetor': False,
                 'state': 'selesai',
                 'nomor_surat_jalan': None,
-                'tanggal_uang_jalan': None,
                 'nomor_setoran': None,
             })
 
