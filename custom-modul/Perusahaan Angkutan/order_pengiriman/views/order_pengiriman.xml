@@ -288,7 +288,6 @@
                                 <group attrs="{'invisible': [('is_oper_order', '=', True)]}">
                                     <separator string="Info Pengiriman" />
                                     <field name="is_oper_order" invisible="1"/>
-                                    <field name="tanggal_uang_jalan" />
                                     <field name="uang_jalan" widget="many2many_tags" />
                                     <field name="sopir" />
                                     <field name="kenek" />
@@ -299,7 +298,6 @@
                                 <group attrs="{'invisible': [('is_oper_order', '=', False)]}">
                                     <separator string="Info Pengiriman (Oper Order)" />
                                     <field name="is_oper_order" invisible="1"/>
-                                    <field name="tanggal_uang_jalan" />
                                     <field name="oper_order" />
                                     <field name="vendor_pa" />
                                     <field name="nomor_kendaraan" />
