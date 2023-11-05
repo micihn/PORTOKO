@@ -24,8 +24,6 @@ class OrderSetoran(models.Model):
     active = fields.Boolean('Archive', default=True, tracking=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 
-
-
     kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', tracking=True, required=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
@@ -98,12 +96,12 @@ class OrderSetoran(models.Model):
 
     list_pembelian = fields.One2many('detail.list.pembelian', 'order_setoran', states={
         'draft': [('readonly', False)],
-        'done': [('readonly', True)],
+        'done': [('readonly', False)],
     })
 
     biaya_fee = fields.One2many('detail.biaya.fee', 'order_setoran', states={
         'draft': [('readonly', False)],
-        'done': [('readonly', True)],
+        'done': [('readonly', False)],
     })
 
     expense_count = fields.Integer(compute='_compute_expense_count')
@@ -191,6 +189,10 @@ class OrderSetoran(models.Model):
         # Cek Detail Order
         if bool(self.detail_order) == False:
             raise ValidationError('Detail Order Belum Terisi!')
+
+        # Cek Total Pengeluaran
+        if self.total_pengeluaran == 0:
+            raise ValidationError('Total Pengeluaran belum diisi!')
 
         # Cek Nomor Surat Jalan & Tanggal
         for order in self.detail_order:
@@ -641,7 +643,107 @@ class OrderSetoran(models.Model):
                     'nominal': record['nominal'],
                 }])
 
-        return super(OrderSetoran, self).write(vals)
+        res = super(OrderSetoran, self).write(vals)
+
+        # Cek apakah ada penambahan atau perubahan biaya_fee
+        if 'biaya_fee' in vals:
+            biaya_fee_list_before_updated = []
+            # Rewriting Biaya Fee di dalam order setoran
+            for record in self.biaya_fee:
+                biaya_fee_before_update_dict = {
+                    'order_setoran': self.id,
+                    'order_pengiriman': record.order_pengiriman.id,
+                    'fee_contact': record.fee_contact.id,
+                    'nominal': record.nominal,
+                }
+
+                biaya_fee_list_before_updated.append(biaya_fee_before_update_dict)
+
+                record.unlink()
+
+            for item in biaya_fee_list_before_updated:
+                self.env['detail.biaya.fee'].create({
+                    'company_id': self.env.company.id,
+                    'order_setoran': self.id,
+                    'order_pengiriman': item['order_pengiriman'],
+                    'fee_contact': item['fee_contact'],
+                    'nominal': item['nominal'],
+                })
+
+            # Rewriting Biaya Fee di order pengiriman
+            biaya_fee_order_pengiriman = []
+            for item in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_fee:
+                fee_dict = {
+                    'order_pengiriman': item.order_pengiriman.id,
+                    'fee_contact': item.fee_contact.id,
+                    'nominal': item.nominal,
+                }
+
+                biaya_fee_order_pengiriman.append(fee_dict)
+
+            for record in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_fee:
+                record.unlink()
+
+            for item in biaya_fee_list_before_updated:
+                self.env['biaya.fee'].create({
+                    'company_id': self.env.company.id,
+                    'order_pengiriman': item['order_pengiriman'],
+                    'fee_contact': item['fee_contact'],
+                    'nominal': item['nominal'],
+                })
+
+        # Cek apakah ada penambahan atau perubahan List Pembelian
+        if 'list_pembelian' in vals:
+            list_pembelian_before_updated = []
+            # Rewriting List Pembelian di dalam order setoran
+            for record in self.list_pembelian:
+                list_pembelian_before_update_dict = {
+                    'order_setoran': self.id,
+                    'order_pengiriman': record.order_pengiriman.id,
+                    'supplier': record.supplier.id,
+                    'nama_barang': record.nama_barang,
+                    'nominal': record.nominal,
+                }
+
+                list_pembelian_before_updated.append(list_pembelian_before_update_dict)
+
+                record.unlink()
+
+            for item in list_pembelian_before_updated:
+                self.env['detail.list.pembelian'].create({
+                    'company_id': self.env.company.id,
+                    'order_setoran': self.id,
+                    'order_pengiriman': item['order_pengiriman'],
+                    'supplier': item['supplier'],
+                    'nama_barang': item['nama_barang'],
+                    'nominal': item['nominal'],
+                })
+
+            # Rewriting Biaya Fee di order pengiriman
+            list_pembelian_order_pengiriman = []
+            for item in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_pembelian:
+                list_pembelian_dict = {
+                    'order_pengiriman': item.order_pengiriman.id,
+                    'supplier': item.supplier.id,
+                    'nama_barang': item.nama_barang,
+                    'nominal': item.nominal,
+                }
+
+                list_pembelian_order_pengiriman.append(list_pembelian_dict)
+
+            for record in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_pembelian:
+                record.unlink()
+
+            for item in list_pembelian_before_updated:
+                self.env['biaya.pembelian'].create({
+                    'company_id': self.env.company.id,
+                    'order_pengiriman': item['order_pengiriman'],
+                    'supplier': item['supplier'],
+                    'nama_barang': item['nama_barang'],
+                    'nominal': item['nominal'],
+                })
+
+        return res
 
 class DetailOrder(models.Model):
     _name = 'detail.order'

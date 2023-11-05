@@ -78,7 +78,6 @@ class AccountOperInvoicePayment(models.TransientModel):
                     'is_sudah_disetor': True,
                     'state': 'sudah_setor',
                     'nomor_surat_jalan': record.nomor_surat_jalan or None,
-                    'tanggal_uang_jalan': record.tanggal_surat_jalan or None,
                 })
 
             # Membuat Invoice
@@ -145,8 +144,8 @@ class AccountOperInvoicePayment(models.TransientModel):
                     for purchase in bill.biaya_pembelian:
                         self.env['account.move'].sudo().create({
                             'move_type': 'in_invoice',
-                            'invoice_date': bill.tanggal_uang_jalan,
-                            'date': bill.tanggal_uang_jalan,
+                            'invoice_date': bill.create_date,
+                            'date': bill.create_date,
                             'partner_id': purchase.supplier.id,
                             'currency_id': self.env.user.company_id.currency_id.id,
                             'ref': bill.order_pengiriman_name,
@@ -190,7 +189,6 @@ class AccountOperInvoicePayment(models.TransientModel):
                     'is_sudah_disetor': True,
                     'state': 'sudah_setor',
                     'nomor_surat_jalan': detail.nomor_surat_jalan or None,
-                    'tanggal_uang_jalan': detail.tanggal_surat_jalan or None,
                 })
 
             setoran.state = 'done'

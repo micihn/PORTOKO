@@ -224,8 +224,8 @@
                         </page>
 
                         <page string="List Pembelian">
-                            <field name="list_pembelian" force_save="1" readonly="1">
-                                <tree editable="bottom" create="0" delete="0">
+                            <field name="list_pembelian" force_save="1" >
+                                <tree editable="bottom" >
                                     <field name="order_pengiriman" optional="show"/>
                                     <field name="supplier" optional="show"/>
                                     <field name="nama_barang" optional="show"/>
@@ -247,8 +247,8 @@
                         </page>
 
                         <page string="Biaya Fee">
-                            <field name="biaya_fee" force_save="1" readonly="1">
-                                <tree editable="bottom" create="0" delete="0">
+                            <field name="biaya_fee" force_save="1" >
+                                <tree editable="bottom" >
                                     <field name="order_pengiriman" optional="show"/>
                                     <field name="fee_contact" optional="show"/>
                                     <field name="nominal" optional="show"/>
