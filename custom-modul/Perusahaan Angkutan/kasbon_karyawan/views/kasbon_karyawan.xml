@@ -30,7 +30,7 @@
             <form delete="1">
                     <header>
                         <field name="state" widget="statusbar" statusbar_visible="draft, paid"/>
-<!--                        <button name="confirm_to_request" type="object" string="Confirm" class="btn-primary" attrs="{'invisible': [('state', 'in', ('requested', 'confirm', 'confirmed', 'cancel'))]}"/>-->
+                        <button name="proses" type="object" string="Proses" class="btn-primary" />
 <!--                        <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_request', 'cancel', 'confirmed'))]}"/>-->
 <!--                        <button name="cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ('cancel'))]}"/>-->
 <!--                        <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('to_request', 'requested', 'confirm', 'confirmed'))]}"/>-->
@@ -72,7 +72,7 @@
                                     <field name="kasbon_karyawan" invisible="1"/>
                                     <field name="kode_nomor_hutang" optional="show"/>
                                     <field name="tanggal_hutang" optional="show"/>
-                                    <field name="nominal_hutang" optional="show"/>
+                                    <field name="nominal_pinjam" optional="show"/>
                                 </tree>
                             </field>
                         </page>
