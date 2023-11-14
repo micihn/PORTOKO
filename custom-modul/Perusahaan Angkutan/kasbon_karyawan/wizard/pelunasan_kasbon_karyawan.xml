@@ -1,0 +1,41 @@
+<odoo>
+    <data>
+        <record id="pelunasan_kasbon_karyawan_wizard_view" model="ir.ui.view">
+             <field name="name">pelunasan.kasbon.karyawan.wizard.view</field>
+             <field name="model">pelunasan.kasbon.karyawan</field>
+             <field name="arch" type="xml">
+                 <form string="Pelunasan Kasbon Karyawan" title="Pelunasan Kasbon Karyawan">
+                     <group>
+                         <group>
+                             <field name="jurnal_kas_pengembalian"/>
+                         </group>
+
+                           <group>
+                               <field name="tanggal_pengembalian"/>
+                               <field name="jumlah_pengembalian"/>
+
+                               <field name="memo"/>
+                         </group>
+                     </group>
+
+                     <footer>
+                         <button string="Proses Pengembalian" type="object" name="proses_pengembalian" />
+                         <button string="Cancel" special="cancel" class="btn btn-secondary" />
+                     </footer>
+                 </form>
+
+
+             </field>
+        </record>
+
+<record id="wizard_pengembalian_hutang_action" model="ir.actions.act_window">
+    <field name="name">Wizard Pengembalian Hutang</field>
+    <field name="res_model">pelunasan.kasbon.karyawan</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+    <field name="view_id" ref="kasbon_karyawan.pelunasan_kasbon_karyawan_wizard_view"/>
+</record>
+
+
+    </data>
+</odoo>

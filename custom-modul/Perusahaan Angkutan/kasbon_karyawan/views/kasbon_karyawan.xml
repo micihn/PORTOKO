@@ -29,65 +29,42 @@
         <field name="arch" type="xml">
             <form delete="1">
                     <header>
-                        <field name="state" widget="statusbar" statusbar_visible="draft, paid"/>
-                        <button name="proses" type="object" string="Proses" class="btn-primary" />
-<!--                        <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_request', 'cancel', 'confirmed'))]}"/>-->
-<!--                        <button name="cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ('cancel'))]}"/>-->
-<!--                        <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('to_request', 'requested', 'confirm', 'confirmed'))]}"/>-->
+                        <field name="state" widget="statusbar" statusbar_visible="draft, lended, returned"/>
+                        <button name="proses_hutang" type="object" string="Proses Hutang" class="btn-primary" attrs="{'invisible':[('state','!=','draft')]}"/>
+                        <button name="wizard_pengembalian_hutang" type="object" string="Proses Pengembalian Hutang" attrs="{'invisible':[('state','!=','lended')]}"/>
                     </header>
 
                 <sheet>
                     <field name="active" invisible="1"/>
                     <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
 
-<!--                    <div class="oe_title">-->
-<!--                        <h1>-->
-<!--                            <field name="oper_order_name"/>-->
-<!--                        </h1>-->
-<!--                    </div>-->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
 
                     <group>
                         <group>
                             <field name="nama_karyawan" string="Nama Karyawan"/>
                             <field name="rekening_karyawan" string="Rekening"/>
-                            <field name="sisa_piutang" string="Sisa Piutang"/>
-
-                            <field name="tipe_kasbon" string="Tipe Kasbon" />
-                            <field name="nominal_pinjam" string="Nominal Pinjam" attrs="{'invisible': [('tipe_kasbon', '=', 'bayar')]}"/>
-                            <field name="nominal_bayar" string="Nominal Bayar" attrs="{'invisible': [('tipe_kasbon', '=', 'pinjam')]}"/>
+                            <field name="nominal_pinjam" string="Nominal Pinjam"/>
+                            <field name="nominal_sisa" string="Sisa Hutang"/>
                         </group>
 
                         <group>
+                            <field name="tanggal" string="Tanggal"/>
                             <field name="akun_piutang" string="Akun Piutang"/>
                             <field name="akun_kas" string="Akun Kas"/>
                             <field name="keterangan" string="Keterangan"/>
-
                         </group>
                     </group>
+                    <group>
+                        <separator string="Journal Entry"/>
+                        <field name="journal_entry_hutang" string="Journal Entry Hutang" widget="many2many_tags"/>
+                        <field name="journal_entry_pelunasan_hutang" string="Journal Entry Pelunasan" widget="many2many_tags"/>
+                    </group>
 
-                    <notebook>
-                        <page string="History PTU">
-                            <field name="history_hutang">
-                                <tree editable="bottom">
-                                    <field name="kasbon_karyawan" invisible="1"/>
-                                    <field name="kode_nomor_hutang" optional="show"/>
-                                    <field name="tanggal_hutang" optional="show"/>
-                                    <field name="nominal_pinjam" optional="show"/>
-                                </tree>
-                            </field>
-                        </page>
-
-                        <page string="History Bayar">
-                            <field name="history_bayar">
-                                <tree editable="bottom">
-                                    <field name="kasbon_karyawan" invisible="1"/>
-                                    <field name="kode_nomor_bayar" optional="show"/>
-                                    <field name="tanggal_bayar" optional="show"/>
-                                    <field name="nominal_bayar" optional="show"/>
-                                </tree>
-                            </field>
-                        </page>
-                    </notebook>
                 </sheet>
 
                 <div class="oe_chatter">

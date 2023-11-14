@@ -1,4 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_kasbon_karyawan,access.kasbon.karyawan,kasbon_karyawan.model_kasbon_karyawan,group_kasbon_karyawan,1,1,1,1
-access_history_bayar,access.history.bayar,kasbon_karyawan.model_history_bayar,group_kasbon_karyawan,1,1,1,1
-access_history_hutang,access.history.hutang,kasbon_karyawan.model_history_hutang,group_kasbon_karyawan,1,1,1,1
+
+access_pelunasan_kasbon_karyawan,access.pelunasan.kasbon.karyawan,kasbon_karyawan.model_pelunasan_kasbon_karyawan,group_kasbon_karyawan,1,1,1,1

@@ -17,6 +17,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/kasbon_karyawan.xml',
+        'wizard/pelunasan_kasbon_karyawan.xml',
         'views/menu.xml',
     ],
     'demo': [],
@@ -24,4 +25,5 @@
     'installable': True,
     'application': True,
     'auto_install': False,
+    'post_init_hook': 'post_init_hook',
 }
