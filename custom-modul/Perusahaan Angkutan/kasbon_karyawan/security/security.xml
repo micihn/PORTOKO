@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Group Category -->
+    <record model="ir.module.category" id="kasbon_karyawan.module_kasbon_karyawan">
+        <field name="name">Kasbon Karyawan</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- Group -->
+    <!-- Kasbon Karyawan Full -->
+        <record model="res.groups" id ="group_kasbon_karyawan">
+            <field name="name">Kasbon Karyawan</field>
+            <field name="category_id" ref="kasbon_karyawan.module_kasbon_karyawan"/>
+        </record>
+</odoo>

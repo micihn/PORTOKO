@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_kasbon_karyawan_root"
+              name="Kasbon Karyawan"
+              sequence="186"
+    >
+    </menuitem>
+
+    <menuitem id="menu_kasbon_karuawan"
+      groups="kasbon_karyawan.group_kasbon_karyawan"
+      sequence="1"
+      name="Kasbon Karyawan"
+      action="action_kasbon_karyawan"
+      parent="kasbon_karyawan.menu_kasbon_karyawan_root">
+    </menuitem>
+</odoo>
