@@ -12,7 +12,7 @@ def post_init_hook(cr, registry):
                 'name' : 'Kasbon Karyawan Sequence - ',
                 'code': 'kasbon.karyawan.sequence',
                 'implementation': 'standard',
-                'prefix': 'KAS/%(day)s/%(month)s/%(year)s/',
+                'prefix': 'PTU/%(day)s/%(month)s/%(year)s/',
                 'padding': 3,
                 'number_increment': 1,
                 'number_next_actual': 1,

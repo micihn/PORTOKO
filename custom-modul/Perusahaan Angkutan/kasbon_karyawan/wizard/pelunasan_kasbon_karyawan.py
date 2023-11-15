@@ -1,4 +1,5 @@
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 class PelunasanKasbonKaryawan(models.TransientModel):
     _name = 'pelunasan.kasbon.karyawan'
@@ -11,6 +12,10 @@ class PelunasanKasbonKaryawan(models.TransientModel):
 
     def proses_pengembalian(self):
         for kasbon_karyawan in self.env['kasbon.karyawan'].browse(self._context.get('active_ids', [])):
+
+            if self.jumlah_pengembalian > kasbon_karyawan.nominal_sisa:
+                raise ValidationError("Nominal Pengembalian lebih besar dari Sisa Pinjaman!")
+
             journal_entry_pelunasan_hutang = self.env['account.move'].sudo().create({
                 'company_id': kasbon_karyawan.company_id.id,
                 'move_type': 'entry',

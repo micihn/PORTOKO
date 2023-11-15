@@ -20,6 +20,7 @@ class KasbonKaryawan(models.Model):
     rekening_karyawan = fields.Many2one('res.partner.bank', 'Rekening')
     nominal_pinjam = fields.Float('Nominal Pinjam', digits=(6, 0))
     nominal_sisa = fields.Float('Sisa Hutang', digits=(6, 0), readonly=True)
+    nominal_bayar = fields.Float('Nominal Bayar', compute='_compute_nominal_bayar', digits=(6, 0))
     tanggal = fields.Date('Tanggal')
     keterangan = fields.Text('Keterangan')
     akun_piutang = fields.Many2one('account.account')
@@ -33,6 +34,11 @@ class KasbonKaryawan(models.Model):
             vals['name'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('kasbon.karyawan.sequence') or 'New'
         result = super(KasbonKaryawan, self).create(vals)
         return result
+
+    @api.depends('nominal_pinjam', 'nominal_sisa')
+    def _compute_nominal_bayar(self):
+        for record in self:
+            record.nominal_bayar = record.nominal_pinjam - record.nominal_sisa
 
     @api.onchange('nama_karyawan')
     def onchange_nama_karyawan(self):
