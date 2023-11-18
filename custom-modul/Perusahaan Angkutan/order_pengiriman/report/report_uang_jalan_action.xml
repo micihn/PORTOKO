@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="report_uang_jalan">
+    <t t-call="web.html_container">
+        <t t-esc="docs"/>
+          <t t-foreach="docs" t-as="o">
+              <div class="page">
+                  <t t-esc="o.company_id.name"/><br />
+                  <t t-esc="o.company_id.street"/><br />
+                  Tlp. <t t-esc="o.company_id.phone"/><br />
+
+                  <div style="text-align:center;">
+                      Uang Jalan<br />
+                      No: <t t-esc="o.uang_jalan_name"/>
+                  </div><br />
+
+                 <div style="text-align:right;">
+                      Tanggal <t t-esc="o.create_date.date()"/><br />
+                      Tipe UJ: <t t-esc="o.tipe_uang_jalan"/>
+                  </div><br />
+
+
+                No Truk <t t-esc="o.kendaraan.license_plate"/><br/>
+                <div style="float: left; text-align: left; width: 48%; white-space: nowrap;">
+                    Supir : <t t-esc="o.sopir.name"/><br />
+                    Kenek : <t t-esc="o.kenek.name"/>
+                </div>
+
+                <div style="float: right; text-align: right; width: 48%; white-space: nowrap;">
+                    NRP
+                </div>
+
+
+
+
+              </div>
+
+
+
+<!--          <t t-call="report_delivery_slip.delivery_slip_header"/>-->
+<!--          <div class="page">-->
+<!--              <center>-->
+<!--                  <style>-->
+<!--                      .custom-table {-->
+<!--                      width: 100%;-->
+<!--                      border-collapse: collapse;-->
+<!--                      }-->
+
+<!--                      .custom-table thead {-->
+<!--                      border: 1px solid black; /* Add the border style to the table header */-->
+<!--                      }-->
+
+<!--                      .custom-table thead th {-->
+<!--                      height: 20px;-->
+<!--                      border-right: 1px solid black;-->
+<!--                      padding-top: 5px;-->
+<!--                      font-weight: bold;-->
+<!--                      }-->
+
+<!--                      .custom-table tbody {-->
+<!--                      border: none; /* Remove the border from the table body */-->
+
+<!--                      }-->
+
+<!--                      .custom-table tbody td{-->
+<!--                      height: 20px;-->
+<!--                      padding-top: 5px;-->
+<!--                      padding-left: 2px;-->
+<!--                      padding-right: 2px;-->
+<!--                      }-->
+
+
+<!--                  </style>-->
+
+<!--                  <table class="custom-table">-->
+<!--                      <thead>-->
+<!--                          <tr>-->
+<!--                              <th style="width:5%; text-align: center; font-size: 10px; vertical-align: middle;">-->
+<!--                                  SR.-->
+<!--                              </th>-->
+<!--                              <th style="width:10%; text-align: center; font-size: 10px; vertical-align: middle;">-->
+<!--                                  Order Nr.-->
+<!--                              </th>-->
+<!--                              <th style="width:8%; text-align: center; font-size: 10px; vertical-align: middle;">-->
+<!--                                  Date-->
+<!--                              </th>-->
+<!--                              <th style="width:8%; text-align: center; font-size: 10px; vertical-align: middle;">-->
+<!--                                  Product-->
+<!--                              </th>-->
+<!--                              <th style="width:27%; text-align: center; font-size: 10px; vertical-align: middle;">-->
+<!--                                  Description-->
+<!--                              </th>-->
+<!--                              <th style="width:7%; text-align: center; font-size: 10px; vertical-align: middle;">-->
+<!--                                  Q.S.nr.-->
+<!--                              </th>-->
+<!--                              <th style="width:7%; text-align: center; font-size: 10px; vertical-align: middle;">-->
+<!--                                  H.S Code-->
+<!--                              </th>-->
+<!--                              <th style="width:7%; text-align: center; font-size: 10px; vertical-align: middle;">-->
+<!--                                  Quantity-->
+<!--                              </th>-->
+<!--                              <th style="width:7%; text-align: center; font-size: 10px; vertical-align: middle;">-->
+<!--                                  Weight-->
+<!--                              </th>-->
+<!--                          </tr>-->
+<!--                      </thead>-->
+
+<!--                      <tbody style="height: 10000px;">-->
+<!--                          &lt;!&ndash;<t t-foreach="o.move_ids" t-as="line">&ndash;&gt;-->
+<!--                          <t t-set="total_line" t-value="0"/>-->
+<!--                          <t t-foreach="o.move_line_ids_without_package" t-as="line">-->
+<!--                              <t t-if="line.product_id.name != 'Pallet'">-->
+<!--                                  <tr>-->
+<!--                                      <td>-->
+<!--                                          <center>-->
+<!--                                              <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="str(line_index + 1) + '0'"/>-->
+
+<!--                                          </center>-->
+<!--                                      </td>-->
+<!--                                      <td style="text-align:left;">-->
+<!--                                          <span style="color: #000000; font-weight:bold; font-size: 10px; font-weight:bold;" t-esc="o.client_ref"/>-->
+<!--                                      </td>-->
+<!--                                      <td>-->
+<!--                                          <center>-->
+<!--                                              <t t-if="o.date_of_transfer">-->
+<!--                                                  <span style="font-size: 10px; text-align:left; font-weight:bold;" t-field="o.date_of_transfer" t-options="{'format': 'dd-MM-YYYY'}"/>-->
+<!--                                              </t>-->
+<!--                                              <t t-else="">-->
+<!--                                                  <span style="font-size: 10px; text-align:left; font-weight:bold;" t-field="o.date_done" t-options="{'format': 'dd-MM-YYYY'}"/>-->
+<!--                                              </t>-->
+<!--                                          </center>-->
+<!--                                      </td>-->
+<!--                                      <td style="text-align: left;" width="97px">-->
+<!--                                          <span style="color: #000000; font-weight:bold; font-size: 10px; font-weight:bold;" t-esc="line.product_id.default_code"/>-->
+<!--                                      </td>-->
+<!--                                      <td style="text-align: left" width="197px">-->
+<!--                                          <span style="color: #000000;font-family:'arial'; font-size: 10px; font-weight:bold;" t-esc="line.product_id.name"/>-->
+<!--                                      </td>-->
+<!--                                      <td style="text-align: left" width="50px">-->
+<!--                                          &lt;!&ndash;<span style="color: #000000;font-family:'arial';font-size: 10px; font-weight:bold;" t-esc="line.move_line_ids.lot_id.name"/>&ndash;&gt;-->
+<!--                                          <span style="color: #000000;font-family:'arial';font-size: 10px; font-weight:bold;" t-esc="line.lot_id.name"/>-->
+<!--                                      </td>-->
+
+<!--                                      <td style="text-align: left" width="50px">-->
+<!--                                          <span style="color: #000000;font-family:'arial';font-size: 10px; font-weight:bold;" t-esc="line.product_id.hs_code"/>-->
+<!--                                      </td>-->
+
+<!--                                      <td style="text-align: right" width="50px">-->
+<!--                                          &lt;!&ndash;<span style="color: #000000;font-family:'arial'; font-size: 10px; font-weight:bold;" t-esc="line.product_uom_qty"/>&ndash;&gt;-->
+<!--                                          <t t-if="o.state == 'assigned'">-->
+<!--                                              <span style="color: #000000;font-family:'arial'; font-size: 10px; font-weight:bold;" t-esc="int(line.reserved_uom_qty)"/>-->
+<!--                                          </t>-->
+<!--                                          <t t-if="o.state == 'done'">-->
+<!--                                              <span style="color: #000000;font-family:'arial'; font-size: 10px; font-weight:bold;" t-esc="int(line.qty_done)"/>-->
+<!--                                          </t>-->
+<!--                                      </td>-->
+<!--                                      <td style="text-align: right" width="50px">-->
+<!--                                          <t t-if="o.state == 'assigned'">-->
+<!--                                              <span style="color: #000000;font-family:'arial'; font-size: 10px; font-weight:bold;" t-esc="'{:,}'.format(int(line.reserved_uom_qty * line.product_id.weight))"/>-->
+<!--                                              <t t-esc="'{:,}'.format(int(o.weight))"/>-->
+<!--                                          </t>-->
+<!--                                          <t t-if="o.state == 'done'">-->
+<!--                                              <span style="color: #000000;font-family:'arial'; font-size: 10px; font-weight:bold;" t-esc="'{:,}'.format(int(line.qty_done * line.product_id.weight))"/>-->
+<!--                                          </t>-->
+
+
+<!--                                      </td>-->
+<!--                                  </tr>-->
+<!--                              </t>-->
+<!--                          </t>-->
+<!--                      </tbody>-->
+<!--                  </table>-->
+<!--                  &lt;!&ndash; DivTable.com &ndash;&gt;-->
+<!--              </center>-->
+
+<!--                    <t t-if="total_line &lt;= 5">-->
+<!--                        <table style="width: 45%; border-collapse: collapse; float: right; margin-top: 360px;margin-bottom: 30px; border: 1px solid #04349c;">-->
+<!--                            <tbody>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-top:15px; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        Received by:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr style="height: 10px;">-->
+<!--                                    <td style="width: 33.006%; border: none;"/>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        NAME:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border-bottom: 1px solid  #04349c;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        DATE:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr style="height: 10px;">-->
+<!--                                    <td style="width: 33.006%; border: none;"/>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; padding-bottom:15px; font-size: 15px; font-weight: bold">-->
+<!--                                        SIGNATURE-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                            </tbody>-->
+<!--                        </table>-->
+<!--                    </t>-->
+<!--                    <t t-elif="total_line &lt;= 10">-->
+<!--                        <table style="width: 45%; border-collapse: collapse; float: right; margin-top: 300px;margin-bottom: 30px; border: 1px solid #04349c;">-->
+<!--                            <tbody>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-top:15px; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        Received by:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr style="height: 10px;">-->
+<!--                                    <td style="width: 33.006%; border: none;"/>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        NAME:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border-bottom: 1px solid  #04349c;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        DATE:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr style="height: 10px;">-->
+<!--                                    <td style="width: 33.006%; border: none;"/>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; padding-bottom:15px; font-size: 15px; font-weight: bold">-->
+<!--                                        SIGNATURE-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                            </tbody>-->
+<!--                        </table>-->
+<!--                    </t>-->
+<!--                    <t t-elif="total_line &lt;= 15">-->
+<!--                        <table style="width: 45%; border-collapse: collapse; float: right; margin-top: 60px;margin-bottom: 30px; border: 1px solid #04349c;">-->
+<!--                            <tbody>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-top:15px; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        Received by:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr style="height: 10px;">-->
+<!--                                    <td style="width: 33.006%; border: none;"/>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        NAME:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border-bottom: 1px solid  #04349c;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        DATE:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr style="height: 10px;">-->
+<!--                                    <td style="width: 33.006%; border: none;"/>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; padding-bottom:15px; font-size: 15px; font-weight: bold">-->
+<!--                                        SIGNATURE-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                            </tbody>-->
+<!--                        </table>-->
+<!--                    </t>-->
+<!--                    <t t-elif="total_line &gt;= 20">-->
+<!--                        <table style="width: 45%; border-collapse: collapse; float: right; margin-top: 30px;margin-bottom: 30px; border: 1px solid #04349c;">-->
+<!--                            <tbody>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-top:15px; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        Received by:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr style="height: 10px;">-->
+<!--                                    <td style="width: 33.006%; border: none;"/>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        NAME:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border-bottom: 1px solid  #04349c;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; font-size: 15px; font-weight: bold">-->
+<!--                                        DATE:-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr style="height: 10px;">-->
+<!--                                    <td style="width: 33.006%; border: none;"/>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td style="width: 33.006%; border: none; padding-left:20px; padding-bottom:15px; font-size: 15px; font-weight: bold">-->
+<!--                                        SIGNATURE-->
+<!--                                    </td>-->
+<!--                                    <td style="width: 62.994%; border: none;"/>-->
+<!--                                </tr>-->
+<!--                            </tbody>-->
+<!--                        </table>-->
+<!--                    </t>-->
+
+<!--              <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">-->
+<!--                  <div class="table table-sm" style="page-break-inside: avoid;">-->
+<!--                            <table class="text-left " style="color: #ffffff; width: 864px;">-->
+<!--          	<tbody>-->
+<!--          		<tr>-->
+<!--          			<td style="width: 733px; font-size: 14px; color: #04349c; font-weight: bold;">BOMET Middle East FZE</td>-->
+<!--          			<td class="border-0" style="color: #04349c; font-size: 14px; width: 202px; font-weight: bold;" colspan="2">Emirates NBD Bank</td>-->
+<!--          			<td class="border-0" style="font-size: 12px; color: #000000; font-weight: bold; width: 338px;" colspan="2">Jumeirah Beach Walk Branch</td>-->
+<!--          		</tr>-->
+<!--          		<tr>-->
+<!--                <td style="color: #000000; height: 13.5px; width: 733px; font-size: 12px; font-weight: bold;">-->
+<!--                    <span style="display: inline; margin: 0; padding: 0;">Warehouse N</span>-->
+<!--                    <span style="display: inline; margin: 0; padding: 0;" class="threshold"> RA08FC03</span>-->
+<!--                </td>-->
+<!--          			<td class="border-0" style="color: #000000; font-weight: bold; font-size: 12px; width: 73px;">SWIFT:</td>-->
+<!--          			<td class="border-0" style="font-weight: bold; font-size: 12px; color: #000000; width: 129px;">EBILAEAD</td>-->
+<!--          			<td class="border-0" style="font-size: 14px; width: 138.828px;"/>-->
+<!--          			<td class="border-0" style="font-size: 14px; width: 199.172px;"/>-->
+<!--          		</tr>-->
+<!--          		<tr>-->
+<!--          			<td style="color: #000000; width: 733px; font-size: 12px; font-weight: bold;">P.O. BOX 263508 - JEBEL ALI FREE ZONE - DUBAI</td>-->
+<!--          			<td class="border-0" style="color: #000000; font-weight: bold; font-size: 12px; width: 73px;">IBAN:</td>-->
+<!--          			<td class="border-0" style="font-weight: bold; font-size: 12px; color: #000000; width: 267.828px;" colspan="2">AE83 0260 0010 1529 8213 201</td>-->
+<!--          			<td class="border-0" style="font-style: italic; font-size: 12px; color: #000000; width: 199.172px;">[AED]</td>-->
+<!--          		</tr>-->
+<!--          		<tr>-->
+<!--          			<td style="color: #000000; width: 733px; font-size: 12px; font-weight: bold;">UNITED ARAB EMIRATES</td>-->
+<!--          			<td class="border-0" style="color: #000000; font-weight: bold; font-size: 12px; width: 73px;">IBAN:</td>-->
+<!--          			<td class="border-0" style="font-weight: bold; font-size: 12px; color: #000000; width: 267.828px;" colspan="2">AE91 0260 0010 2529 8213 202</td>-->
+<!--          			<td class="border-0" style="font-style: italic; font-size: 12px; color: #000000; width: 199.172px;">[USD]</td>-->
+<!--          		</tr>-->
+<!--          		<tr>-->
+<!--          			<td style="color: #000000; width: 733px; font-size: 12px; font-weight: bold;">VAT: 100.022.428.500.003</td>-->
+<!--          			<td class="border-0" style="color: #000000; font-weight: bold; font-size: 12px; width: 73px;">IBAN:</td>-->
+<!--          			<td class="border-0" style="font-weight: bold; font-size: 12px; color: #000000; width: 267.828px;" colspan="2">AE64 0260 0010 2529 8213 203</td>-->
+<!--          			<td class="border-0" style="font-style: italic; font-size: 12px; color: #000000; width: 199.172px;">[EUR]</td>-->
+<!--          		</tr>-->
+<!--          		<tr>-->
+<!--          			<td style="width: 733px; font-size: 12px; font-weight: bold;"><a style="color: #04349c; text-decoration: none;" href="mailto:sales.uae@bomet.ae">sales.uae@bomet.ae</a> - <a style="color: #04349c; text-decoration: none;" href="www.bomet.ae">www.bomet.ae</a></td>-->
+<!--          			<td class="border-0" style="color: #000000; font-weight: bold; font-size: 12px; width: 73px;"/>-->
+<!--          			<td class="border-0" style="font-weight: bold; font-size: 12px; color: #000000; width: 267.828px;" colspan="2"/>-->
+<!--          			<td class="border-0" style="font-style: italic; font-size: 12px; color: #000000; width: 199.172px;"/>-->
+<!--          		</tr>-->
+<!--          	</tbody>-->
+<!--          </table>-->
+<!--                  </div>-->
+<!--              </div>-->
+
+<!--          </div>-->
+      </t>
+  </t>
+    </template>
+
+<!--    &lt;!&ndash; This is the custom header declaration &ndash;&gt;-->
+<!--    <template id="delivery_slip_header">-->
+
+<!--        <div class="header">-->
+<!--            <img class="img" src="/report_delivery_slip/static/src/logo.png" style="max-height: 90px; float:left"/>-->
+<!--            <img class="img" src="/report_delivery_slip/static/src/iso.png" style="max-height: 90px; float:right"/>-->
+
+
+<!--            <br/>-->
+<!--            <br/>-->
+<!--            <br/>-->
+<!--            <br/>-->
+<!--            <br/>-->
+<!--            <br/>-->
+<!--            <br/>-->
+<!--            <h4>-->
+<!--                <center>-->
+<!--                    <span style="font-weight: bold; font-family: 'arial';">PACKINGLIST</span>-->
+<!--                </center>-->
+<!--            </h4>-->
+
+<!--            <style>-->
+<!--            .header-table {-->
+<!--                width: 100%;-->
+<!--                border-collapse: collapse;-->
+<!--                border: none;-->
+
+<!--                }-->
+
+<!--                .header-table tbody {-->
+<!--                border: none; /* Remove the border from the table body */-->
+<!--                }-->
+
+<!--                .header-table tbody tr{-->
+<!--                border: none;-->
+<!--                }-->
+
+<!--                .header-table tbody td{-->
+<!--                height: 17px;-->
+<!--                border: none;-->
+<!--                }-->
+<!--            </style>-->
+
+<!--<style>-->
+<!--    .vertical-text {-->
+<!--        position: fixed;-->
+<!--        -webkit-transform: rotate(90deg);-->
+<!--        -webkit-transform-origin: center bottom auto;-->
+<!--        top: 50%;-->
+<!--        right: 0;-->
+<!--    }-->
+<!--</style>-->
+
+
+<!--<table class="header-table" style="width: 773px;">-->
+<!--	<tbody>-->
+<!--		<tr>-->
+<!--			<td style="width: 196px;"/>-->
+<!--			<td style="width: 163px;"/>-->
+<!--			<td style="width: 87.3594px; font-style: italic; font-weight: bold; font-size: 11px;">For:</td>-->
+<!--			<td style="width: 140.641px; font-style: italic; font-weight: bold; font-size: 11px;"/>-->
+<!--		</tr>-->
+<!--		<tr>-->
+<!--			<td style="width: 196px;"/>-->
+<!--			<td style="width: 163px;"/>-->
+<!--            <td style="width: 233.406px; height:23px; font-weight: bold; " colspan="2">-->
+<!--                <t t-esc="o.partner_id.name" style="text-transform: uppercase;"/>-->
+<!--            </td>-->
+<!--		</tr>-->
+<!--		<tr>-->
+<!--			<td style="font-weight: bold; width: 196px;">MARK : HIME</td>-->
+<!--			<td style="width: 163px;"/>-->
+<!--            <td style="width: 233.406px; height:23px; font-weight: bold; " colspan="2">-->
+<!--                <t t-esc="o.partner_id.street"/>-->
+<!--            </td>-->
+<!--		</tr>-->
+<!--		<tr>-->
+<!--			<td style="width: 196px;"/>-->
+<!--			<td style="width: 163px;"/>-->
+<!--            <td style="width: 233.406px; font-weight: bold; height:23px;" colspan="2">-->
+<!--                <t t-esc="o.partner_id.street2"/>-->
+<!--            </td>-->
+<!--		</tr>-->
+<!--		<tr>-->
+<!--			<td style="font-weight: bold; width: 196px;"> &lt;!&ndash; kunci &ndash;&gt;-->
+<!--				<p style="font-size: 14px; display: inline; line-height: 1; margin-right: 100px;"><strong>Weight nett:</strong></p>-->
+<!--                <p style="font-size: 14px; display: inline; margin-right: 5px;">-->
+<!--                    <t t-esc="'{:,}'.format(int(o.weight))"/>-->
+<!--                </p>-->
+<!--				<p style="font-size: 14px; display: inline;">KGS</p>-->
+<!--			</td>-->
+<!--			<td style="width: 163px;"/>-->
+<!--            <td style="width: 233.406px; font-weight: bold; height:23px;" colspan="2">-->
+<!--                <t t-esc="o.partner_id.city"/> - <t t-esc="o.partner_id.country_id.name" style="text-transform: uppercase;"/>-->
+
+<!--            </td>-->
+<!--		</tr>-->
+<!--		<tr>-->
+<!--			<td style="font-weight: bold; width: 196px;">-->
+<!--				<p style="font-size: 14px; display: inline; line-height: 1; margin-right: 150px;"><strong>Pallets</strong></p>-->
+<!--                <t t-set="pallet_quantity" t-value="0"/>-->
+<!--                <t t-foreach="o.move_ids" t-as="line">-->
+<!--                    <t t-if="line.product_id.name == 'Pallet'">-->
+<!--                        <t t-set="pallet_qty" t-value="int(line.product_uom_qty)"/>-->
+<!--                        <t t-set="pallet_quantity" t-value="pallet_quantity + pallet_qty"/>-->
+<!--                    </t>-->
+<!--                </t>-->
+<!--                <p style="font-size: 14px; display: inline; margin-right: 10px;">-->
+<!--                    <t t-esc="pallet_quantity" t-style="padding-left: 0;"/>-->
+<!--                </p>-->
+<!--			</td>-->
+<!--			<td style="width: 163px;"/>-->
+<!--			<td style="width: 228px;" colspan="2"/>-->
+<!--		</tr>-->
+<!--		<tr>-->
+<!--			<td style="width: 196px;"/>-->
+<!--			<td style="width: 163px;"/>-->
+<!--			<td style="width: 228px;" colspan="2"/>-->
+<!--		</tr>-->
+<!--		<tr>-->
+<!--			<td style="width: 196px;"/>-->
+<!--			<td style="width: 163px;"/>-->
+<!--			<td style="font-size: 11px; font-weight: bold; width: 87.3594px;">Date :</td>-->
+<!--			<td style="font-size: 11px; font-weight: bold; width: 137px; ">-->
+<!--                <t t-if="o.date_of_transfer">-->
+<!--                    <span t-field="o.date_of_transfer" t-options="{'format': 'dd-MM-YYYY'}"/>-->
+<!--                </t>-->
+<!--                <t t-else="">-->
+<!--                    <span t-field="o.date_done" t-options="{'format': 'dd-MM-YYYY'}"/>-->
+<!--                </t></td>-->
+<!--		</tr>-->
+<!--		<tr>-->
+<!--			<td style="width: 196px;"/>-->
+<!--			<td style="width: 163px;"/>-->
+<!--			<td style="font-size: 11px; font-weight: bold; width: 87.3594px;">Delivery no.</td>-->
+<!--			<td style="font-size: 11px; font-weight: bold; width: 137px; "><t t-esc="o.name"/></td>-->
+<!--		</tr>-->
+<!--		<tr>-->
+<!--			<td style="width: 196px;"/>-->
+<!--			<td style="width: 163px;"/>-->
+<!--			<td style="font-size: 11px; font-weight: bold; width: 87.3594px;">Delivery</td>-->
+<!--			<td style="font-size: 11px; font-weight: bold; width: 140.641px;">DAP, JEBEL ALI, Incoterms 2010</td>-->
+<!--		</tr>-->
+<!--		<tr>-->
+<!--			<td style="font-weight: bold; width: 196px;">-->
+<!--				<p style="font-size: 14px; display: inline; line-height: 1; margin-right: 10px;"><strong>Ordernumber:</strong></p>-->
+<!--                <p style="font-size: 14px; display: inline;">-->
+<!--                    <strong><t t-esc="o.client_ref"/></strong>-->
+
+<!--                </p>-->
+<!--			</td>-->
+<!--			<td style="width: 163px;"/>-->
+<!--			<td style="font-size: 11px; font-weight: bold; width: 87.3594px;">Page :</td>-->
+<!--			<td style="font-size: 11px; font-weight: bold; width: 137px; "><span class="page"/>-->
+<!--                of-->
+<!--                <span class="topage"/>-->
+<!--                Page(s)</td>-->
+<!--		</tr>-->
+<!--	</tbody>-->
+<!--</table>-->
+
+
+
+
+<!--        </div>-->
+
+<!--    </template>-->
+</odoo>

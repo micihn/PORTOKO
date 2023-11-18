@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_uang_jalan" model="report.paperformat">
+        <field name="name">Uang Jalan Paperformat</field>
+        <field name="default" eval="True" />
+        <field name="format">custom</field>
+        <field name="page_height">140</field>
+        <field name="page_width">95</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">7</field>
+        <field name="margin_bottom">7</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_spacing">7</field>
+        <field name="header_line" eval="False" />
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="report_uang_jalan_action" model="ir.actions.report">
+        <field name="name">Uang Jalan</field>
+        <field name="model">uang.jalan</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">order_pengiriman.report_uang_jalan</field>
+        <field name="report_file">order_pengiriman.report_uang_jalan</field>
+        <field name="paperformat_id" ref="order_pengiriman.paperformat_uang_jalan"/>
+        <field name="binding_model_id" ref="order_pengiriman.model_uang_jalan"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>
