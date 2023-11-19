@@ -12,62 +12,76 @@
                 </style>
 
                 <div class="page odoo-default-font">
-                    <b>
+                   <div style="text-align: left; font-weight: bold;">
                         <t t-esc="o.company_id.name"/>
-                    </b>
-                    <br/>
-                    <t t-esc="o.company_id.street"/>
-                    <br/>
-                    Tlp.
-                    <t t-esc="o.company_id.phone"/>
-                    <br/>
+                    </div>
+                    <div style="text-align: left; margin-top: 3px;">
+                        <t t-esc="o.company_id.street"/>
+                    </div>
 
-                    <h3 style="text-align: center; margin-bottom: 0;">
+                    <div style="text-align: left; margin-top: 3px;">
+                        Tlp. <t t-esc="o.company_id.phone"/>
+                    </div>
+
+                    <h3 style="text-align: center; margin-bottom: 0; margin-top: 10px;">
                         <span style="text-decoration: underline; font-weight: bold;">SETORAN</span>
                     </h3>
 
-                    <div style="text-align: center; margin-top: 0;">
+                    <div style="text-align: center; margin-top: 3px;">
                         <b>No:
                             <t t-esc="o.kode_order_setoran"/>
                         </b>
                     </div>
-                    <br/>
-
-                    <span style="font-size: 14px">Tanggal</span>
-                    <span style="margin-left:10px; font-size: 14px">:
-                        <t t-esc="o.create_date.strftime('%d-%m-%Y')"/>
-                    </span>
 
                     <br/>
-                    <span style="font-size: 14px">No. Truk</span>
-                    <span style="margin-left:4px; font-size: 14px">:
-                        <t t-esc="o.kendaraan.license_plate"/>
-                    </span>
-                    <br/>
 
-                    <div style="float: left; text-align: left; width: 48%; white-space: nowrap; font-size: 14px;">
+
+
+<div style="font-size: 14px; margin-top: 10px;">
+    <span>
+        Tanggal
+    </span>
+
+    <span style="margin-left: 6px;">
+        : <t t-esc="o.create_date.strftime('%d-%m-%Y')"/>
+    </span>
+</div>
+
+<div style="font-size: 14px; margin-top: 3px;">
+    <span>
+        No Truk
+    </span>
+
+    <span style="margin-left: 6px;">
+        : <t t-esc="o.kendaraan.license_plate"/>
+    </span>
+</div>
+
+                    <div style="float: left; text-align: left; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
                         Supir
-                        <span style="margin-left: 26px;">:
-                            <t t-esc="o.sopir.name"/>
+                        <span style="margin-left:23px; font-size: 14px">
+                            : <t t-esc="o.sopir.name"/>
                         </span>
-                        <br/>
+
+                    </div>
+
+                    <div style="float: right; text-align: right; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
+                        Komisi : Rp<t t-esc="'{:,}'.format(int(o.komisi_sopir)).replace(',', '.')"/>
+                    </div>
+
+                    <div style="float: left; text-align: left; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
                         Kenek
-                        <span style="margin-left: 20px;">:
-                            <t t-esc="o.kenek.name"/>
+                        <span style="margin-left:16px; font-size: 14px">
+                            : <t t-esc="o.kenek.name"/>
                         </span>
+
                     </div>
 
-                    <div style="float: right; text-align: right; width: 48%; white-space: nowrap; font-size: 14px;">
-                        Komisi :
-                        Rp<t t-esc="'{:,}'.format(int(o.komisi_sopir)).replace(',', '.')"/>
-                    </div>
+                    <div style="float: right; text-align: right; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
+                        Komisi : Rp<t t-esc="'{:,}'.format(int(o.komisi_kenek)).replace(',', '.')"/>
+                    </div><br/><br/><br/>
 
-                    <div style="float: right; text-align: right; width: 48%; white-space: nowrap; font-size: 14px;">
-                        Komisi :
-                        Rp<t t-esc="'{:,}'.format(int(o.komisi_kenek)).replace(',', '.')"/>
-                    </div>
-                    <br/>
-                    <br/>
+
                     ---------------------------------------------------------------------
 
 
