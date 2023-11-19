@@ -4,68 +4,92 @@
         <t t-call="web.html_container">
             <t t-esc="docs"/>
             <t t-foreach="docs" t-as="o">
-                <div class="page">
-                    <b>
-                        <t t-esc="o.company_id.name"/>
-                    </b>
-                    <br/>
-                    <t t-esc="o.company_id.street"/>
-                    <br/>
-                    Tlp.
-                    <t t-esc="o.company_id.phone"/>
-                    <br/>
 
-                    <h3 style="text-align: center; margin-bottom: 0;">
+                <style type="text/css">
+                    .odoo-default-font {
+                        font-family: Lato, sans-serif;
+                    }
+                </style>
+
+                <div class="page odoo-default-font">
+                    <div style="text-align: left; font-weight: bold;">
+                        <t t-esc="o.company_id.name"/>
+                    </div>
+
+
+                    <div style="text-align: left; margin-top: 3px;">
+                        <t t-esc="o.company_id.street"/>
+                    </div>
+
+                    <div style="text-align: left; margin-top: 3px;">
+                        Tlp. <t t-esc="o.company_id.phone"/>
+                    </div>
+
+
+                    <h3 style="text-align: center; margin-bottom: 0; margin-top: 10px;">
                         <span style="text-decoration: underline; font-weight: bold;">UANG JALAN</span>
                     </h3>
 
-                    <div style="text-align: center; margin-top: 0;">
+                    <div style="text-align: center; margin-top: 3px;">
                         <b>No:
                             <t t-esc="o.uang_jalan_name"/>
                         </b>
                     </div>
-                    <br/>
 
+                    <div style="text-align:right; margin-top: 10px; margin-bottom: 3px;">
+                        <span style="font-size:14px">Tanggal <t t-esc="o.create_date.strftime('%d-%m-%Y')"/></span><br/>
+                    </div>
 
                     <div style="text-align:right;">
-                        Tanggal
-                        <t t-esc="o.create_date.strftime('%d-%m-%Y')"/>
-                        <br/>
                         <t t-if="o.tipe_uang_jalan == 'standar'">
-                            Tipe UJ: Standar
+                            <span style="font-size:14px; ">Tipe UJ: Standar</span>
                         </t>
                         <t t-else="">
-                            Tipe UJ: Nominal Saja
+                            <span style="font-size:14px">Tipe UJ: Nominal Saja</span>
                         </t>
                     </div>
-                    <br/>
 
 
-                    No Truk
-                    <span style="margin-left:6px">:
+
+
+
+
+                   <span style="font-size: 14px; margin-top: 10px;">
+                        No Truk
+                    </span>
+
+                    <span style="margin-left:6px; font-size: 14px; margin-top: 10px;" >:
                         <t t-esc="o.kendaraan.license_plate"/>
                     </span>
                     <br/>
-                    <div style="float: left; text-align: left; width: 48%; white-space: nowrap;">
+
+                    <div style="float: left; text-align: left; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
                         Supir
-                        <span style="margin-left:26px">:
+                        <span style="margin-left:26px; font-size: 14px">:
                             <t t-esc="o.sopir.name"/>
                         </span>
-                        <br/>
+
+                    </div>
+
+                    <div style="float: right; text-align: right; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
+                        NRP : <t t-esc="o.sopir.bank_account_id.acc_number"/>
+                    </div><br/>
+
+                    <div style="float: left; text-align: left; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
                         Kenek
-                        <span style="margin-left:19px">:
+                        <span style="margin-left:19px; font-size: 14px; margin-top: 3px;">:
                             <t t-esc="o.kenek.name"/>
                         </span>
                     </div>
 
-                    <div style="float: right; text-align: right; width: 48%; white-space: nowrap;">
-                        NRP :
-                        <t t-esc="o.sopir.bank_account_id.acc_number"/>
-                    </div>
                     <br/>
                     <br/>
 
-                    ---------------------------------------------------------------------
+                   <span style="margin-top: 3px;">
+                        ---------------------------------------------------------------------------
+                    </span>
+
+
 
                     <br/>
                     <br/>
@@ -77,7 +101,7 @@
                                     <t t-esc="str(line_index + 1) + '.'"/>
                                 </b>
                             </span>
-                            <span style="float: left; width: 150px;"> <!-- Adjust width as needed -->
+                            <span style="float: left; width: 150px;">
                                 <b>
                                     <t t-esc="line.order_pengiriman.order_pengiriman_name"/>
                                 </b>
@@ -90,7 +114,7 @@
                             </span>
                             <div style="clear: both;"></div>
 
-                            <span style="float: left; margin-left: 20px;">
+                            <span style="float: left; margin-left: 20px; margin-top: 5px; width: 100%;">
                                 <t t-esc="line.muat.lokasi"/>
                                 -
                                 <t t-esc="line.bongkar.lokasi"/>
@@ -100,22 +124,23 @@
                         <br/>
                     </t>
 
-                    ---------------------------------------------------------------------
-                    <br/>
+                    <span style="margin-top: 3px; margin-bottom: 3px">
+                        ---------------------------------------------------------------------------
+                    </span>
                     <b>
                         <div style="float: left; text-align: left; width: 48%; white-space: nowrap;">
                             Total Nominal :
                         </div>
-
 
                         <div style="float: right; text-align: right; width: 48%; white-space: nowrap;">
                             Rp
                             <t t-esc="'{:,}'.format(int(o.total)).replace(',', '.')"/>
                         </div>
                         <br/>
-                        (
-                        <t t-esc="o.env['uang.jalan'].terbilang(int(o.total))"/>
-                        Rupiah)
+                    <span style="margin-top: 3px; ">
+                        (<t t-esc="o.env['uang.jalan'].terbilang(int(o.total))"/>Rupiah)
+                    </span>
+
                         <br/>
                         <br/>
                     </b>
