@@ -3,27 +3,37 @@
     <template id="report_uang_jalan">
     <t t-call="web.html_container">
         <head>
-            <meta charset="utf-8"/>
+<!--            <meta charset="utf-8"/>-->
         </head>
         <t t-esc="docs"/>
           <t t-foreach="docs" t-as="o">
               <div class="page">
-                  <t t-esc="o.company_id.name"/><br />
+                  <b><t t-esc="o.company_id.name"/></b><br />
                   <t t-esc="o.company_id.street"/><br />
-                  Tlp. <t t-esc="o.company_id.phone"/><br /><br />
+                  Tlp. <t t-esc="o.company_id.phone"/><br />
 
-                  <div style="text-align:center;">
-                      Uang Jalan<br />
-                      No: <t t-esc="o.uang_jalan_name"/>
-                  </div><br />
+<h3 style="text-align: center; margin-bottom: 0;">
+    <span style="text-decoration: underline; font-weight: bold;">UANG JALAN</span>
+</h3>
+
+<div style="text-align: center; margin-top: 0;">
+    <b>No: <t t-esc="o.uang_jalan_name"/></b>
+</div>
+<br />
+
 
                  <div style="text-align:right;">
-                      Tanggal <t t-esc="o.create_date.date()"/><br />
-                      Tipe UJ: <t t-esc="o.tipe_uang_jalan"/>
+                      Tanggal <t t-esc="o.create_date.strftime('%d-%m-%Y')"/><br />
+                     <t t-if="o.tipe_uang_jalan == 'standar'">
+    Tipe UJ: Standar
+</t>
+<t t-else="">
+    Tipe UJ: Nominal Saja
+</t>
                   </div><br />
 
 
-                No Truk <t t-esc="o.kendaraan.license_plate"/><br/>
+                No Truk : <t t-esc="o.kendaraan.license_plate"/><br/>
                 <div style="float: left; text-align: left; width: 48%; white-space: nowrap;">
                     Supir : <t t-esc="o.sopir.name"/><br />
                     Kenek : <t t-esc="o.kenek.name"/>
@@ -39,54 +49,63 @@
 
                 <t t-foreach="o.uang_jalan_line" t-as="line">
                     <div>
-                        <span style="float: left; width: 20px;"> <!-- Adjust width as needed -->
-                            <t t-esc="str(line_index + 1) + '.'" />
+                        <span style="float: left; width: 20px;">
+                            <b>
+                                <t t-esc="str(line_index + 1) + '.'" />
+                            </b>
                         </span>
                         <span style="float: left; width: 150px;"> <!-- Adjust width as needed -->
-                            <t t-esc="line.order_pengiriman.order_pengiriman_name"/>
+                            <b>
+                                <t t-esc="line.order_pengiriman.order_pengiriman_name"/>
+                            </b>
                         </span>
                         <span style="float: right;">
-                            Rp<t t-esc="'{:,}'.format(int(line.nominal_uang_jalan)).replace(',', '.')"/>
+                            <b>
+                                Rp<t t-esc="'{:,}'.format(int(line.nominal_uang_jalan)).replace(',', '.')"/>
+                            </b>
                         </span>
                         <div style="clear: both;"></div>
 
                         <span style="float: left; margin-left: 20px;">
-                            <t t-esc="line.muat.lokasi"/> &#8212; <t t-esc="line.bongkar.lokasi"/>
+                            <t t-esc="line.muat.lokasi"/> - <t t-esc="line.bongkar.lokasi"/>
                         </span>
-
-                    </div>
+                    </div><br /><br />
                 </t>
 
               <br /><br />
 
               --------------------------------------------------------------------- <br/>
+                  <b>
                 <div style="float: left; text-align: left; width: 48%; white-space: nowrap;">
                     Total Nominal :
                 </div>
 
-                <div style="float: right; text-align: right; width: 48%; white-space: nowrap;">
-                    Rp<t t-esc="'{:,}'.format(int(o.total)).replace(',', '.')"/>
-                </div>
 
-                  (<t t-esc="o.env['uang.jalan'].terbilang(int(o.total))"/> Rupiah)<br />
-                  Keterangan : <t t-esc="o.keterangan"/><br/><br/><br/><br/>
+                    <div style="float: right; text-align: right; width: 48%; white-space: nowrap;">
+                        Rp<t t-esc="'{:,}'.format(int(o.total)).replace(',', '.')"/>
+                    </div><br/>
+                      (<t t-esc="o.env['uang.jalan'].terbilang(int(o.total))"/> Rupiah)<br /><br/>
+                  </b>
+                  <b>
+                    Keterangan
+                  </b> : <t t-esc="o.keterangan"/><br/><br/><br/><br/>
 
 
 
 <div style="white-space: nowrap; text-align:center">
     <div style="display: inline-block; text-align: center;">
         Mengetahui <br/><br/><br/>
-        (.................)
+        (...................)
     </div>
 
     <div style="display: inline-block; text-align: center; margin-left: 45px;">
         Kasir <br/><br/><br/>
-        (.................)
+        (...................)
     </div>
 
     <div style="display: inline-block; text-align: center; margin-left: 45px;">
         Penerima <br/><br/><br/>
-        (.................)
+        (...................)
     </div>
 </div>
 
