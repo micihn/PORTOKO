@@ -7,12 +7,12 @@
 
                 <style type="text/css">
                     .odoo-default-font {
-                        font-family: Lato, sans-serif;
+                    font-family: Lato, sans-serif;
                     }
                 </style>
 
                 <div class="page odoo-default-font">
-                   <div style="text-align: left; font-weight: bold;">
+                    <div style="text-align: left; font-weight: bold;">
                         <t t-esc="o.company_id.name"/>
                     </div>
                     <div style="text-align: left; margin-top: 3px;">
@@ -20,7 +20,8 @@
                     </div>
 
                     <div style="text-align: left; margin-top: 3px;">
-                        Tlp. <t t-esc="o.company_id.phone"/>
+                        Tlp.
+                        <t t-esc="o.company_id.phone"/>
                     </div>
 
                     <h3 style="text-align: center; margin-bottom: 0; margin-top: 10px;">
@@ -36,50 +37,58 @@
                     <br/>
 
 
+                    <div style="font-size: 14px; margin-top: 10px;">
+                        <span>
+                            Tanggal
+                        </span>
 
-<div style="font-size: 14px; margin-top: 10px;">
-    <span>
-        Tanggal
-    </span>
+                        <span style="margin-left: 6px;">
+                            :
+                            <t t-esc="o.create_date.strftime('%d-%m-%Y')"/>
+                        </span>
+                    </div>
 
-    <span style="margin-left: 6px;">
-        : <t t-esc="o.create_date.strftime('%d-%m-%Y')"/>
-    </span>
-</div>
+                    <div style="font-size: 14px; margin-top: 3px;">
+                        <span>
+                            No Truk
+                        </span>
 
-<div style="font-size: 14px; margin-top: 3px;">
-    <span>
-        No Truk
-    </span>
-
-    <span style="margin-left: 6px;">
-        : <t t-esc="o.kendaraan.license_plate"/>
-    </span>
-</div>
+                        <span style="margin-left: 6px;">
+                            :
+                            <t t-esc="o.kendaraan.license_plate"/>
+                        </span>
+                    </div>
 
                     <div style="float: left; text-align: left; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
                         Supir
                         <span style="margin-left:23px; font-size: 14px">
-                            : <t t-esc="o.sopir.name"/>
+                            :
+                            <t t-esc="o.sopir.name"/>
                         </span>
 
                     </div>
 
                     <div style="float: right; text-align: right; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
-                        Komisi : Rp<t t-esc="'{:,}'.format(int(o.komisi_sopir)).replace(',', '.')"/>
+                        Komisi : Rp
+                        <t t-esc="'{:,}'.format(int(o.komisi_sopir)).replace(',', '.')"/>
                     </div>
 
                     <div style="float: left; text-align: left; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
                         Kenek
                         <span style="margin-left:16px; font-size: 14px">
-                            : <t t-esc="o.kenek.name"/>
+                            :
+                            <t t-esc="o.kenek.name"/>
                         </span>
 
                     </div>
 
                     <div style="float: right; text-align: right; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
-                        Komisi : Rp<t t-esc="'{:,}'.format(int(o.komisi_kenek)).replace(',', '.')"/>
-                    </div><br/><br/><br/>
+                        Komisi : Rp
+                        <t t-esc="'{:,}'.format(int(o.komisi_kenek)).replace(',', '.')"/>
+                    </div>
+                    <br/>
+                    <br/>
+                    <br/>
 
 
                     ---------------------------------------------------------------------
@@ -91,7 +100,8 @@
                                 <td width="55%">Hasil Jasa</td>
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
-                                    Rp<t t-esc="'{:,}'.format(int(o.total_jumlah)).replace(',', '.')"/>
+                                    Rp
+                                    <t t-esc="'{:,}'.format(int(o.total_jumlah)).replace(',', '.')"/>
                                 </td>
                             </tr>
 
@@ -99,7 +109,8 @@
                                 <td width="55%">Bayar Dimuka</td>
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
-                                    Rp<t t-esc="'{:,}'.format(int(o.total_bayar_dimuka)).replace(',', '.')"/>
+                                    Rp
+                                    <t t-esc="'{:,}'.format(int(o.total_bayar_dimuka)).replace(',', '.')"/>
                                 </td>
                             </tr>
 
@@ -107,7 +118,8 @@
                                 <td width="55%">Ongkos</td>
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
-                                    Rp<t t-esc="'{:,}'.format(int(o.total_ongkos)).replace(',', '.')"/>
+                                    Rp
+                                    <t t-esc="'{:,}'.format(int(o.total_ongkos)).replace(',', '.')"/>
                                 </td>
                             </tr>
 
@@ -115,7 +127,8 @@
                                 <td width="55%">Uang Jalan</td>
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
-                                    Rp<t t-esc="'{:,}'.format(int(o.total_uang_jalan)).replace(',', '.')"/>
+                                    Rp
+                                    <t t-esc="'{:,}'.format(int(o.total_uang_jalan)).replace(',', '.')"/>
                                 </td>
                             </tr>
 
@@ -123,7 +136,8 @@
                                 <td width="55%">Pengeluaran</td>
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
-                                    Rp<t t-esc="'{:,}'.format(int(o.total_pengeluaran)).replace(',', '.')"/>
+                                    Rp
+                                    <t t-esc="'{:,}'.format(int(o.total_pengeluaran)).replace(',', '.')"/>
                                 </td>
                             </tr>
 
@@ -131,7 +145,8 @@
                                 <td width="55%">Biaya Fee</td>
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
-                                    Rp<t t-esc="'{:,}'.format(int(o.total_biaya_fee)).replace(',', '.')"/>
+                                    Rp
+                                    <t t-esc="'{:,}'.format(int(o.total_biaya_fee)).replace(',', '.')"/>
                                 </td>
                             </tr>
 
@@ -139,7 +154,8 @@
                                 <td width="55%">Biaya Pembelian</td>
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
-                                    Rp<t t-esc="'{:,}'.format(int(o.total_pembelian)).replace(',', '.')"/>
+                                    Rp
+                                    <t t-esc="'{:,}'.format(int(o.total_pembelian)).replace(',', '.')"/>
                                 </td>
                             </tr>
 
@@ -153,7 +169,8 @@
                                 <td width="55%">Sisa</td>
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
-                                    Rp<t t-esc="'{:,}'.format(int(o.sisa)).replace(',', '.')"/>
+                                    Rp
+                                    <t t-esc="'{:,}'.format(int(o.sisa)).replace(',', '.')"/>
                                 </td>
                             </tr>
 
@@ -169,7 +186,8 @@
                                 <td width="55%">UANG SENDIRI (US)</td>
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
-                                    Rp<t t-esc="'{:,}'.format(int(o.total_pengeluaran - o.total_uang_jalan)).replace(',', '.')"/>
+                                    Rp
+                                    <t t-esc="'{:,}'.format(int(o.total_pengeluaran - o.total_uang_jalan)).replace(',', '.')"/>
                                 </td>
                             </tr>
 
