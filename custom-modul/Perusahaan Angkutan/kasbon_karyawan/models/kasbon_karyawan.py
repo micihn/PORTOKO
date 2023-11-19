@@ -16,15 +16,43 @@ class KasbonKaryawan(models.Model):
 
     active = fields.Boolean('Archive', default=True, tracking=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
-    nama_karyawan = fields.Many2one('res.partner', 'Nama Karyawan')
-    rekening_karyawan = fields.Many2one('res.partner.bank', 'Rekening')
-    nominal_pinjam = fields.Float('Nominal Pinjam', digits=(6, 0))
+    nama_karyawan = fields.Many2one('res.partner', 'Nama Karyawan', states={
+        'draft': [('readonly', False)],
+        'lended': [('readonly', True)],
+        'returned': [('readonly', True)],
+    })
+    rekening_karyawan = fields.Many2one('res.partner.bank', 'Rekening', states={
+        'draft': [('readonly', False)],
+        'lended': [('readonly', True)],
+        'returned': [('readonly', True)],
+    })
+    nominal_pinjam = fields.Float('Nominal Pinjam', digits=(6, 0), states={
+        'draft': [('readonly', False)],
+        'lended': [('readonly', True)],
+        'returned': [('readonly', True)],
+    })
     nominal_sisa = fields.Float('Sisa Hutang', digits=(6, 0), readonly=True)
     nominal_bayar = fields.Float('Nominal Bayar', compute='_compute_nominal_bayar', digits=(6, 0))
-    tanggal = fields.Date('Tanggal')
-    keterangan = fields.Text('Keterangan')
-    akun_piutang = fields.Many2one('account.account')
-    akun_kas = fields.Many2one('account.journal')
+    tanggal = fields.Date('Tanggal', states={
+        'draft': [('readonly', False)],
+        'lended': [('readonly', True)],
+        'returned': [('readonly', True)],
+    })
+    keterangan = fields.Text('Keterangan', states={
+        'draft': [('readonly', False)],
+        'lended': [('readonly', True)],
+        'returned': [('readonly', True)],
+    })
+    akun_piutang = fields.Many2one('account.account', states={
+        'draft': [('readonly', False)],
+        'lended': [('readonly', True)],
+        'returned': [('readonly', True)],
+    })
+    akun_kas = fields.Many2one('account.journal', states={
+        'draft': [('readonly', False)],
+        'lended': [('readonly', True)],
+        'returned': [('readonly', True)],
+    })
     journal_entry_hutang = fields.Many2many('account.move', string='Journal Entry Hutang', readonly=True, relation='kasbon_karyawan_journal_entry_hutang_rel')
     journal_entry_pelunasan_hutang = fields.Many2many('account.move', string='Journal Entry Pelunasan', readonly=True, relation='kasbon_karyawan_journal_entry_pelunasan_hutang_rel')
 
