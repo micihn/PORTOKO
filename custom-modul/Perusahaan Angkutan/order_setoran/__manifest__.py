@@ -31,6 +31,8 @@
         'wizard/oper_setoran_create_invoice.xml',
         'report/report_komisi_sopir.xml',
         'report/report_komisi_sopir_action.xml',
+        'report/report_setoran.xml',
+        'report/report_setoran_action.xml',
     ],
     'demo': [],
     'qweb': [],
