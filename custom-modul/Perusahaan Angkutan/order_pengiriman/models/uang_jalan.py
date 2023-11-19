@@ -94,31 +94,33 @@ class UangJalan(models.Model):
         return result
 
     @api.model
-    def terbilang(self, angka):
-        satuan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan"]
-        belasan = ["", "Sebelas", "Dua Belas", "Tiga Belas", "Empat Belas", "Lima Belas", "Enam Belas", "Tujuh Belas", "Delapan Belas", "Sembilan Belas"]
-        puluhan = ["", "Sepuluh", "Dua Puluh", "Tiga Puluh", "Empat Puluh", "Lima Puluh", "Enam Puluh", "Tujuh Puluh", "Delapan Puluh", "Sembilan Puluh"]
+    def terbilang(self, bil):
+        angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam",
+                 "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"]
+        Hasil = " "
+        n = int(bil)
+        if n >= 0 and n <= 11:
+            Hasil = angka[n]
+        elif n < 20:
+            Hasil = self.terbilang(n - 10) + " Belas "
+        elif n < 100:
+            Hasil = self.terbilang(n / 10) + " Puluh " + self.terbilang(n % 10)
+        elif n < 200:
+            Hasil = " Seratus " + self.terbilang(n - 100)
+        elif n < 1000:
+            Hasil = self.terbilang(n / 100) + " Ratus " + self.terbilang(n % 100)
+        elif n < 2000:
+            Hasil = " Seribu " + self.terbilang(n - 1000)
+        elif n < 1000000:
+            Hasil = self.terbilang(n / 1000) + " Ribu " + self.terbilang(n % 1000)
+        elif n < 1000000000:
+            Hasil = self.terbilang(n / 1000000) + " Juta " + self.terbilang(n % 1000000)
+        elif n < 1000000000000:
+            Hasil = self.terbilang(n / 1000000000) + " Milyar " + self.terbilang(n % 1000000000)
+        elif n < 1000000000000000:
+            Hasil = self.terbilang(n / 1000000000000) + " Triliyun " + self.terbilang(n % 1000000000000)
 
-        terbilang_str = ""
-
-        if angka < 0:
-            terbilang_str += "Minus "
-            angka = abs(angka)
-
-        if angka < 10:
-            terbilang_str += satuan[angka]
-        elif angka < 20:
-            terbilang_str += belasan[angka - 10]
-        elif angka < 100:
-            terbilang_str += puluhan[angka // 10] + " " + satuan[angka % 10]
-        elif angka < 1000:
-            terbilang_str += satuan[angka // 100] + " Ratus " + self.terbilang(angka % 100)
-        elif angka < 1000000:
-            terbilang_str += self.terbilang(angka // 1000) + " Ribu " + self.terbilang(angka % 1000)
-        else:
-            terbilang_str += self.terbilang(angka // 1000000) + " Juta " + self.terbilang(angka % 1000000)
-
-        return terbilang_str
+        return Hasil
 
 
     def write(self, vals):

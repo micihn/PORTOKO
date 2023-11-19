@@ -72,7 +72,12 @@
                     </div>
 
                     <div style="float: right; text-align: right; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
-                        NRP : <t t-esc="o.sopir.bank_account_id.acc_number"/>
+                        <t t-if="o.sopir.bank_account_id.acc_number">
+                            NRP : <t t-esc="o.sopir.bank_account_id.acc_number"/>
+                        </t>
+                        <t t-else="">
+                            NRP : -
+                        </t>
                     </div><br/>
 
                     <div style="float: left; text-align: left; width: 48%; white-space: nowrap; font-size: 14px; margin-top: 3px;">
@@ -86,27 +91,25 @@
                     <br/>
 
                    <span style="margin-top: 3px;">
-                        ---------------------------------------------------------------------------
+                        ------------------------------------------------------------------------
                     </span>
-
-
 
                     <br/>
                     <br/>
 
                     <t t-foreach="o.uang_jalan_line" t-as="line">
                         <div>
-                            <span style="float: left; width: 20px;">
+                            <span style="float: left; font-size:14px; width: 20px;">
                                 <b>
                                     <t t-esc="str(line_index + 1) + '.'"/>
                                 </b>
                             </span>
-                            <span style="float: left; width: 150px;">
+                            <span style="float: left; font-size:14px; width: 150px;">
                                 <b>
                                     <t t-esc="line.order_pengiriman.order_pengiriman_name"/>
                                 </b>
                             </span>
-                            <span style="float: right;">
+                            <span style="float: right; font-size:14px;">
                                 <b>
                                     Rp
                                     <t t-esc="'{:,}'.format(int(line.nominal_uang_jalan)).replace(',', '.')"/>
@@ -114,7 +117,7 @@
                             </span>
                             <div style="clear: both;"></div>
 
-                            <span style="float: left; margin-left: 20px; margin-top: 5px; width: 100%;">
+                            <span style="float: left; margin-left: 20px; font-size:14px; margin-top: 5px; width: 100%;">
                                 <t t-esc="line.muat.lokasi"/>
                                 -
                                 <t t-esc="line.bongkar.lokasi"/>
@@ -125,7 +128,7 @@
                     </t>
 
                     <span style="margin-top: 3px; margin-bottom: 3px">
-                        ---------------------------------------------------------------------------
+                        ------------------------------------------------------------------------
                     </span>
                     <b>
                         <div style="float: left; text-align: left; width: 48%; white-space: nowrap;">
@@ -136,25 +139,20 @@
                             Rp
                             <t t-esc="'{:,}'.format(int(o.total)).replace(',', '.')"/>
                         </div>
-                        <br/>
-                    <span style="margin-top: 3px; ">
-                        (<t t-esc="o.env['uang.jalan'].terbilang(int(o.total))"/>Rupiah)
-                    </span>
 
-                        <br/>
-                        <br/>
+                        <div style="text-align: left; width: 100%; margin-top: 20px; font-size:14px">
+                            (<t t-esc="o.env['uang.jalan'].terbilang(int(o.total))"/>Rupiah)
+                        </div>
                     </b>
                     <b>
-                        Keterangan
+                        <div style="text-align: left; width: 100%; margin-top: 20px; font-size:14px">
+                            Keterangan : <t t-esc="o.keterangan"/>
+                        </div>
                     </b>
-                    :
-                    <t t-esc="o.keterangan"/>
-                    <br/>
-                    <br/>
 
 
-                    <div style="white-space: nowrap; text-align:center">
-                        <div style="display: inline-block; text-align: center;">
+                    <div style="white-space: nowrap; text-align:center; margin-top: 20px;">
+                        <div style="display: inline-block; text-align: center; font-size:14px">
                             Mengetahui
                             <br/>
                             <br/>
@@ -162,7 +160,7 @@
                             (...................)
                         </div>
 
-                        <div style="display: inline-block; text-align: center; margin-left: 45px;">
+                        <div style="display: inline-block; text-align: center; margin-left: 45px; font-size:14px">
                             Kasir
                             <br/>
                             <br/>
@@ -170,7 +168,7 @@
                             (...................)
                         </div>
 
-                        <div style="display: inline-block; text-align: center; margin-left: 45px;">
+                        <div style="display: inline-block; text-align: center; margin-left: 45px; font-size:14px">
                             Penerima
                             <br/>
                             <br/>
