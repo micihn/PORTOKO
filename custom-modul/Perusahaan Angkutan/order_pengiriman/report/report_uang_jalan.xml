@@ -1,31 +1,164 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
+    <template id="report_uang_jalan">
+        <t t-call="web.html_container">
+            <t t-esc="docs"/>
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <b>
+                        <t t-esc="o.company_id.name"/>
+                    </b>
+                    <br/>
+                    <t t-esc="o.company_id.street"/>
+                    <br/>
+                    Tlp.
+                    <t t-esc="o.company_id.phone"/>
+                    <br/>
 
-    <record id="paperformat_uang_jalan" model="report.paperformat">
-        <field name="name">Uang Jalan Paperformat</field>
-        <field name="default" eval="True" />
-        <field name="format">custom</field>
-        <field name="page_height">140</field>
-        <field name="page_width">95</field>
-        <field name="orientation">Portrait</field>
-        <field name="margin_top">3</field>
-        <field name="margin_bottom">5</field>
-        <field name="margin_left">5</field>
-        <field name="margin_right">5</field>
-        <field name="header_spacing">5</field>
-        <field name="header_line" eval="False" />
-        <field name="dpi">90</field>
-    </record>
+                    <h3 style="text-align: center; margin-bottom: 0;">
+                        <span style="text-decoration: underline; font-weight: bold;">UANG JALAN</span>
+                    </h3>
 
-    <record id="report_uang_jalan_action" model="ir.actions.report">
-        <field name="name">Uang Jalan</field>
-        <field name="model">uang.jalan</field>
-        <field name="report_type">qweb-pdf</field>
-        <field name="report_name">order_pengiriman.report_uang_jalan</field>
-        <field name="report_file">order_pengiriman.report_uang_jalan</field>
-        <field name="paperformat_id" ref="order_pengiriman.paperformat_uang_jalan"/>
-        <field name="binding_model_id" ref="order_pengiriman.model_uang_jalan"/>
-        <field name="binding_type">report</field>
-    </record>
+                    <div style="text-align: center; margin-top: 0;">
+                        <b>No:
+                            <t t-esc="o.uang_jalan_name"/>
+                        </b>
+                    </div>
+                    <br/>
+
+
+                    <div style="text-align:right;">
+                        Tanggal
+                        <t t-esc="o.create_date.strftime('%d-%m-%Y')"/>
+                        <br/>
+                        <t t-if="o.tipe_uang_jalan == 'standar'">
+                            Tipe UJ: Standar
+                        </t>
+                        <t t-else="">
+                            Tipe UJ: Nominal Saja
+                        </t>
+                    </div>
+                    <br/>
+
+
+                    No Truk
+                    <span style="margin-left:6px">:
+                        <t t-esc="o.kendaraan.license_plate"/>
+                    </span>
+                    <br/>
+                    <div style="float: left; text-align: left; width: 48%; white-space: nowrap;">
+                        Supir
+                        <span style="margin-left:26px">:
+                            <t t-esc="o.sopir.name"/>
+                        </span>
+                        <br/>
+                        Kenek
+                        <span style="margin-left:19px">:
+                            <t t-esc="o.kenek.name"/>
+                        </span>
+                    </div>
+
+                    <div style="float: right; text-align: right; width: 48%; white-space: nowrap;">
+                        NRP :
+                        <t t-esc="o.sopir.bank_account_id.acc_number"/>
+                    </div>
+                    <br/>
+                    <br/>
+
+                    ---------------------------------------------------------------------
+
+                    <br/>
+                    <br/>
+
+                    <t t-foreach="o.uang_jalan_line" t-as="line">
+                        <div>
+                            <span style="float: left; width: 20px;">
+                                <b>
+                                    <t t-esc="str(line_index + 1) + '.'"/>
+                                </b>
+                            </span>
+                            <span style="float: left; width: 150px;"> <!-- Adjust width as needed -->
+                                <b>
+                                    <t t-esc="line.order_pengiriman.order_pengiriman_name"/>
+                                </b>
+                            </span>
+                            <span style="float: right;">
+                                <b>
+                                    Rp
+                                    <t t-esc="'{:,}'.format(int(line.nominal_uang_jalan)).replace(',', '.')"/>
+                                </b>
+                            </span>
+                            <div style="clear: both;"></div>
+
+                            <span style="float: left; margin-left: 20px;">
+                                <t t-esc="line.muat.lokasi"/>
+                                -
+                                <t t-esc="line.bongkar.lokasi"/>
+                            </span>
+                        </div>
+                        <br/>
+                        <br/>
+                    </t>
+
+                    ---------------------------------------------------------------------
+                    <br/>
+                    <b>
+                        <div style="float: left; text-align: left; width: 48%; white-space: nowrap;">
+                            Total Nominal :
+                        </div>
+
+
+                        <div style="float: right; text-align: right; width: 48%; white-space: nowrap;">
+                            Rp
+                            <t t-esc="'{:,}'.format(int(o.total)).replace(',', '.')"/>
+                        </div>
+                        <br/>
+                        (
+                        <t t-esc="o.env['uang.jalan'].terbilang(int(o.total))"/>
+                        Rupiah)
+                        <br/>
+                        <br/>
+                    </b>
+                    <b>
+                        Keterangan
+                    </b>
+                    :
+                    <t t-esc="o.keterangan"/>
+                    <br/>
+                    <br/>
+
+
+                    <div style="white-space: nowrap; text-align:center">
+                        <div style="display: inline-block; text-align: center;">
+                            Mengetahui
+                            <br/>
+                            <br/>
+                            <br/>
+                            (...................)
+                        </div>
+
+                        <div style="display: inline-block; text-align: center; margin-left: 45px;">
+                            Kasir
+                            <br/>
+                            <br/>
+                            <br/>
+                            (...................)
+                        </div>
+
+                        <div style="display: inline-block; text-align: center; margin-left: 45px;">
+                            Penerima
+                            <br/>
+                            <br/>
+                            <br/>
+                            (...................)
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </t>
+        </t>
+    </template>
 
 </odoo>
