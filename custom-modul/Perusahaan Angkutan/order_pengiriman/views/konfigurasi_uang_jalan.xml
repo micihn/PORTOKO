@@ -61,7 +61,7 @@
                         <separator string="Uang Makan" />
                             <field name="uang_makan_per_hari" string="Uang Makan Per Hari" optional="show"/>
 
-                        <separator string="Kalkulasi Hari Tempuh Dan Biaya" />
+                        <separator string="Kalkulasi Biaya" />
                             <field name="hari" string="Hari Tempuh" optional="show"/>
                             <field name="uang_makan" string="Total Uang Makan" optional="show"/>
                             <field name="uang_solar" string="Total Uang Solar" optional="show"/>

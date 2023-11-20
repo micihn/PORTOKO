@@ -93,6 +93,36 @@ class UangJalan(models.Model):
         result = super(UangJalan, self).create(vals)
         return result
 
+    @api.model
+    def terbilang(self, bil):
+        angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam",
+                 "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"]
+        Hasil = " "
+        n = int(bil)
+        if n >= 0 and n <= 11:
+            Hasil = angka[n]
+        elif n < 20:
+            Hasil = self.terbilang(n - 10) + " Belas "
+        elif n < 100:
+            Hasil = self.terbilang(n / 10) + " Puluh " + self.terbilang(n % 10)
+        elif n < 200:
+            Hasil = " Seratus " + self.terbilang(n - 100)
+        elif n < 1000:
+            Hasil = self.terbilang(n / 100) + " Ratus " + self.terbilang(n % 100)
+        elif n < 2000:
+            Hasil = " Seribu " + self.terbilang(n - 1000)
+        elif n < 1000000:
+            Hasil = self.terbilang(n / 1000) + " Ribu " + self.terbilang(n % 1000)
+        elif n < 1000000000:
+            Hasil = self.terbilang(n / 1000000) + " Juta " + self.terbilang(n % 1000000)
+        elif n < 1000000000000:
+            Hasil = self.terbilang(n / 1000000000) + " Milyar " + self.terbilang(n % 1000000000)
+        elif n < 1000000000000000:
+            Hasil = self.terbilang(n / 1000000000000) + " Triliyun " + self.terbilang(n % 1000000000000)
+
+        return Hasil
+
+
     def write(self, vals):
         if 'tipe_uang_jalan' in vals:
             # Method untuk reset jika transisi "Tipe Uang Jalan" terjadi

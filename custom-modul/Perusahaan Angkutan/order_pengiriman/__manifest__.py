@@ -28,6 +28,8 @@
         'views/oper_order.xml',
         'views/uang_jalan.xml',
         'views/menu.xml',
+        'report/report_uang_jalan.xml',
+        'report/report_uang_jalan_action.xml',
     ],
     'demo': [],
     'post_init_hook': 'post_init_hook',

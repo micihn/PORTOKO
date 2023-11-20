@@ -16,9 +16,14 @@
         <field name="name">kasbon.karyawan.tree</field>
         <field name="model">kasbon.karyawan</field>
         <field name="arch" type="xml">
-            <tree >
+            <tree default_order="name desc">
+                <field name="name" string="Nomor Kas"/>
                 <field name="nama_karyawan" string="Nama Karyawan" optional="show"/>
-<!--                <field name="state" string="State" optional="show" widget="badge" decoration-info="state=='to_request'" decoration-warning="state=='requested'" decoration-muted="state=='cancel'" decoration-success="state in ['confirmed']"/>-->
+                <field name="tanggal" string="Tanggal Pinjam" optional="show"/>
+                <field name="keterangan" string="Keterangan" optional="show"/>
+                <field name="nominal_pinjam" string="Nominal Hutang" optional="show"/>
+                <field name="nominal_bayar" string="Nominal Bayar" optional="show"/>
+                <field name="state" string="State" optional="show" widget="badge" decoration-info="state=='draft'" decoration-warning="state=='lended'" decoration-success="state=='returned'"/>
             </tree>
         </field>
     </record>
@@ -49,6 +54,7 @@
                             <field name="nama_karyawan" string="Nama Karyawan"/>
                             <field name="rekening_karyawan" string="Rekening"/>
                             <field name="nominal_pinjam" string="Nominal Pinjam"/>
+                            <field name="nominal_bayar" string="Nominal Bayar"/>
                             <field name="nominal_sisa" string="Sisa Hutang"/>
                         </group>
 

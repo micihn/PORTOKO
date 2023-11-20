@@ -69,7 +69,7 @@ class KonfigurasiUangJalan(models.Model):
     solar = fields.Float('Kebutuhan Solar (L)', compute='_calculate_solar')
     uang_solar = fields.Float('Uang Solar', compute='_calculate_uang_solar')
     uang_solar_per_liter = fields.Float('Harga Solar Per Liter', compute='_calculate_uang_solar_per_liter')
-    hari = fields.Float('Hari Tempuh', compute='_calculate_hari')
+    hari = fields.Float('Hari Tempuh')
     uang_makan = fields.Float('Total Uang Makan', compute='_calculate_uang_makan')
     uang_makan_per_hari = fields.Float('Uang Makan Per Hari', compute='_calculate_uang_makan_per_hari')
     kuli = fields.Integer('Biaya Kuli', default=0)
@@ -101,7 +101,7 @@ class KonfigurasiUangJalan(models.Model):
         for record in self:
             record.uang_solar = record.solar * record.uang_solar_per_liter
 
-    @api.depends('jarak')
+    @api.onchange('jarak')
     def _calculate_hari(self):
         for record in self:
             if record.jarak <= 99:

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_komisi_sopir" model="report.paperformat">
+        <field name="name">Komisi Sopir Paperformat</field>
+        <field name="default" eval="True" />
+        <field name="format">custom</field>
+        <field name="page_height">140</field>
+        <field name="page_width">95</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">3</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_spacing">5</field>
+        <field name="header_line" eval="False" />
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="report_komisi_sopir_action" model="ir.actions.report">
+        <field name="name">Komisi Sopir</field>
+        <field name="model">order.setoran</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">order_setoran.report_komisi_sopir</field>
+        <field name="report_file">order_setoran.report_komisi_sopir</field>
+        <field name="paperformat_id" ref="order_setoran.paperformat_komisi_sopir"/>
+        <field name="binding_model_id" ref="order_setoran.model_order_setoran"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>
