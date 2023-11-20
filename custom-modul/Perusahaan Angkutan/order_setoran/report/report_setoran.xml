@@ -178,7 +178,12 @@
                                 <td width="55%">% UJ</td>
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
-                                    <t t-esc="'{:,}'.format((o.total_pengeluaran + o.komisi_sopir + o.komisi_kenek) * 100 / o.total_jumlah).replace(',', '.')"/>
+                                    <t t-esc="'{:0,.2f}'.format(round((o.total_pengeluaran + o.komisi_sopir + o.komisi_kenek) * 100 / o.total_jumlah, 2))"/>
+
+
+
+
+
                                 </td>
                             </tr>
 
