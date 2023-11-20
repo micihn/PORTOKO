@@ -119,7 +119,7 @@
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
                                     Rp
-                                    <t t-esc="'{:,}'.format(int(o.total_ongkos)).replace(',', '.')"/>
+                                    <t t-esc="'{:,}'.format(int(o.total_ongkos_calculated)).replace(',', '.')"/>
                                 </td>
                             </tr>
 
@@ -179,11 +179,6 @@
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
                                     <t t-esc="'{:0,.2f}'.format(round((o.total_pengeluaran + o.komisi_sopir + o.komisi_kenek) * 100 / o.total_jumlah, 2))"/>
-
-
-
-
-
                                 </td>
                             </tr>
 
