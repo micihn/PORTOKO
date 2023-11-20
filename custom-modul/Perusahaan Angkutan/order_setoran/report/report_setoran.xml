@@ -191,8 +191,12 @@
                                 <td width="55%">UANG SENDIRI (US)</td>
                                 <td width="5%">:</td>
                                 <td style="text-align:right">
-                                    Rp
-                                    <t t-esc="'{:,}'.format(int(o.total_pengeluaran - o.total_uang_jalan)).replace(',', '.')"/>
+                                    <t t-if="(o.total_pengeluaran - o.total_uang_jalan) &gt; 0">
+                                    Rp <t t-esc="'{:,}'.format(int(o.total_pengeluaran - o.total_uang_jalan)).replace(',', '.')"/>
+                                    </t>
+                                    <t t-else="">
+                                        Rp0
+                                    </t>
                                 </td>
                             </tr>
 
