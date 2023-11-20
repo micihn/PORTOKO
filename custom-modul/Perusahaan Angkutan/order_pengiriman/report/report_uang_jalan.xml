@@ -45,16 +45,11 @@
                         <t t-set="total_line" t-value="total_line + 1"/>
                         <t t-set="nominal_uang_jalan" t-value="nominal_uang_jalan + line.nominal_uang_jalan"/>
 
-                        <t t-if="total_line % 3 == 0">
+                        <t t-if="total_line % 3 == 0 and total_line != len(o.uang_jalan_line)">
                             <t t-call="order_pengiriman.uang_jalan_footer" />
                             <div style="page-break-after:always;" />
-
-<!--                            <t t-set="total_line" t-value="0"/>-->
+                            <t t-call="order_pengiriman.uang_jalan_header" />
                             <t t-set="nominal_uang_jalan" t-value="0"/>
-
-                            <t t-if="total_line != len(o.uang_jalan_line)">
-                                <t t-call="order_pengiriman.uang_jalan_header" />
-                            </t>
                         </t>
 
 <!--                        <t t-if="total_line &gt; 2">-->
@@ -66,9 +61,12 @@
 <!--                        </t>-->
                     </t>
 
-                    <t t-if="total_line % 3 != 0">
+                    <t t-if="total_line % 3 != 0 and total_line != len(o.uang_jalan_line)">
                         <t t-call="order_pengiriman.uang_jalan_footer" />
                         <div style="page-break-before:always;" />
+                    </t>
+                    <t t-else="">
+                        <t t-call="order_pengiriman.uang_jalan_footer" />
                     </t>
 
                 </div>
