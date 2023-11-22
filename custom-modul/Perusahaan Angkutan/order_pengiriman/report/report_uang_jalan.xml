@@ -16,17 +16,17 @@
                     <t t-set="nominal_uang_jalan" t-value="0"/>
                     <t t-foreach="o.uang_jalan_line" t-as="line"> <!-- for item in x -->
                         <div>
-                            <span style="float: left; font-size:14px; width: 20px;">
+                            <span style="float: left; font-size:13px; width: 20px;">
                                 <b>
                                     <t t-esc="str(total_line + 1) + '.'"/>
                                 </b>
                             </span>
-                            <span style="float: left; font-size:14px; width: 150px;">
+                            <span style="float: left; font-size:13px; width: 150px;">
                                 <b>
                                     <t t-esc="line.order_pengiriman.order_pengiriman_name"/>
                                 </b>
                             </span>
-                            <span style="float: right; font-size:14px;">
+                            <span style="float: right; font-size:13px;">
                                 <b>
                                     Rp
                                     <t t-esc="'{:,}'.format(int(line.nominal_uang_jalan)).replace(',', '.')"/>
@@ -34,7 +34,7 @@
                             </span>
                             <div style="clear: both;"></div>
 
-                            <span style="float: left; margin-left: 20px; font-size:14px; margin-top: 5px; width: 100%;">
+                            <span style="float: left; margin-left: 20px; font-size:13px; margin-top: 5px; width: 100%;">
                                 <t t-esc="line.muat.lokasi"/>
                                 -
                                 <t t-esc="line.bongkar.lokasi"/>
@@ -101,7 +101,7 @@
         </div>
 
         <div style="text-align:right; margin-top: 10px; margin-bottom: 3px;">
-            <span style="font-size:14px">Tanggal
+            <span style="font-size:13px">Tanggal
                 <t t-esc="o.create_date.strftime('%d-%m-%Y')"/>
             </span>
             <br/>
@@ -109,10 +109,10 @@
 
         <div style="text-align:right;">
             <t t-if="o.tipe_uang_jalan == 'standar'">
-                <span style="font-size:14px; ">Tipe UJ: Standar</span>
+                <span style="font-size:13px; ">Tipe UJ: Standar</span>
             </t>
             <t t-else="">
-                <span style="font-size:14px">Tipe UJ: Nominal Saja</span>
+                <span style="font-size:13px">Tipe UJ: Nominal Saja</span>
             </t>
         </div>
 
@@ -177,12 +177,12 @@
                     <t t-esc="'{:,}'.format(int(nominal_uang_jalan)).replace(',', '.')"/>
                 </div>
 
-                <div style="text-align: left; width: 100%; margin-top: 20px; font-size:14px">
+                <div style="text-align: left; width: 100%; margin-top: 20px; font-size:13px">
                     (<t t-esc="o.env['uang.jalan'].terbilang(int(nominal_uang_jalan))"/>Rupiah)
                 </div>
             </b>
             <b>
-                <div style="text-align: left; width: 100%; margin-top: 20px; font-size:14px">
+                <div style="text-align: left; width: 100%; margin-top: 20px; font-size:13px">
                     Keterangan :
                     <t t-esc="o.keterangan"/>
                 </div>
@@ -190,7 +190,7 @@
 
 
             <div style="white-space: nowrap; text-align:center; margin-top: 20px;">
-                <div style="display: inline-block; text-align: center; font-size:14px">
+                <div style="display: inline-block; text-align: center; font-size:13px">
                     Mengetahui
                     <br/>
                     <br/>
@@ -198,7 +198,7 @@
                     (...................)
                 </div>
 
-                <div style="display: inline-block; text-align: center; margin-left: 45px; font-size:14px">
+                <div style="display: inline-block; text-align: center; margin-left: 45px; font-size:13px">
                     Kasir
                     <br/>
                     <br/>
@@ -206,7 +206,7 @@
                     (...................)
                 </div>
 
-                <div style="display: inline-block; text-align: center; margin-left: 45px; font-size:14px">
+                <div style="display: inline-block; text-align: center; margin-left: 45px; font-size:13px">
                     Penerima
                     <br/>
                     <br/>
