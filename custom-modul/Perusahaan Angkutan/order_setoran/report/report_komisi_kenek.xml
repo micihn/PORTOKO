@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="report_komisi_kenek">
+        <t t-call="web.html_container">
+            <t t-esc="docs"/>
+            <t t-foreach="docs" t-as="o">
+
+                <style type="text/css">
+                    .odoo-default-font {
+                        font-family: Lato, sans-serif;
+                    }
+                </style>
+
+                <div class="page odoo-default-font">
+                    <div style="text-align: left; font-weight: bold;">
+                        <t t-esc="o.company_id.name"/>
+                    </div>
+                    <div style="text-align: left; margin-top: 3px;">
+                        <t t-esc="o.company_id.street"/>
+                    </div>
+
+                    <div style="text-align: left; margin-top: 3px;">
+                        Tlp. <t t-esc="o.company_id.phone"/>
+                    </div>
+
+                    <br/>
+
+                    <h3 style="text-align: center; margin-bottom: 0; margin-top: 10px;">
+                        <span style="text-decoration: underline; font-weight: bold;">KOMISI KENEK</span>
+                    </h3>
+
+                    <div style="text-align: center; margin-top: 3px;">
+                        <b>No:
+                            <t t-esc="o.kode_order_setoran"/>
+                        </b>
+                    </div>
+
+                    <br/>
+
+                    <table style="width: 100%;">
+                        <tbody>
+                        <tr>
+                            <td width="35%" height="20px">Tanggal</td>
+                            <td width="5%">:</td>
+                            <td><t t-esc="o.tanggal_st.strftime('%d-%m-%Y')"/></td>
+                        </tr>
+                        <tr>
+                            <td width="35%" height="20px">No. Truk</td>
+                            <td width="5%">:</td>
+                            <td><t t-esc="o.kendaraan.license_plate"/></td>
+                        </tr>
+                        <tr>
+                            <td width="35%" height="20px">Kenek</td>
+                            <td width="5%">:</td>
+                            <td><t t-esc="o.kenek.name"/></td>
+                        </tr>
+                        <tr>
+                            <td width="35%" height="20px">NRP</td>
+                            <td width="5%">:</td>
+                            <td><t t-esc="o.kenek.bank_account_id.bank_id.name"/> - <t t-esc="o.kenek.bank_account_id.acc_number"/></td>
+                        </tr>
+                        <tr >
+                            <td style="vertical-align: top;" width="35%" height="40px">Keterangan</td>
+                            <td style="vertical-align: top;" width="5%">:</td>
+                            <td style="vertical-align: top;"><t t-esc="o.keterangan"/></td>
+                        </tr>
+                        <tr>
+                            <td width="35%" height="20px"><b>Jumlah Komisi</b></td>
+                            <td width="5%">:</td>
+                            <td>
+                                <b>
+                                    Rp<t t-esc="'{:,}'.format(int(o.komisi_kenek)).replace(',', '.')"/>
+                                </b>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table><br /><br />
+
+
+                    <div style="white-space: nowrap; text-align:center">
+                        <div style="display: inline-block; text-align: center;">
+                            Mengetahui
+                            <br/>
+                            <br/>
+                            <br/>
+                            (...................)
+                        </div>
+
+                        <div style="display: inline-block; text-align: center; margin-left: 45px;">
+                            Kasir
+                            <br/>
+                            <br/>
+                            <br/>
+                            (...................)
+                        </div>
+
+                        <div style="display: inline-block; text-align: center; margin-left: 45px;">
+                            Penerima
+                            <br/>
+                            <br/>
+                            <br/>
+                            (...................)
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </t>
+        </t>
+    </template>
+
+</odoo>
