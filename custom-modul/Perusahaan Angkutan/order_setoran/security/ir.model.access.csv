@@ -4,7 +4,7 @@ access_detail_order,access.detail.order,order_setoran.model_detail_order,group_o
 access_detail_list_uang_jalan,access.detail.list.uang.jalan,order_setoran.model_detail_list_uang_jalan,group_order_setoran,1,1,1,1
 access_detail_list_pembelian,access.detail.list.pembelian,order_setoran.model_detail_list_pembelian,group_order_setoran,1,1,1,1
 access_detail_biaya_fee,access.detail.biaya.fee,order_setoran.model_detail_biaya_fee,group_order_setoran,1,1,1,1
-
+access_konfigurasi_account_setoran,access.konfigurasi.account.setoran,order_setoran.model_konfigurasi_account_setoran,group_order_setoran,1,1,1,1
 
 access_oper_setoran,access.oper.setoran,order_setoran.model_oper_setoran,group_order_setoran,1,1,1,1
 access_detail_order_setoran,access.detail.order.setoran,order_setoran.model_detail_order_setoran,group_order_setoran,1,1,1,1

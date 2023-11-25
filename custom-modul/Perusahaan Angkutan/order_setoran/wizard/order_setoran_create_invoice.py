@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 import itertools
+from odoo.exceptions import ValidationError
 
 
 class AccountInvoicePayment(models.TransientModel):
@@ -39,7 +40,6 @@ class AccountInvoicePayment(models.TransientModel):
         return default_vals
 
     def create_invoice(self):
-
         def find_master_pembelian(self):
             # Mengambil ID Database Produk berdasarkan external ID
             external_id = self.env.ref('order_setoran.product_vendor_product_service')
@@ -59,6 +59,20 @@ class AccountInvoicePayment(models.TransientModel):
             return product_id
 
         for setoran in self.env['order.setoran'].browse(self._context.get('active_ids', [])):
+
+            account_settings = self.env['konfigurasi.account.setoran'].search([('company_id', '=', setoran.company_id.id)])
+            account_kas = account_settings.account_kas
+            account_piutang = account_settings.account_piutang
+            account_biaya_ujt = account_settings.account_biaya_ujt
+
+            if bool(account_kas) == False:
+                raise ValidationError("Konfigurasi Account belum diisi! Lakukan konfigurasi di Order Setoran > Konfigurasi")
+
+            if bool(account_piutang) == False:
+                raise ValidationError("Konfigurasi Account belum diisi! Lakukan konfigurasi di Order Setoran > Konfigurasi")
+
+            if bool(account_biaya_ujt) == False:
+                raise ValidationError("Konfigurasi Account belum diisi! Lakukan konfigurasi di Order Setoran > Konfigurasi")
 
             # Write nomor surat jalan
             for detail in setoran.detail_order:
@@ -176,7 +190,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Kas')], limit=1).id,
+                            'account_id': account_kas.id,
                             'company_id': setoran.company_id.id,
                             'credit': setoran.total_pengeluaran - setoran.total_uang_jalan,
                         }),
@@ -184,7 +198,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
+                            'account_id': account_piutang.id,
                             'company_id': setoran.company_id.id,
                             'debit': setoran.total_pengeluaran - setoran.total_uang_jalan,
                         }),
@@ -202,7 +216,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Biaya UJT')], limit=1).id,
+                            'account_id': account_biaya_ujt.id,
                             'company_id': setoran.company_id.id,
                             'debit': setoran.total_pengeluaran,
                         }),
@@ -210,7 +224,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
+                            'account_id': account_piutang.id,
                             'company_id': setoran.company_id.id,
                             'credit': setoran.total_pengeluaran,
                         }),
@@ -230,7 +244,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Kas')], limit=1).id,
+                            'account_id': account_kas.id,
                             'company_id': setoran.company_id.id,
                             'debit': setoran.total_uang_jalan - setoran.total_pengeluaran,
                         }),
@@ -238,7 +252,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
+                            'account_id': account_piutang.id,
                             'company_id': setoran.company_id.id,
                             'credit': setoran.total_uang_jalan - setoran.total_pengeluaran,
                         }),
@@ -256,7 +270,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Biaya UJT')], limit=1).id,
+                            'account_id': account_biaya_ujt.id,
                             'company_id': setoran.company_id.id,
                             'debit': setoran.total_pengeluaran,
                         }),
@@ -264,7 +278,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
+                            'account_id': account_piutang.id,
                             'company_id': setoran.company_id.id,
                             'credit': setoran.total_pengeluaran,
                         }),
@@ -283,7 +297,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Biaya UJT')], limit=1).id,
+                            'account_id': account_biaya_ujt.id,
                             'company_id': setoran.company_id.id,
                             'debit': setoran.total_pengeluaran,
                         }),
@@ -291,7 +305,7 @@ class AccountInvoicePayment(models.TransientModel):
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
-                            'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
+                            'account_id': account_piutang.id,
                             'company_id': setoran.company_id.id,
                             'credit': setoran.total_pengeluaran,
                         }),

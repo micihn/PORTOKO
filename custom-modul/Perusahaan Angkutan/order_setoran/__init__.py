@@ -41,4 +41,15 @@ def post_init_hook(cr, registry):
                     'number_next_actual': data['number_next_actual'],
                 })
 
+    def create_konfigurasi_account_setoran(cr, registry):
+        env = api.Environment(cr, SUPERUSER_ID, {})
+        companies = env['res.company'].search([])
+
+        for company in companies:
+            env['konfigurasi.account.setoran'].create({
+                'name': 'Konfigurasi Account',
+                'company_id': company.id,
+            })
+
     create_sequence(cr, registry)
+    create_konfigurasi_account_setoran(cr, registry)

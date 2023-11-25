@@ -25,6 +25,7 @@
         'security/ir.model.access.csv',
         'views/oper_setoran.xml',
         'views/order_setoran.xml',
+        'views/konfigurasi_account.xml',
         'views/menu.xml',
         'data/master_product.xml',
         'wizard/order_setoran_create_invoice.xml',
