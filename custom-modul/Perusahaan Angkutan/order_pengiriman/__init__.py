@@ -15,6 +15,16 @@ def post_init_hook(cr, registry):
                 'company_id': company.id,
             })
 
+    def create_konfigurasi_account_uang_jalan(cr, registry):
+        env = api.Environment(cr, SUPERUSER_ID, {})
+        companies = env['res.company'].search([])
+
+        for company in companies:
+            env['konfigurasi.account.uang.jalan'].create({
+                'name': 'Konfigurasi Account',
+                'company_id': company.id,
+            })
+
     def create_tipe_muatan(cr, registry):
         env = api.Environment(cr, SUPERUSER_ID, {})
         companies = env['res.company'].search([])
@@ -89,7 +99,9 @@ def post_init_hook(cr, registry):
                 })
 
     create_konfigurasi_solar_uang_makan(cr, registry)
+    create_konfigurasi_account_uang_jalan(cr, registry)
     create_tipe_muatan(cr, registry)
     create_sequence(cr, registry)
+
 
 

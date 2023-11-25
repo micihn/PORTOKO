@@ -27,4 +27,11 @@
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
         </record>
 
+        <!-- Multi-company : Konfigurasi Account Setpram -->
+        <record model="ir.rule" id="konfigurasi_account_setoran_multicompany_rule">
+            <field name="name">Konfigurasi Account Setoran Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','konfigurasi.account.setoran')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
 </odoo>

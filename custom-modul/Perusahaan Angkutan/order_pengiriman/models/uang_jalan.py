@@ -171,6 +171,16 @@ class UangJalan(models.Model):
         self.state = 'submitted'
 
     def paid(self):
+        account_settings = self.env['konfigurasi.account.uang.jalan'].search([('company_id', '=', self.company_id.id)])
+        account_uang_jalan = account_settings.account_uang_jalan
+        account_kas = account_settings.account_kas
+
+        if bool(account_uang_jalan) == False:
+            raise ValidationError("Konfigurasi Account belum diisi")
+
+        if bool(account_kas) == False:
+            raise ValidationError("Konfigurasi Account belum diisi")
+
         if self.tipe_uang_jalan == 'standar':
 
             uang_jalan_list = []
@@ -205,7 +215,7 @@ class UangJalan(models.Model):
                     (0, 0, {
                         'name': self.uang_jalan_name,
                         'date': self.create_date,
-                        'account_id': self.env['account.account'].search([('name', '=', 'Kas')], limit=1).id,
+                        'account_id': account_kas.id,
                         'company_id': self.company_id.id,
                         'credit': self.total,
                     }),
@@ -213,7 +223,7 @@ class UangJalan(models.Model):
                     (0, 0, {
                         'name': self.uang_jalan_name,
                         'date': self.create_date,
-                        'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
+                        'account_id': account_uang_jalan.id,
                         'company_id': self.company_id.id,
                         'debit': self.total,
                     }),
@@ -233,7 +243,7 @@ class UangJalan(models.Model):
                     (0, 0, {
                         'name': self.uang_jalan_name,
                         'date': self.create_date,
-                        'account_id': self.env['account.account'].search([('name', '=', 'Kas')], limit=1).id,
+                        'account_id': account_kas.id,
                         'company_id': self.company_id.id,
                         'credit': self.total,
                     }),
@@ -241,7 +251,7 @@ class UangJalan(models.Model):
                     (0, 0, {
                         'name': self.uang_jalan_name,
                         'date': self.create_date,
-                        'account_id': self.env['account.account'].search([('name', '=', 'Pihut Advance')], limit=1).id,
+                        'account_id': account_uang_jalan.id,
                         'company_id': self.company_id.id,
                         'debit': self.total,
                     }),

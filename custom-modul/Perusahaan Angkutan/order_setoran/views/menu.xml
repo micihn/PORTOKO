@@ -23,52 +23,20 @@
       parent="order_setoran.menu_order_setoran_root">
     </menuitem>
 
-<!--    <menuitem id="menu_uang_jalan"-->
-<!--      groups="order_pengiriman.group_order_pengiriman"-->
-<!--      sequence="3"-->
-<!--      name="Uang Jalan"-->
-<!--      action="action_uang_jalan"-->
-<!--      parent="order_pengiriman.menu_order_pengiriman_root">-->
-<!--    </menuitem>-->
+    <menuitem id="menu_konfigurasi"
+        groups="order_setoran.group_order_setoran"
+        sequence="10"
+        name="Konfigurasi"
+        action="action_order_setoran"
+        parent="order_setoran.menu_order_setoran_root">
+    </menuitem>
 
-<!--    <menuitem id="menu_konfigurasi"-->
-<!--        groups="order_pengiriman.group_order_pengiriman"-->
-<!--        sequence="10"-->
-<!--        name="Konfigurasi"-->
-<!--        action="action_order_pengiriman"-->
-<!--        parent="order_pengiriman.menu_order_pengiriman_root">-->
-<!--    </menuitem>-->
-
-<!--    <menuitem id="menu_konfigurasi_lokasi"-->
-<!--        groups="order_pengiriman.group_order_pengiriman"-->
-<!--        sequence="11"-->
-<!--        name="Lokasi"-->
-<!--        action="action_konfigurasi_lokasi"-->
-<!--        parent="order_pengiriman.menu_konfigurasi">-->
-<!--    </menuitem>-->
-
-<!--    <menuitem id="menu_konfigurasi_plant"-->
-<!--        groups="order_pengiriman.group_order_pengiriman"-->
-<!--        sequence="12"-->
-<!--        name="PLANT"-->
-<!--        action="action_konfigurasi_plant"-->
-<!--        parent="order_pengiriman.menu_konfigurasi">-->
-<!--    </menuitem>-->
-
-<!--    <menuitem id="menu_konfigurasi_solar_uang_makan"-->
-<!--        groups="order_pengiriman.group_order_pengiriman"-->
-<!--        sequence="13"-->
-<!--        name="Solar Dan Uang Makan"-->
-<!--        action="action_konfigurasi_solar_uang_makan"-->
-<!--        parent="order_pengiriman.menu_konfigurasi">-->
-<!--    </menuitem>-->
-
-<!--    <menuitem id="menu_konfigurasi_uang_jalan"-->
-<!--        groups="order_pengiriman.group_order_pengiriman"-->
-<!--        sequence="14"-->
-<!--        name="Uang Jalan"-->
-<!--        action="action_konfigurasi_uang_jalan"-->
-<!--        parent="order_pengiriman.menu_konfigurasi">-->
-<!--    </menuitem>-->
+    <menuitem id="menu_konfigurasi_account_setoran"
+        groups="order_setoran.group_order_setoran"
+        sequence="11"
+        name="Account"
+        action="action_konfigurasi_account_setoran"
+        parent="order_setoran.menu_konfigurasi">
+    </menuitem>
 
 </odoo>

@@ -15,6 +15,7 @@
         'fleet',
         'hr',
         'web_notify',
+        'om_account_accountant',
     ],
     'data': [
         'security/security.xml',
@@ -25,6 +26,7 @@
         'views/konfigurasi_plant.xml',
         'views/konfigurasi_solar_uang_makan.xml',
         'views/konfigurasi_uang_jalan.xml',
+        'views/konfigurasi_account.xml',
         'views/oper_order.xml',
         'views/uang_jalan.xml',
         'views/menu.xml',
