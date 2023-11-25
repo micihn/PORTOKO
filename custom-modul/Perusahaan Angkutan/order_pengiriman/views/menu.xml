@@ -79,6 +79,14 @@
         parent="order_pengiriman.menu_konfigurasi">
     </menuitem>
 
+    <menuitem id="menu_konfigurasi_account"
+        groups="order_pengiriman.group_order_pengiriman"
+        sequence="16"
+        name="Account"
+        action="action_konfigurasi_account_uang_jalan"
+        parent="order_pengiriman.menu_konfigurasi">
+    </menuitem>
+
     <menuitem id="menu_uang_jalan"
       groups="order_pengiriman.group_order_approver_uang_jalan"
       sequence="3"

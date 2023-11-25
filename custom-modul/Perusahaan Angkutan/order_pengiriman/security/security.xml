@@ -55,6 +55,13 @@
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
         </record>
 
+        <!-- Multi-company : Konfigurasi Account -->
+        <record model="ir.rule" id="konfigurasi_account_multicompany_rule">
+            <field name="name">Konfigurasi Account Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','konfigurasi.account.uang.jalan')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
         <!-- Multi-company : Konfigurasi Solar Uang Makan -->
         <record model="ir.rule" id="konfigurasi_solar_uang_makan_multicompany_rule">
             <field name="name">Konfigurasi Solar Uang Makan Multi-Company rule</field>
