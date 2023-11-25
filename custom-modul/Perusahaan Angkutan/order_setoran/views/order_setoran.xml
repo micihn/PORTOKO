@@ -43,7 +43,7 @@
                     <div class="oe_button_box" name="button_box">
                         <button
                                 name="action_get_vendor_bill_view"
-                                icon="fa-dollar"
+                                icon="fa-credit-card"
                                 type="object">
                             <field name="vendor_bills_count" widget="statinfo" string="Vendor Bill"/>
                         </button>
@@ -57,7 +57,7 @@
 
                         <button
                                 name="action_get_invoice_view"
-                                icon="fa-dollar"
+                                icon="fa-pencil-square-o"
                                 type="object">
                             <field name="invoice_count" widget="statinfo" string="Invoice"/>
                         </button>
@@ -153,6 +153,13 @@
                                     <field name="komisi_sopir"/>
                                 </div>
 
+                                 <div style="display: flex; justify-content: space-between; ">
+                                    <label for="keterangan_komisi_sopir" string="Keterangan"/>
+                                    <div style="width: 100%; text-align: left;">
+                                        <field name="keterangan_komisi_sopir" />
+                                    </div>
+                                </div><br/><br/>
+
                                 <div style="display: flex; justify-content: space-between; ">
                                     <label for="komisi_kenek_percentage" string="Komisi Kenek : "/>
                                     <div style="width: 12%; text-align: center;">
@@ -161,6 +168,18 @@
                                     <label for="komisi_kenek_percentage" string="%" />
                                     <field name="komisi_kenek"/>
                                 </div>
+
+                                 <div style="display: flex; justify-content: space-between; ">
+                                    <label for="keterangan_komisi_kenek" string="Keterangan"/>
+                                    <div style="width: 100%; text-align: left;">
+                                        <field name="keterangan_komisi_kenek" />
+                                    </div>
+                                </div>
+
+
+
+
+
 
 
                             </div>

@@ -62,7 +62,7 @@
                         <tr >
                             <td style="vertical-align: top;" width="35%" height="40px">Keterangan</td>
                             <td style="vertical-align: top;" width="5%">:</td>
-                            <td style="vertical-align: top;"><t t-esc="o.keterangan"/></td>
+                            <td style="vertical-align: top;"><t t-esc="o.keterangan_komisi_sopir"/></td>
                         </tr>
                         <tr>
                             <td width="35%" height="20px"><b>Jumlah Komisi</b></td>

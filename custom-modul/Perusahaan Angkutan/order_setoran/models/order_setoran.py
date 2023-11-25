@@ -54,6 +54,18 @@ class OrderSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
+    keterangan_komisi_sopir = fields.Char('Keterangan Komisi Sopir', tracking=True, states={
+        'draft': [('readonly', False)],
+        'done': [('readonly', True)],
+        'cancel': [('readonly', True)],
+    })
+
+    keterangan_komisi_kenek = fields.Char('Keterangan Komisi Kenek', tracking=True, states={
+        'draft': [('readonly', False)],
+        'done': [('readonly', True)],
+        'cancel': [('readonly', True)],
+    })
+
     total_pengeluaran = fields.Float(digits=(6, 0), required=True,states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
@@ -209,83 +221,6 @@ class OrderSetoran(models.Model):
             'target': 'new',
             'name': 'Create Invoice',
         }
-
-        # # Perhitungan & pembuatan expenses
-        # if self.total_uang_jalan - self.total_pengeluaran < 0:
-        #     # Buat Imbursement dana pribadi sopir atau kenek
-        #     self.env['hr.expense'].sudo().create({
-        #         'name': f"Ganti Uang {self.sopir.name} / {self.kenek.name} {datetime.now().strftime('%d/%m/%Y')}",
-        #         'employee_id': self.sopir.id,
-        #         'product_id': find_external_id(self),
-        #         'quantity': 1,
-        #         'total_amount': abs(self.total_uang_jalan - self.total_pengeluaran),
-        #         'payment_mode': 'own_account',
-        #         'tax_ids': None,
-        #         'reference': self.kode_order_setoran,
-        #     })
-        #
-        #     # Buat Komisi Sopir
-        #     if self.komisi_sopir > 0 and self.sisa > 0:
-        #         self.env['hr.expense'].sudo().create({
-        #             'name': f"Komisi Sopir {self.sopir.name} {formatted_dates_str}",
-        #             'employee_id': self.sopir.id,
-        #             'product_id': find_external_id(self),
-        #             'quantity': 1,
-        #             'total_amount': self.komisi_sopir,
-        #             'payment_mode': 'company_account',
-        #             'tax_ids': None,
-        #             'reference': self.kode_order_setoran,
-        #         })
-        #
-        #     # Buat komisi kenek
-        #     if self.komisi_kenek > 0 and self.sisa > 0:
-        #         self.env['hr.expense'].sudo().create({
-        #             'name': f"Komisi Kenek {self.kenek.name} {formatted_dates_str}",
-        #             'employee_id': self.kenek.id,
-        #             'product_id': find_external_id(self),
-        #             'quantity': 1,
-        #             'total_amount': self.komisi_kenek,
-        #             'payment_mode': 'company_account',
-        #             'tax_ids': None,
-        #             'reference': self.kode_order_setoran,
-        #         })
-        #
-        #     # Write Nomor Surat Jalan
-        #     for record in self.detail_order:
-        #         record.order_pengiriman.write({
-        #             'is_sudah_disetor': True,
-        #             'state': 'sudah_setor',
-        #             'nomor_surat_jalan': record.nomor_surat_jalan or None,
-        #         })
-        # else:
-        #     # Munculkan Pop Up untuk Masukkan sisa uang kelebihan ke journal via journal entry
-        #     return {
-        #         'type': 'ir.actions.act_window',
-        #         'res_model': 'account.invoice.payment',
-        #         'view_mode': 'form',
-        #         'target': 'new',
-        #         'name': 'Create Invoice',
-        #     }
-
-        # Perhitungan Invoice
-
-        # for order in self.detail_order:
-        #     self.env['account.move'].sudo().create({
-        #         'move_type': 'out_invoice',
-        #         'invoice_date': order.order_pengiriman.tanggal_terima,
-        #         'date': fields.Datetime.now(),
-        #         'partner_id': order.order_pengiriman.customer.id,
-        #         'currency_id': self.env.user.company_id.currency_id.id,
-        #         'invoice_origin': order.order_pengiriman.order_pengiriman_name,
-        #         'nomor_setoran': self.kode_order_setoran,
-        #         'invoice_line_ids': [
-        #             (0, 0, {
-        #                 'name': 'Jasa Pengiriman',
-        #                 'price_unit': order.order_pengiriman.total_ongkos,
-        #                 'tax_ids': None,
-        #             })
-        #         ],
-        #     })
 
     def cancel(self):
         # Update Order Pengiriman
