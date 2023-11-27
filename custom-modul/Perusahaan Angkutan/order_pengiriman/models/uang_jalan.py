@@ -343,7 +343,7 @@ class UangJalanLine(models.Model):
     uang_jalan = fields.Many2one('uang.jalan', invisible=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     tipe_muatan = fields.Many2one('konfigurasi.tipe.muatan', 'Tipe Muatan', required=True)
-    order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order', ondelete='restrict',)
+    order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order', ondelete='restrict', domain="[('state', 'not in', ['sudah_setor'])]")
     muat = fields.Many2one('konfigurasi.lokasi', 'Muat', compute='_compute_muat_and_bongkar')
     bongkar = fields.Many2one('konfigurasi.lokasi', 'Bongkar', compute='_compute_muat_and_bongkar')
     nominal_uang_jalan = fields.Float('Nominal UJ', default=0, digits=(6, 0))

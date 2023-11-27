@@ -1,1 +1,1 @@
-from . import kasbon_karyawan
+from . import kasbon_karyawan, res_company

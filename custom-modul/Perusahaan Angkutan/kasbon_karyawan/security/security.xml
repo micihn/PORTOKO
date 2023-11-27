@@ -12,4 +12,12 @@
             <field name="name">Kasbon Karyawan</field>
             <field name="category_id" ref="kasbon_karyawan.module_kasbon_karyawan"/>
         </record>
+
+    <!-- Record rules -->
+        <!-- Multi-company : Konfigurasi Kasbon Karyawan -->
+        <record model="ir.rule" id="konfigurasi_kasbon_multicompany_rule">
+            <field name="name">Konfigurasi Kasbon Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','kasbon.karyawan')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
 </odoo>

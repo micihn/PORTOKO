@@ -3,7 +3,7 @@ from odoo import api, SUPERUSER_ID
 
 def post_init_hook(cr, registry):
 
-    def create_sequence(cr, registry):
+    def create_sequence_setoran(cr, registry):
         env = api.Environment(cr, SUPERUSER_ID, {})
         companies = env['res.company'].search([])
 
@@ -51,5 +51,5 @@ def post_init_hook(cr, registry):
                 'company_id': company.id,
             })
 
-    create_sequence(cr, registry)
+    create_sequence_setoran(cr, registry)
     create_konfigurasi_account_setoran(cr, registry)
