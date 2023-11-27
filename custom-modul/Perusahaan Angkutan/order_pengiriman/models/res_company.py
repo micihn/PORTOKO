@@ -1,6 +1,6 @@
 from odoo import api, fields, models
 
-class ResCompanyInherit(models.Model):
+class ResCompanyPengirimanInherit(models.Model):
     _inherit = 'res.company'
 
     def create_konfigurasi_solar_uang_makan(self, company):
@@ -26,14 +26,14 @@ class ResCompanyInherit(models.Model):
                 'company_id': company.id,
             })
 
-    def create_sequence(self, company):
+    def create_sequence_pengiriman(self, company):
 
         sequence_data = [
             {
                 'name' : 'Order Pengiriman Sequence - ',
                 'code': 'order.pengiriman.sequence',
                 'implementation': 'standard',
-                'prefix': 'SO/%(day)s/%(month)s/%(year)s',
+                'prefix': 'SO/%(day)s/%(month)s/%(year)s/',
                 'padding': 3,
                 'number_increment': 1,
                 'number_next_actual': 1,
@@ -41,7 +41,7 @@ class ResCompanyInherit(models.Model):
                 'name' : 'Oper Order Sequence - ',
                 'code': 'oper.order.sequence',
                 'implementation': 'standard',
-                'prefix': 'OP/%(day)s/%(month)s/%(year)s',
+                'prefix': 'OP/%(day)s/%(month)s/%(year)s/',
                 'padding': 3,
                 'number_increment': 1,
                 'number_next_actual': 1,
@@ -81,10 +81,10 @@ class ResCompanyInherit(models.Model):
 
     @api.model
     def create(self, values):
-        company = super(ResCompanyInherit, self).create(values)
+        company = super(ResCompanyPengirimanInherit, self).create(values)
 
         self.create_konfigurasi_solar_uang_makan(company)
         self.create_tipe_muatan(company)
-        self.create_sequence(company)
+        self.create_sequence_pengiriman(company)
 
         return company

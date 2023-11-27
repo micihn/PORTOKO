@@ -10,6 +10,7 @@
     'category': 'Accounting',
     'website': 'https://www.altelasoftware.com',
     'depends': [
+        'base',
         'om_account_accountant',
         'contacts',
     ],

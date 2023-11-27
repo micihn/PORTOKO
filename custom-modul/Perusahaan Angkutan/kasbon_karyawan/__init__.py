@@ -3,7 +3,7 @@ from odoo import api, SUPERUSER_ID
 
 def post_init_hook(cr, registry):
 
-    def create_sequence(cr, registry):
+    def create_sequence_kasbon(cr, registry):
         env = api.Environment(cr, SUPERUSER_ID, {})
         companies = env['res.company'].search([])
 
@@ -33,4 +33,4 @@ def post_init_hook(cr, registry):
                     'number_next_actual': data['number_next_actual'],
                 })
 
-    create_sequence(cr, registry)
+    create_sequence_kasbon(cr, registry)

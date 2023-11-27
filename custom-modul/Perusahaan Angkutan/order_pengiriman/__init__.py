@@ -43,7 +43,7 @@ def post_init_hook(cr, registry):
                     'company_id': company.id,
                 })
 
-    def create_sequence(cr, registry):
+    def create_sequence_pengiriman(cr, registry):
         env = api.Environment(cr, SUPERUSER_ID, {})
         companies = env['res.company'].search([])
 
@@ -52,7 +52,7 @@ def post_init_hook(cr, registry):
                 'name' : 'Order Pengiriman Sequence - ',
                 'code': 'order.pengiriman.sequence',
                 'implementation': 'standard',
-                'prefix': 'SO/%(day)s/%(month)s/%(year)s',
+                'prefix': 'SO/%(day)s/%(month)s/%(year)s/',
                 'padding': 3,
                 'number_increment': 1,
                 'number_next_actual': 1,
@@ -60,7 +60,7 @@ def post_init_hook(cr, registry):
                 'name' : 'Oper Order Sequence - ',
                 'code': 'oper.order.sequence',
                 'implementation': 'standard',
-                'prefix': 'OP/%(day)s/%(month)s/%(year)s',
+                'prefix': 'OP/%(day)s/%(month)s/%(year)s/',
                 'padding': 3,
                 'number_increment': 1,
                 'number_next_actual': 1,
@@ -101,7 +101,7 @@ def post_init_hook(cr, registry):
     create_konfigurasi_solar_uang_makan(cr, registry)
     create_konfigurasi_account_uang_jalan(cr, registry)
     create_tipe_muatan(cr, registry)
-    create_sequence(cr, registry)
+    create_sequence_pengiriman(cr, registry)
 
 
 

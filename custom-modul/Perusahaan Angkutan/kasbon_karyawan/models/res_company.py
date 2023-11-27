@@ -1,29 +1,20 @@
 from odoo import api, fields, models
 
-class ResCompanySetoranInherit(models.Model):
+class ResCompanyKasbonInherit(models.Model):
     _inherit = 'res.company'
 
-    def create_sequence_setoran(self, company):
+    def create_sequence_kasbon(self, company):
 
         sequence_data = [
             {
-                'name' : 'Order Setoran Sequence - ',
-                'code': 'order.setoran.sequence',
+                'name' : 'Kasbon Karyawan Sequence - ',
+                'code': 'kasbon.karyawan.sequence',
                 'implementation': 'standard',
-                'prefix': 'ST/%(day)s/%(month)s/%(year)s/',
-                'padding': 3,
-                'number_increment': 1,
-                'number_next_actual': 1,
-            },{
-                'name' : 'Oper Setoran Sequence - ',
-                'code': 'oper.setoran.sequence',
-                'implementation': 'standard',
-                'prefix': 'SOP/%(day)s/%(month)s/%(year)s/',
+                'prefix': 'PTU/%(day)s/%(month)s/%(year)s/',
                 'padding': 3,
                 'number_increment': 1,
                 'number_next_actual': 1,
             }
-
         ]
 
         for data in sequence_data:
@@ -41,8 +32,8 @@ class ResCompanySetoranInherit(models.Model):
 
     @api.model
     def create(self, values):
-        company = super(ResCompanySetoranInherit, self).create(values)
+        company = super(ResCompanyKasbonInherit, self).create(values)
 
-        self.create_sequence_setoran(company)
+        self.create_sequence_kasbon(company)
 
         return company
