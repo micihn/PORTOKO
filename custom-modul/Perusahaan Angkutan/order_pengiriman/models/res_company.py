@@ -49,7 +49,7 @@ class ResCompanyInherit(models.Model):
                 'name' : 'Uang Jalan Sequence - ',
                 'code': 'uang.jalan.sequence',
                 'implementation': 'standard',
-                'prefix': 'UJ/%(month)s/%(day)s/%(year)s/',
+                'prefix': 'UJ/%(day)s/%(month)s/%(year)s/',
                 'padding': 3,
                 'number_increment': 1,
                 'number_next_actual': 1,
