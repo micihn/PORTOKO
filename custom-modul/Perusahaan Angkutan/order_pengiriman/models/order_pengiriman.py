@@ -184,13 +184,16 @@ class OrderPengiriman(models.Model):
 
         uang_jalan_line_values = []
         for item in records:
+
+            konfigurasi_tipe_muatan_id = self.env['konfigurasi.tipe.muatan'].search([], limit=1).id
             uang_jalan_line_values.append({
                 'uang_jalan':uang_jalan.id,
                 'order_pengiriman': item.id,
-                'tipe_muatan': 1,
+                'tipe_muatan': konfigurasi_tipe_muatan_id,
                 'muat': item.alamat_muat.id,
                 'bongkar': item.alamat_bongkar.id,
             })
+
         uang_jalan_lines = self.env['uang.jalan.line'].create(uang_jalan_line_values)
 
         self.env.user.notify_success(message='Pembuatan Uang Jalan Berhasil', title='Sukses')
