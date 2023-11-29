@@ -53,15 +53,8 @@ class KonfigurasiUangJalan(models.Model):
         result = super(KonfigurasiUangJalan, self).write(vals)
         return result
 
+    customer_id = fields.Many2one('res.partner', 'Customer')
     tipe_muatan = fields.Many2one('konfigurasi.tipe.muatan', 'Tipe Muatan', required=True)
-    # tipe = fields.Selection([
-    #         ('tronton_isi','Tronton Isi'),
-    #         ('tronton_kosong','Tronton Kosong'),
-    #         ('tronton_dedicated', 'Tronton Dedicated'),
-    #         ('trailer_isi', 'Trailer Isi'),
-    #         ('trailer_kosong', 'Trailer Kosong'),
-    #         ('trailer_dedicated', 'Trailer Dedicated'),
-    # ], string='Tipe', required=True)
 
     lokasi_muat = fields.Many2one('konfigurasi.lokasi', 'Lokasi Muat', ondelete='restrict', required=True)
     lokasi_bongkar = fields.Many2one('konfigurasi.lokasi', 'Lokasi Bongkar', ondelete='restrict', required=True)

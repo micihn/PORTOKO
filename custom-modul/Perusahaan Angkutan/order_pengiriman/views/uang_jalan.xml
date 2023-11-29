@@ -74,6 +74,7 @@
                                     <field name="uang_jalan" invisible="1"/>
                                     <field name="order_pengiriman" string="No Order" width="20%" optional="show" options="{'no_create': True}"/>
                                     <field name="tipe_muatan" width="20%" optional="show" options="{'no_create': True}"/>
+                                    <field name="customer_id" width="20%" optional="show" options="{'no_create': True}"/>
                                     <field name="muat" width="20%" optional="show"/>
                                     <field name="bongkar" width="20%" optional="show"/>
                                     <field name="keterangan" width="20%" optional="show"/>

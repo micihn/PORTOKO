@@ -342,6 +342,7 @@ class UangJalanLine(models.Model):
 
     uang_jalan = fields.Many2one('uang.jalan', invisible=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+    customer_id = fields.Many2one('res.partner', 'Customer', compute='_compute_muat_and_bongkar')
     tipe_muatan = fields.Many2one('konfigurasi.tipe.muatan', 'Tipe Muatan', required=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order', ondelete='restrict', domain="[('state', 'not in', ['sudah_setor'])]")
     muat = fields.Many2one('konfigurasi.lokasi', 'Muat', compute='_compute_muat_and_bongkar')
@@ -352,12 +353,14 @@ class UangJalanLine(models.Model):
     @api.depends('order_pengiriman.alamat_muat', 'order_pengiriman.alamat_bongkar')
     def _compute_muat_and_bongkar(self):
         for record in self:
+            record.customer_id = record.order_pengiriman.customer
             record.muat = record.order_pengiriman.alamat_muat
             record.bongkar = record.order_pengiriman.alamat_bongkar
 
     @api.depends('order_pengiriman')
     def _calculate_nominal_uang_jalan(self):
         nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].search([
+            ('customer_id', '=', int(self.customer_id.id)),
             ('tipe_muatan', '=', int(self.tipe_muatan.id)),
             ('lokasi_muat', '=', int(self.muat.id)),
             ('lokasi_bongkar', '=', int(self.bongkar.id)),
