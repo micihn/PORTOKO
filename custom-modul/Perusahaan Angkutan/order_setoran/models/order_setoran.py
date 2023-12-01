@@ -66,8 +66,7 @@ class OrderSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    total_pengeluaran = fields.Float(digits=(6, 0), compute='_compute_total_pengeluaran', required=True,states={
-        'draft': [('readonly', False)],
+    total_pengeluaran = fields.Float(digits=(6, 0), compute='_compute_total_pengeluaran', store=True, readonly=False, states={
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     })
@@ -314,7 +313,10 @@ class OrderSetoran(models.Model):
     @api.depends('rincian_pengeluaran.nominal_biaya')
     def _compute_total_pengeluaran(self):
         for record in self:
-            record.total_pengeluaran = sum(record.rincian_pengeluaran.mapped('nominal_biaya'))
+            if record.rincian_pengeluaran.mapped('nominal_biaya'):
+                record.total_pengeluaran = sum(record.rincian_pengeluaran.mapped('nominal_biaya'))
+            else:
+                record.total_pengeluaran = 0
 
     @api.model
     def create(self, vals):
