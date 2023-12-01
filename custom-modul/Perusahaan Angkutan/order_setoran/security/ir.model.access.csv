@@ -17,3 +17,7 @@ access_account_invoice_payment_line,access.account.invoice.payment.line,order_se
 
 access_account_invoice_oper_payment,access.account.invoice.oper.payment,order_setoran.model_account_invoice_oper_payment,group_order_setoran,1,1,1,1
 access_account_invoice_oper_payment_line,access.account.invoice.oper.payment.line,order_setoran.model_account_invoice_oper_payment_line,group_order_setoran,1,1,1,1
+
+
+
+access_detail_total_pengeluaran,access.detail.total.pengeluaran,order_setoran.model_detail_total_pengeluaran,group_order_setoran,1,1,1,1

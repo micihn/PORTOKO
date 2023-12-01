@@ -285,6 +285,15 @@
                             </div>
 
                         </page>
+
+                        <page string="Rincian Pengeluaran">
+                            <field name="rincian_pengeluaran">
+                                <tree editable="bottom" >
+                                    <field name="rincian_biaya" optional="show"/>
+                                    <field name="nominal_biaya" optional="show"/>
+                                </tree>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
 
