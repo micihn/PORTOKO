@@ -41,6 +41,7 @@
                     <group>
                         <group>
                             <separator string="Detail Pengiriman" />
+                                <field name="customer_id" />
                                 <field name="tipe_muatan" string="Tipe Muatan" />
                                 <field name="lokasi_muat" />
                                 <field name="lokasi_bongkar" />

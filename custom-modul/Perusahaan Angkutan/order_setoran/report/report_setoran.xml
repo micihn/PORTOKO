@@ -194,6 +194,18 @@
                                     </t>
                                 </td>
                             </tr>
+                            <t t-if="o.total_pengeluaran &lt; o.total_uang_jalan">
+                                <tr>
+                                    <td width="55%">KAS LEBIH</td>
+                                    <td width="5%">:</td>
+                                    <td style="text-align:right">
+                                        Rp <t t-esc="'{:,}'.format(int(o.total_uang_jalan - o.total_pengeluaran)).replace(',', '.')"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-else="">
+
+                            </t>
 
                         </tbody>
                     </table>

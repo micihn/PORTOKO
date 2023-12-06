@@ -66,8 +66,7 @@ class OrderSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    total_pengeluaran = fields.Float(digits=(6, 0), required=True,states={
-        'draft': [('readonly', False)],
+    total_pengeluaran = fields.Float(digits=(6, 0), compute='_compute_total_pengeluaran', store=True, readonly=False, states={
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     })
@@ -97,6 +96,11 @@ class OrderSetoran(models.Model):
     ], default='draft', string="State", index=True, hide=True, tracking=True)
 
     detail_order = fields.One2many('detail.order', 'order_setoran', states={
+        'draft': [('readonly', False)],
+        'done': [('readonly', True)],
+    })
+
+    rincian_pengeluaran = fields.One2many('detail.total.pengeluaran', 'order_setoran', states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
     })
@@ -305,6 +309,14 @@ class OrderSetoran(models.Model):
     def _compute_total_bayar_dimuka(self):
         for record in self:
             record.total_bayar_dimuka = sum(record.detail_order.mapped('bayar_dimuka'))
+
+    @api.depends('rincian_pengeluaran.nominal_biaya')
+    def _compute_total_pengeluaran(self):
+        for record in self:
+            if record.rincian_pengeluaran.mapped('nominal_biaya'):
+                record.total_pengeluaran = sum(record.rincian_pengeluaran.mapped('nominal_biaya'))
+            else:
+                record.total_pengeluaran = 0
 
     @api.model
     def create(self, vals):
@@ -743,3 +755,12 @@ class AccountMoveInvoice(models.Model):
 
     nomor_setoran = fields.Char('No. Setoran')
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+
+class DetailTotalPengeluaran(models.Model):
+    _name = 'detail.total.pengeluaran'
+    _description = 'Detail Total Pengeluaran'
+
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+    order_setoran = fields.Many2one('order.setoran', invisible=True)
+    rincian_biaya = fields.Char('Rincian Biaya')
+    nominal_biaya = fields.Float('Nominal Biaya', digits=(6, 0))

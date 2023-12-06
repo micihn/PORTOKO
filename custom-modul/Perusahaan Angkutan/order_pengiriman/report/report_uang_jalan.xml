@@ -15,7 +15,9 @@
                     <t t-call="order_pengiriman.uang_jalan_header" /> <!-- Header -->
                     <t t-set="nominal_uang_jalan" t-value="0"/>
                     <t t-set="nominal_tambahan" t-value="0"/>
-                    <t t-foreach="o.uang_jalan_line" t-as="line"> <!-- for item in x -->
+
+                    <t t-if="o.tipe_uang_jalan == 'standar'">
+                        <t t-foreach="o.uang_jalan_line" t-as="line"> <!-- for item in x -->
                         <div>
                             <span style="float: left; font-size:13px; width: 20px;">
                                 <b>
@@ -55,11 +57,54 @@
                             <t t-set="nominal_tambahan" t-value="1"/>
                         </t>
                     </t>
+                    </t>
+                    <t t-else="">
+                        <t t-foreach="o.uang_jalan_nominal_tree" t-as="line"> <!-- for item in x -->
+                            <div>
+                                <span style="float: left; font-size:13px; width: 20px;">
+                                    <b>
+                                        <t t-esc="str(total_line + 1) + '.'"/>
+                                    </b>
+                                </span>
+                                <span style="float: left; font-size:13px; width: 150px;">
+                                     <t t-if="line.muat">
+                                            <t t-esc="line.muat.lokasi"/>
+                                        </t>
+                                        <t t-if="line.bongkar">
+                                            - <t t-esc="line.bongkar.lokasi"/>
+                                        </t>
+                                </span>
+                                <span style="float: right; font-size:13px;">
+                                    <b>
+                                        Rp
+                                        <t t-esc="'{:,}'.format(int(line.nominal_uang_jalan)).replace(',', '.')"/>
+                                    </b>
+                                </span>
+                                <div style="clear: both;"></div>
+
+                            </div>
+
+                            <br/>
+                            <br/>
+
+                            <t t-set="total_line" t-value="total_line + 1"/>
+                            <t t-set="nominal_uang_jalan" t-value="nominal_uang_jalan + line.nominal_uang_jalan"/>
+
+                            <t t-if="total_line % 3 == 0 and total_line != len(o.uang_jalan_nominal_tree)">
+                                <t t-call="order_pengiriman.uang_jalan_footer" />
+                                <div style="page-break-after:always;" />
+                                <t t-call="order_pengiriman.uang_jalan_header" />
+                                <t t-set="nominal_uang_jalan" t-value="0"/>
+                                <t t-set="nominal_tambahan" t-value="1"/>
+                            </t>
+                        </t>
+                    </t>
 
                     <t t-if="total_line % 3 != 0 and total_line != len(o.uang_jalan_line)">
                         <t t-call="order_pengiriman.uang_jalan_footer" />
                         <div style="page-break-before:always;" />
                     </t>
+
                     <t t-else="">
                         <t t-call="order_pengiriman.uang_jalan_footer" />
                     </t>
@@ -180,7 +225,7 @@
                 </div>
 
                 <div style="float: right; text-align: right; width: 48%; white-space: nowrap; margin-top:5px">
-                        Rp<t t-esc="'{:,}'.format(int(nominal_uang_jalan)).replace(',', '.')"/>
+                        Rp<t t-esc="'{:,}'.format(int(nominal_uang_jalan + o.biaya_tambahan_standar + o.biaya_tambahan_nominal_saja)).replace(',', '.')"/>
                 </div>
 
                 <div style="text-align: left; width: 100%; margin-top: 50px; font-size:13px; font-style: italic;">
@@ -188,7 +233,7 @@
                         Terbilang : <t t-esc="o.env['uang.jalan'].terbilang(int(nominal_uang_jalan + o.biaya_tambahan_standar + o.biaya_tambahan_nominal_saja))"/>Rupiah
                     </t>
                     <t t-else="">
-                        Terbilang : <t t-esc="o.env['uang.jalan'].terbilang(int(nominal_uang_jalan))"/>Rupiah
+                        Terbilang : <t t-esc="o.env['uang.jalan'].terbilang(int(nominal_uang_jalan))"/>0 Rupiah
                     </t>
                 </div>
             </b>
