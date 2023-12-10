@@ -5,7 +5,13 @@
             <t t-call="web.html_container">
                 <t t-call="web.internal_layout">
                     <div class="page">
-                        <t t-esc="docs" />
+                        <t t-if="tanggal_start and tanggal_finish">
+                            <strong><t t-esc="tanggal_start" t-options="{'widget': 'datetime'}"/> - <t t-esc="tanggal_finish" t-options="{'widget': 'datetime'}"/></strong>
+                        </t>
+
+                        <t t-if="services">
+                            <t t-esc="services" />
+                        </t>
                     </div>
                 </t>
             </t>
