@@ -1,20 +1,51 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<odoo>
+<openerp>
     <data>
         <template id="report_service_fleet">
             <t t-call="web.html_container">
-                <t t-call="web.internal_layout">
-                    <div class="page">
-                        <t t-if="tanggal_start and tanggal_finish">
-                            <strong><t t-esc="tanggal_start" t-options="{'widget': 'datetime'}"/> - <t t-esc="tanggal_finish" t-options="{'widget': 'datetime'}"/></strong>
-                        </t>
+            <t t-call="web.internal_layout">
+                <style type="text/css">
+                    .odoo-default-font {
+                    font-family: Lato, sans-serif;
+                    }
+                </style>
 
-                        <t t-if="services">
-                            <t t-esc="services" />
-                        </t>
-                    </div>
-                </t>
+                <div class="page ">
+                    Laporan Pemakaian Truck<br />
+                    <t t-if="tanggal_start and tanggal_finish">
+                            Periode
+                            <t t-esc="tanggal_start" t-options="{'widget': 'date'}"/>
+                            s/d
+                            <t t-esc="tanggal_finish" t-options="{'widget': 'date'}"/>
+                    </t><br />
+
+                    <t t-esc="license_plate" /><br /><br />
+
+                    <table class="table table-sm">
+                        <thead style="font-size:9px; text-align:left"><tr>
+                            <th>Kelompok</th>
+                            <th>Tanggal</th>
+                            <th>Kode Barang</th>
+                            <th>Nama Barang</th>
+                            <th>Qty</th>
+                            <th>Harga</th>
+                            <th>Jumlah</th>
+                        </tr></thead>
+                        <tbody style="font-size:9px; text-align:left">
+                            <tr t-foreach='services' t-as='service'>
+                                <td><t t-esc="service['service_type_id']"/></td>
+                                <td><t t-esc="service['date']"/></td>
+                                <td><t t-esc="service['default_code']"/></td>
+                                <td><t t-esc="service['name']"/></td>
+                                <td><t t-esc="service['qty']"/></td>
+                                <td><t t-esc="service['amount']"/></td>
+                                <td><t t-esc="service['total_amount']"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
             </t>
         </template>
     </data>
-</odoo>
+</openerp>

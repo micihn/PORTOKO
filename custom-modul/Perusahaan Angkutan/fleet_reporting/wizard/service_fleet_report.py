@@ -28,5 +28,31 @@ class ServiceFleetReport(models.TransientModel):
             self.services = [(5, 0, 0)]
 
     def generate_report(self):
-        data = {'tanggal_start': self.tanggal_start, 'tanggal_finish': self.tanggal_finish, 'services': self.services.ids}
+        service_list = []
+        for record in self.services:
+            service_dictionary = {
+                'service_type_id': record.service_type_id.name,
+                'date': record.date,
+                'default_code': record.product_id.default_code,
+                'name': record.product_id.name,
+                'qty': record.product_qty,
+                'amount': record.amount,
+                'total_amount': record.total_amount,
+            }
+            service_list.append(service_dictionary)
+
+            # print(record.service_type_id.name)
+            # print(record.date)
+            # print(record.product_id.default_code) # False Potential
+            # print(record.product_id.name) # False Potential
+            # print(record.product_qty)
+            # print(record.amount)
+            # print(record.total_amount)
+
+        data = {'tanggal_start': self.tanggal_start,
+                'tanggal_finish': self.tanggal_finish,
+                'kendaraan': self.kendaraan.name,
+                'license_plate': self.kendaraan.license_plate,
+                'services': service_list,
+                }
         return self.env.ref('fleet_reporting.report_service_fleet_action').report_action([], data=data)
