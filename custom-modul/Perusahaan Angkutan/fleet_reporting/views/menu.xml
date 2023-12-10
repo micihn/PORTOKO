@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_service_fleet_report"
+      groups="fleet.fleet_group_manager"
+      sequence="1"
+      name="Service Report"
+      action="action_service_fleet_report"
+      parent="fleet.menu_fleet_reporting">
+    </menuitem>
+</odoo>

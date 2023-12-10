@@ -6,7 +6,7 @@
     >
     </menuitem>
 
-    <menuitem id="menu_kasbon_karuawan"
+    <menuitem id="menu_kasbon_karyawan"
       groups="kasbon_karyawan.group_kasbon_karyawan"
       sequence="1"
       name="Kasbon Karyawan"

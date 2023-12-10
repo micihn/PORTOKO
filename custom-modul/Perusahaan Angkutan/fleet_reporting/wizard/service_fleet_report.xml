@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="service_fleet_report" model="ir.ui.view">
+        <field name="name">service.fleet.report.form</field>
+        <field name="model">service.fleet.report</field>
+        <field name="arch" type="xml">
+            <form string="Service Fleet Report">
+                <group>
+                    <field name="kendaraan"/>
+                    <field name="tanggal_start"/>
+                    <field name="tanggal_finish"/>
+                </group>
+                <footer>
+                    <button name="generate_report" string="Print" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_service_fleet_report" model="ir.actions.act_window">
+        <field name="name">Service Fleet Report</field>
+        <field name="res_model">service.fleet.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
