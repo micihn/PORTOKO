@@ -16,6 +16,7 @@ class ServiceFleetReport(models.TransientModel):
                 ('vehicle_id', '=', self.kendaraan.id),
                 ('date', '>=', self.tanggal_start),
                 ('date', '<=', self.tanggal_finish),
+                ('state_record', '=', self.tanggal_finish),
             ])
 
             if services:

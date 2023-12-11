@@ -5,8 +5,8 @@
         <field name="name">Service Fleet Paperformat</field>
         <field name="default" eval="True" />
         <field name="format">custom</field>
-        <field name="page_height">140</field>
-        <field name="page_width">95</field>
+        <field name="page_height">297</field>
+        <field name="page_width">210</field>
         <field name="orientation">Portrait</field>
         <field name="margin_top">3</field>
         <field name="margin_bottom">5</field>
@@ -21,5 +21,6 @@
         <field name="model">fleet.vehicle.log.services</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">fleet_reporting.report_service_fleet</field>
+        <field name="paperformat_id" ref="fleet_reporting.paperformat_service_fleet"/>
     </record>
 </odoo>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<openerp>
+<odoo>
     <data>
         <template id="report_service_fleet">
             <t t-call="web.html_container">
@@ -10,19 +10,19 @@
                         }
 
                         .default-font-size{
-                        font-size:8px
+                        font-size:14px
                         }
 
                         .default-tablefont-size{
-                        font-size:7px
+                        font-size:13px
                         }
 
                         .bottom-spacing{
-                        margin-bottom: 2px;
+                        margin-bottom: 4px;
                         }
 
                         .bottom-spacing-extra{
-                        margin-bottom: 6px;
+                        margin-bottom: 12px;
                         }
 
                         .custom-table th {
@@ -46,7 +46,7 @@
                         }
 
                         .custom-table-sm > :not(caption) > * > * {
-                        padding: 0.2rem 0.2rem;
+                        padding: 0.4rem 0.4rem;
                         }
                     </style>
 
@@ -151,17 +151,19 @@
                                         </td>
                                     </t>
                                 </tr>
-                                <tr class="default-tablefont-size " style="border-top: 1px solid #000;">
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>Total :</td>
-                                    <td style="text-align:right;">
-                                        <t t-esc="'{:,}'.format(int(pengeluaran_service))"/>
-                                    </td>
-                                </tr>
+                                <t t-if="service['service_category'] == 'service' ">
+                                    <tr class="default-tablefont-size " style="border-top: 1px solid #000;">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>Total :</td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(pengeluaran_service))"/>
+                                        </td>
+                                    </tr>
+                                </t>
                             </tbody>
                         </table>
                     </div>
@@ -169,4 +171,4 @@
             </t>
         </template>
     </data>
-</openerp>
+</odoo>

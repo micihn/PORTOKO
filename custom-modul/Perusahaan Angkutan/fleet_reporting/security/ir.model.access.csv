@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_service_fleet_report,access.service.fleet.report,fleet_reporting.model_service_fleet_report,,1,1,1,1
+access_fleet_configuration_service,access.fleet.configuration.service,fleet_reporting.model_fleet_configuration_service,fleet.fleet_group_manager,1,1,1,1

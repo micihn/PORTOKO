@@ -1,57 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <record model="ir.ui.view" id="fleet_vehicle_log_services_product_tree">
+            <field name="name">fleet.vehicle.log.services.product.tree</field>
+            <field name="model">fleet.vehicle.log.services</field>
+            <field name="inherit_id" ref="fleet.fleet_vehicle_log_services_view_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='state']" position="replace">
+                    <field name="state_record" decoration-info="state_record=='draft'" decoration-muted="state_record=='batal'" decoration-warning="state_record=='diminta'" decoration-success="state_record=='selesai'" widget="badge"/>
+                </xpath>
+            </field>
+        </record>
+
         <record model="ir.ui.view" id="fleet_vehicle_log_services_product">
             <field name="name">fleet.vehicle.log.services.product</field>
             <field name="model">fleet.vehicle.log.services</field>
             <field name="inherit_id" ref="fleet.fleet_vehicle_log_services_view_form"/>
             <field name="arch" type="xml">
 
-            <xpath expr="//field[@name='date']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
+                <header>
+                    <button class="btn-primary" type="object" name="validate" string="Validate" attrs="{'invisible': [('state_record', 'not in', ('draft'))]}"/>
+                    <button type="object" name="cancel" string="Cancel" attrs="{'invisible': [('state_record', 'in', ('batal'))]}"/>
+                </header>
 
-            <xpath expr="//field[@name='vendor_id']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
+                <xpath expr="//field[@name='state']" position="replace">
+                    <field name="state_record" widget="statusbar" statusbar_visible="draft, diminta, selesai" nolabel="1" readonly="1"/>
+                </xpath>
 
-            <xpath expr="//field[@name='service_type_id']" position="attributes">
-                <attribute name="options">{'no_quick_create': True, 'no_create_edit': True}</attribute>
-            </xpath>
+                <xpath expr="//field[@name='date']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
 
-            <xpath expr="//field[@name='description']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
+                <xpath expr="//field[@name='vendor_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
 
-            <xpath expr="//field[@name='service_type_id']" position="before">
-                <field name = "date" />
-            </xpath>
+                <xpath expr="//field[@name='service_type_id']" position="attributes">
+                    <attribute name="options">{'no_quick_create': True, 'no_create_edit': True}</attribute>
+                </xpath>
 
-            <xpath expr="//field[@name='date']" position="before">
-                    <field name = "description" />
-            </xpath>
+                <xpath expr="//field[@name='description']" position="attributes">
+                    <attribute name="attrs">
+                        {
+                            'readonly': [('state_record', 'not in', ('draft'))],
+                        }
+                    </attribute>
+                </xpath>
 
-            <xpath expr="//field[@name='date']" position="before">
-                <field name = "is_service" invisible="1"/>
-                <field name = "initial" invisible="1"/>
-            </xpath>
+                <xpath expr="//field[@name='service_type_id']" position="before">
+                    <field name="date"/>
+                </xpath>
 
-            <xpath expr="//field[@name='service_type_id']" position="after">
-                <field name = "product_id" />
-                <field name = "product_qty" />
-            </xpath>
+                <xpath expr="//field[@name='description']" position="before">
+                    <field name="name"/>
+                </xpath>
 
-            <xpath expr="//field[@name='product_id']" position="attributes">
-                <attribute name="attrs">{'invisible': ['|', ('initial', '=', True), ('is_service', '=', True)]}</attribute>
-            </xpath>
+                <xpath expr="//field[@name='date']" position="before">
+                    <field name="is_service" invisible="1"/>
+                    <field name="initial" invisible="1"/>
+                </xpath>
 
-            <xpath expr="//field[@name='product_qty']" position="attributes">
-                <attribute name="attrs">{'invisible': ['|', ('initial', '=', True), ('is_service', '=', True)]}</attribute>
-            </xpath>
+                <xpath expr="//field[@name='service_type_id']" position="after">
+                    <field name="product_id"/>
+                    <field name="product_qty"/>
+                </xpath>
 
-            <xpath expr="//field[@name='amount']" position="after">
-                <field name = "total_amount" />
-            </xpath>
+                <xpath expr="//field[@name='product_id']" position="attributes">
+                    <attribute name="attrs">
+                        {
+                            'invisible': ['|', ('initial', '=', True), ('is_service', '=', True)],
+                            'readonly': [('state_record', 'not in', ('draft'))],
+                        }
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='product_qty']" position="attributes">
+                    <attribute name="attrs">
+                        {
+                            'invisible': ['|', ('initial', '=', True), ('is_service', '=', True)],
+                            'readonly': [('state_record', 'not in', ('draft'))],
+                        }
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='amount']" position="attributes">
+                    <attribute name="attrs">
+                        {
+                            'readonly': [('state_record', 'not in', ('draft'))],
+                        }
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='service_type_id']" position="attributes">
+                    <attribute name="attrs">
+                        {
+                            'readonly': [('state_record', 'not in', ('draft'))],
+                        }
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='date']" position="attributes">
+                    <attribute name="attrs">
+                        {
+                            'readonly': [('state_record', 'not in', ('draft'))],
+                        }
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='vehicle_id']" position="attributes">
+                    <attribute name="attrs">
+                        {
+                            'readonly': [('state_record', 'not in', ('draft'))],
+                        }
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='purchaser_id']" position="attributes">
+                    <attribute name="attrs">
+                        {
+                            'readonly': [('state_record', 'not in', ('draft'))],
+                        }
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='odometer']" position="attributes">
+                    <attribute name="attrs">
+                        {
+                            'readonly': [('state_record', 'not in', ('draft'))],
+                        }
+                    </attribute>
+                </xpath>
+
+
+
+
+                <xpath expr="//field[@name='amount']" position="after">
+                    <field name="total_amount"/>
+                </xpath>
 
 
             </field>

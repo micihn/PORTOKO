@@ -7,4 +7,12 @@
       action="action_service_fleet_report"
       parent="fleet.menu_fleet_reporting">
     </menuitem>
+
+    <menuitem id="menu_service_configuration"
+      groups="fleet.fleet_group_manager"
+      sequence="20"
+      name="Configuration"
+      action="action_configuration_service"
+      parent="fleet.fleet_services_configuration">
+    </menuitem>
 </odoo>
