@@ -20,7 +20,7 @@
 
                 <header>
                     <button class="btn-primary" type="object" name="validate" string="Validate" attrs="{'invisible': [('state_record', 'not in', ('draft'))]}"/>
-                    <button type="object" name="cancel" string="Cancel" attrs="{'invisible': [('state_record', 'in', ('batal'))]}"/>
+                    <button type="object" name="cancel" string="Cancel" attrs="{'invisible': [('state_record', 'in', ('batal', 'selesai'))]}"/>
                 </header>
 
                 <xpath expr="//field[@name='state']" position="replace">

@@ -19,7 +19,7 @@
         'security/security.xml',
         'views/fleet_vehicle_log_services.xml',
         'views/fleet_configuration_service.xml',
-        'views/stock_picking.xml',
+        # 'views/stock_picking.xml',
         'wizard/service_fleet_report.xml',
         'report/report_service_fleet.xml',
         'report/report_service_fleet_action.xml',
