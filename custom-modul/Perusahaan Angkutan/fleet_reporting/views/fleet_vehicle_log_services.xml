@@ -11,6 +11,14 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
 
+            <xpath expr="//field[@name='vendor_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='service_type_id']" position="attributes">
+                <attribute name="options">{'no_quick_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+
             <xpath expr="//field[@name='description']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
@@ -19,22 +27,32 @@
                 <field name = "date" />
             </xpath>
 
+            <xpath expr="//field[@name='date']" position="before">
+                    <field name = "description" />
+            </xpath>
+
+            <xpath expr="//field[@name='date']" position="before">
+                <field name = "is_service" invisible="1"/>
+                <field name = "initial" invisible="1"/>
+            </xpath>
+
             <xpath expr="//field[@name='service_type_id']" position="after">
                 <field name = "product_id" />
                 <field name = "product_qty" />
+            </xpath>
+
+            <xpath expr="//field[@name='product_id']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('initial', '=', True), ('is_service', '=', True)]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='product_qty']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('initial', '=', True), ('is_service', '=', True)]}</attribute>
             </xpath>
 
             <xpath expr="//field[@name='amount']" position="after">
                 <field name = "total_amount" />
             </xpath>
 
-<!--            <field name="amount" position="before">-->
-<!--                <field name = "product_qty" />-->
-<!--            </field>-->
-
-<!--            <field name="amount" position="after">-->
-<!--                <field name = "total_cost" />-->
-<!--            </field>-->
 
             </field>
         </record>

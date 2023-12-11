@@ -31,8 +31,10 @@ class ServiceFleetReport(models.TransientModel):
         service_list = []
         for record in self.services:
             service_dictionary = {
+                'service_category': record.service_type_id.category,
+                'description': record.description,
                 'service_type_id': record.service_type_id.name,
-                'date': record.date,
+                'date': record.date.strftime('%d/%m/%Y'),
                 'default_code': record.product_id.default_code,
                 'name': record.product_id.name,
                 'qty': record.product_qty,
@@ -49,8 +51,8 @@ class ServiceFleetReport(models.TransientModel):
             # print(record.amount)
             # print(record.total_amount)
 
-        data = {'tanggal_start': self.tanggal_start,
-                'tanggal_finish': self.tanggal_finish,
+        data = {'tanggal_start': self.tanggal_start.strftime('%d-%m-%Y'),
+                'tanggal_finish': self.tanggal_finish.strftime('%d-%m-%Y'),
                 'kendaraan': self.kendaraan.name,
                 'license_plate': self.kendaraan.license_plate,
                 'services': service_list,
