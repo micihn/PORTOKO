@@ -15,9 +15,10 @@ class FleetVehicleLogServiceProduct(models.Model):
     name = fields.Char(readonly=True, required=True, copy=False, default='New')
     product_id = fields.Many2one('product.product')
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
-    product_qty = fields.Float('Quantity')
+    product_qty = fields.Float('Quantity', copy=False, default=1)
     total_amount = fields.Monetary(compute='_compute_total_amount', store=True)
     is_service = fields.Boolean()
+    amount = fields.Monetary(copy=False)
     initial = fields.Boolean(default=True)
     description = fields.Char(required=True)
     state_record = fields.Selection([

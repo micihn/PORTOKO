@@ -8,4 +8,3 @@ class ConfigurationService(models.Model):
     name = fields.Char(readonly=True, default='Fleet Configuration Service')
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     operation_type = fields.Many2one('stock.picking.type', string='Operasi Sparepart')
-    consumption_name = fields.Char()
