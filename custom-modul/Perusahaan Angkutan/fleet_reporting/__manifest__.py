@@ -13,6 +13,7 @@
         'fleet',
         'hr_fleet',
         'stock',
+        'om_account_accountant',
     ],
     'data': [
         'security/ir.model.access.csv',

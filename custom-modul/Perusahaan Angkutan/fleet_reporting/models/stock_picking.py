@@ -23,4 +23,6 @@ class InternalTransferFleet(models.Model):
         res = super(InternalTransferFleet, self).button_validate()
         if self.fleet_layer == 2:
             self.fleet_service_id.state_record = 'selesai'
+        else:
+            self.fleet_service_id.state_record = 'diminta'
         return res

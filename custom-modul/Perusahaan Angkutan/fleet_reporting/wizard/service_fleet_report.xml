@@ -9,7 +9,7 @@
                     <field name="kendaraan"/>
                     <field name="tanggal_start"/>
                     <field name="tanggal_finish"/>
-                    <field name="services" invisible="0"/>
+                    <field name="services" invisible="1"/>
                 </group>
                 <footer>
                     <button name="generate_report" string="Print" type="object" class="btn-primary" data-hotkey="q"/>

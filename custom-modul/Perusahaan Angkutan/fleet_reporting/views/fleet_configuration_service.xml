@@ -16,7 +16,7 @@
         <field name="name">fleet.configuration.service.tree</field>
         <field name="model">fleet.configuration.service</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree delete="0" create="0">
                 <field name="name" string="Name"/>
             </tree>
         </field>
@@ -26,7 +26,7 @@
         <field name="name">fleet.configuration.service.form</field>
         <field name="model">fleet.configuration.service</field>
         <field name="arch" type="xml">
-            <form delete="0">
+            <form delete="0" create="0">
                 <sheet>
                     <div class="oe_title">
                         <h1>

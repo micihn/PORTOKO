@@ -39,6 +39,22 @@
                     <attribute name="options">{'no_quick_create': True, 'no_create_edit': True}</attribute>
                 </xpath>
 
+                <xpath expr="//field[@name='service_type_id']" position="after">
+                    <field name="account_expense" attrs="{
+                        'invisible':['|', ('initial', '=', True), ('is_service', '=', False)],
+                        'readonly': [('state_record', 'not in', ('draft',))]
+                    }">
+                    </field>
+                </xpath>
+
+                <xpath expr="//field[@name='account_expense']" position="after">
+                    <field name="account_journal" attrs="{
+                        'invisible':['|', ('initial', '=', True), ('is_service', '=', False)],
+                        'readonly': [('state_record', 'not in', ('draft',))]
+                    }">
+                    </field>
+                </xpath>
+
                 <xpath expr="//field[@name='description']" position="attributes">
                     <attribute name="attrs">
                         {
