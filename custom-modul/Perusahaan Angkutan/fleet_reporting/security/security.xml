@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record rules -->
+    <!-- Multi-company : Fleet Service Configuration Multi-Company rule -->
+        <record model="ir.rule" id="fleet_service_configuration_multicompany_rule">
+            <field name="name">Fleet Service Configuration Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','fleet.configuration.service')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+    <!-- Multi-company : Order Pengiriman -->
+        <record model="ir.rule" id="fleet_service_type_multicompany_rule">
+            <field name="name">Fleet Service Type Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','fleet.service.type')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+</odoo>
