@@ -36,6 +36,7 @@
                     <group>
                         <group>
                             <field name="operation_type" />
+                            <field name="return_operation_type" />
                         </group>
                     </group>
                 </sheet>
