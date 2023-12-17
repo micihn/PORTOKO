@@ -12,7 +12,12 @@ class UangJalan(models.Model):
     tipe_uang_jalan = fields.Selection([
         ('standar', "Standar"),
         ('nominal_saja', "Nominal Saja"),
-    ], required=True, default='standar')
+    ], required=True, default='standar', states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+    })
 
     uang_jalan_name = fields.Char(readonly=True, required=True, copy=False, default='New')
     kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', copy=True, ondelete='restrict', states={
@@ -79,6 +84,7 @@ class UangJalan(models.Model):
         ('submitted', "Submitted"),
         ('validated', "Validated"),
         ('paid', "Paid"),
+        ('paid_no_order', "Paid, No Order"),
         ('cancel', "Cancelled"),
     ], default='to_submit', string="State", hide=True, tracking=True)
 

@@ -158,7 +158,20 @@ class OrderPengiriman(models.Model):
         'sudah_setor': [('readonly', True)],
     })
 
-    uang_jalan = fields.Many2many('uang.jalan', string='No. Uang Jalan', readonly=False, store=True, copy=False)
+    uang_jalan = fields.Many2many('uang.jalan', string='No. Uang Jalan', readonly=False, store=True, copy=False, domain=[('state', '=', 'paid')], states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
+    uang_jalan_nominal_saja = fields.Many2many('uang.jalan', string='No. Uang Jalan', readonly=False, store=True, copy=False, domain=[('state', '=', 'paid')], states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', False)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
     nomor_setoran = fields.Char('Nomor Setoran')
     oper_setoran = fields.Char('Oper Setoran')
 
@@ -251,9 +264,9 @@ class OrderPengiriman(models.Model):
                 pass
             else:
                 # Order Baru
-                if current_state == 'order_baru' and selected_state == 'dalam_perjalanan':
+                if current_state == 'order_baru' and selected_state == 'dalam_perjalanan' and 'uang_jalan' in vals:
                     raise ValidationError('Anda harus membuat Uang Jalan untuk mengubah status Order Pengiriman ini.')
-                elif current_state == 'dalam_perjalanan' and selected_state == 'order_baru':
+                elif current_state == 'dalam_perjalanan' and selected_state == 'order_baru' and 'uang_jalan' in vals:
                     raise ValidationError('Uang jalan telah terbuat untuk Order Pengiriman ini. Silahkan batalkan uang jalan yang sudah dibuat.')
                 elif current_state == 'order_baru' and selected_state == 'selesai':
                     raise ValidationError('Anda tidak dapat mengubah status order baru menjadi selesai dalam sekali proses.')
@@ -265,6 +278,19 @@ class OrderPengiriman(models.Model):
                     raise ValidationError('Anda tidak dapat mengubah status melalui metode ini. Anda harus membuat setoran untuk melakukannya.')
                 elif current_state == 'sudah_setor' and selected_state == 'selesai':
                     raise ValidationError('Anda tidak dapat mengubah status melalui metode ini karena setoran telah berhasil dibuat untuk order pengiriman ini.')
+
+        if 'uang_jalan' in vals:
+            if bool(vals['uang_jalan'][0][2]) == True:
+                self.sudo().write({'state': 'dalam_perjalanan'})
+
+                for item in vals['uang_jalan'][0][2]:
+                    uang_jalan = self.env['uang.jalan'].search([('id', '=', item)])
+
+            elif bool(vals['uang_jalan'][0][2]) == False:
+                self.sudo().write({'state': 'order_baru'})
+
+                for item in vals['uang_jalan'][0][2]:
+                    uang_jalan = self.env['uang.jalan'].search([('id', '=', item)])
         else:
             pass
 

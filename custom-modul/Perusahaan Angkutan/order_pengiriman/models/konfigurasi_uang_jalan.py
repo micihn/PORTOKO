@@ -19,9 +19,9 @@ class KonfigurasiUangJalan(models.Model):
             ('tipe_muatan', '=', vals.get('tipe_muatan')),
             ('lokasi_muat', '=', vals.get('lokasi_muat')),
             ('lokasi_bongkar', '=', vals.get('lokasi_bongkar')),
-            ('company_id', '=', int(self.env.company.id))
+            ('company_id', '=', int(self.env.company.id)),
+            ('customer_id', '=', vals.get('customer_id'))
         ])
-
 
         if existing_record:
             # Handle the case where a matching record already exists
@@ -35,12 +35,13 @@ class KonfigurasiUangJalan(models.Model):
         return result
 
     def write(self, vals):
-        if 'tipe_muatan' in vals or 'lokasi_muat' in vals or 'lokasi_bongkar' in vals:
+        if 'tipe_muatan' in vals or 'lokasi_muat' in vals or 'lokasi_bongkar' in vals or 'customer_id' in vals:
             existing_record = self.search([
-                ('tipe_muatan', '=', vals.get('tipe_muatan', self.tipe_muatan)),
+                ('tipe_muatan', '=', vals.get('tipe_muatan', self.tipe_muatan.id)),
                 ('lokasi_muat', '=', vals.get('lokasi_muat', self.lokasi_muat.id)),
                 ('lokasi_bongkar', '=', vals.get('lokasi_bongkar', self.lokasi_bongkar.id)),
-                ('company_id', '=', int(self.env.company.id))
+                ('company_id', '=', int(self.env.company.id)),
+                ('customer_id', '=', vals.get('customer_id', self.customer_id.id))
             ])
 
             if existing_record:
