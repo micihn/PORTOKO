@@ -150,7 +150,8 @@ class UangJalan(models.Model):
                     ('tipe_muatan', '=', int(record.tipe_muatan.id)),
                     ('lokasi_muat', '=', int(record.muat.id)),
                     ('lokasi_bongkar', '=', int(record.bongkar.id)),
-                    ('company_id', '=', int(self.env.company.id))
+                    ('company_id', '=', int(self.env.company.id)),
+                    ('customer_id', '=', int(record.customer_id.id)),
                 ]).uang_jalan
                 if nominal_uang_jalan:
                     record.nominal_uang_jalan = nominal_uang_jalan
@@ -309,7 +310,8 @@ class UangJalan(models.Model):
                 ('tipe_muatan', '=', int(record.tipe_muatan.id)),
                 ('lokasi_muat', '=', int(record.sudo().muat.id)),
                 ('lokasi_bongkar', '=', int(record.sudo().bongkar.id)),
-                ('company_id', '=', int(record.env.company.id))
+                ('company_id', '=', int(record.env.company.id)),
+                ('customer_id', '=', int(record.customer_id.id)),
             ]).uang_jalan
 
             if nominal_uang_jalan:
@@ -386,7 +388,8 @@ class UangJalanLine(models.Model):
                 ('tipe_muatan', '=', int(self.tipe_muatan.id)),
                 ('lokasi_muat', '=', int(self.muat.id)),
                 ('lokasi_bongkar', '=', int(self.bongkar.id)),
-                ('company_id', '=', int(self.env.company.id))
+                ('company_id', '=', int(self.env.company.id)),
+                ('customer_id', '=', int(self.customer_id.id)),
             ]).uang_jalan
             if nominal_uang_jalan:
                 self.nominal_uang_jalan = nominal_uang_jalan

@@ -18,6 +18,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="kode_uang_jalan" string="Kode Uang Jalan" optional="show"/>
+                <field name="customer_id" string="Tipe Muatan" optional="show" />
                 <field name="tipe_muatan" string="Tipe Muatan" optional="show" />
                 <field name="lokasi_muat" string="Kota Muat" optional="show"/>
                 <field name="lokasi_bongkar" string="Kota Bongkar" optional="show"/>

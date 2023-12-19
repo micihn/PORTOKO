@@ -54,9 +54,8 @@ class KonfigurasiUangJalan(models.Model):
         result = super(KonfigurasiUangJalan, self).write(vals)
         return result
 
-    customer_id = fields.Many2one('res.partner', 'Customer')
+    customer_id = fields.Many2one('res.partner', 'Customer', required=True)
     tipe_muatan = fields.Many2one('konfigurasi.tipe.muatan', 'Tipe Muatan', required=True)
-
     lokasi_muat = fields.Many2one('konfigurasi.lokasi', 'Lokasi Muat', ondelete='restrict', required=True)
     lokasi_bongkar = fields.Many2one('konfigurasi.lokasi', 'Lokasi Bongkar', ondelete='restrict', required=True)
     jarak = fields.Float('Jarak (Km)', default = 0, required=True)
@@ -70,8 +69,8 @@ class KonfigurasiUangJalan(models.Model):
     tol = fields.Integer('Biaya Tol', default=0)
     tonase = fields.Integer('Biaya Tonase', default=0)
     lain_lain = fields.Integer('Biaya Lain-lain', default=0)
-    uang_jalan = fields.Float('Uang Jalan', compute='_calculate_uang_jalan') # Todo Uang Solar x Uang Makan x Kuli x Tol x Tonase x Lain-lain
-    uang_jalan_pembulatan = fields.Float('Uang Jalan (Dibulatkan)') # todo Dalam Excel, =ROUNDUP(KolomUangJalan; -4)
+    uang_jalan = fields.Float('Uang Jalan', compute='_calculate_uang_jalan')
+    uang_jalan_pembulatan = fields.Float('Uang Jalan (Dibulatkan)')
 
     @api.depends('jarak')
     def _calculate_solar(self):
