@@ -273,17 +273,27 @@ class OrderPengiriman(models.Model):
                     raise ValidationError('Anda tidak dapat mengubah status melalui metode ini karena setoran telah berhasil dibuat untuk order pengiriman ini.')
 
         if 'uang_jalan' in vals:
-            if bool(vals['uang_jalan'][0][2]) == True:
+            if vals['uang_jalan'] == None:
+                pass
+            elif bool(vals['uang_jalan'][0][2]) == True:
                 self.sudo().write({'state': 'dalam_perjalanan'})
 
-                for item in vals['uang_jalan'][0][2]:
-                    uang_jalan = self.env['uang.jalan'].search([('id', '=', item)])
+                try:
+                    for item in vals['uang_jalan'][0][2]:
+                        uang_jalan = self.env['uang.jalan'].search([('id', '=', item)])
+                except:
+                    if vals['uang_jalan'][0][2]:
+                        uang_jalan = self.env['uang.jalan'].search([('id', '=', int(vals['uang_jalan'][0][2]))])
 
             elif bool(vals['uang_jalan'][0][2]) == False:
                 self.sudo().write({'state': 'order_baru'})
 
-                for item in vals['uang_jalan'][0][2]:
-                    uang_jalan = self.env['uang.jalan'].search([('id', '=', item)])
+                try:
+                    for item in vals['uang_jalan'][0][2]:
+                        uang_jalan = self.env['uang.jalan'].search([('id', '=', item)])
+                except:
+                    if vals['uang_jalan'][0][2]:
+                        uang_jalan = self.env['uang.jalan'].search([('id', '=', int(vals['uang_jalan'][0][2]))])
         else:
             pass
 
