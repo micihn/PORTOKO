@@ -189,7 +189,6 @@ class UangJalan(models.Model):
             raise ValidationError("Konfigurasi Account belum diisi")
 
         if self.tipe_uang_jalan == 'standar':
-
             uang_jalan_list = []
             for rec in self.uang_jalan_line:
                 for uang_jalan in rec.sudo().order_pengiriman.uang_jalan:

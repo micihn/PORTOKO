@@ -308,11 +308,12 @@ class OrderPengiriman(models.Model):
                     if vals['uang_jalan'][0][2]:
                         uang_jalan = self.env['uang.jalan'].search([('id', '=', int(vals['uang_jalan'][0][2]))])
 
-                vals['sopir'] = None
-                vals['kenek'] = None
-                vals['nomor_kendaraan'] = None
-                vals['model_kendaraan'] = None
-                vals['kendaraan'] = None
+                if vals['uang_jalan'][0][2] != 0:
+                    vals['sopir'] = None
+                    vals['kenek'] = None
+                    vals['nomor_kendaraan'] = None
+                    vals['model_kendaraan'] = None
+                    vals['kendaraan'] = None
 
         res = super(OrderPengiriman, self).write(vals)
 
