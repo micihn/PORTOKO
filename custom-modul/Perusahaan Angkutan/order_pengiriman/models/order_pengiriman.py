@@ -285,6 +285,19 @@ class OrderPengiriman(models.Model):
                     if vals['uang_jalan'][0][2]:
                         uang_jalan = self.env['uang.jalan'].search([('id', '=', int(vals['uang_jalan'][0][2]))])
 
+                if bool(vals['uang_jalan'][0][2]):
+                    vals['state'] = 'dalam_perjalanan'
+                    if len(vals['uang_jalan'][0][2]) > 1:
+                        raise UserError(
+                            'Uang jalan "Nominal Saja" harus menggunakan satu surat jalan saja pada Order Pengiriman ini.')
+                    else:
+                        uang_jalan = self.env['uang.jalan'].search([('id', '=', vals['uang_jalan'][0][2][0])])
+                        vals['sopir'] = uang_jalan.sopir.id
+                        vals['kenek'] = uang_jalan.kenek.id
+                        vals['nomor_kendaraan'] = uang_jalan.kendaraan.license_plate
+                        vals['model_kendaraan'] = uang_jalan.kendaraan.model_id.name
+                        vals['kendaraan'] = uang_jalan.kendaraan.id
+
             elif bool(vals['uang_jalan'][0][2]) == False:
                 self.sudo().write({'state': 'order_baru'})
 
@@ -294,8 +307,12 @@ class OrderPengiriman(models.Model):
                 except:
                     if vals['uang_jalan'][0][2]:
                         uang_jalan = self.env['uang.jalan'].search([('id', '=', int(vals['uang_jalan'][0][2]))])
-        else:
-            pass
+
+                vals['sopir'] = None
+                vals['kenek'] = None
+                vals['nomor_kendaraan'] = None
+                vals['model_kendaraan'] = None
+                vals['kendaraan'] = None
 
         res = super(OrderPengiriman, self).write(vals)
 
@@ -500,6 +517,18 @@ class OrderPengiriman(models.Model):
     @api.model
     def create(self, vals):
         vals['order_pengiriman_name'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('order.pengiriman.sequence')
+
+        if bool(vals['uang_jalan'][0][2]):
+            vals['state'] = 'dalam_perjalanan'
+            if len(vals['uang_jalan'][0][2]) > 1:
+                raise UserError('Uang jalan "Nominal Saja" harus menggunakan satu surat jalan saja pada Order Pengiriman ini.')
+            else:
+                uang_jalan = self.env['uang.jalan'].search([('id', '=',vals['uang_jalan'][0][2][0])])
+                vals['sopir'] = uang_jalan.sopir.id
+                vals['kenek'] = uang_jalan.kenek.id
+                vals['nomor_kendaraan'] = uang_jalan.kendaraan.license_plate
+                vals['model_kendaraan'] = uang_jalan.kendaraan.model_id.name
+                vals['kendaraan'] = uang_jalan.kendaraan.id
 
         result = super(OrderPengiriman, self).create(vals)
 
