@@ -338,7 +338,6 @@ class OrderSetoran(models.Model):
         ############################## Membuat Dictionary-List Detail Order ###########################
 
         for record in self.env['order.pengiriman'].search([('kendaraan', '=', vals['kendaraan']), ('sopir','=', vals['sopir']), ('kenek','=', vals['kenek']), ('state', '=', 'selesai'), ('company_id', '=', int(self.env.company))]):
-
             # Meng-assign nomor setoran ke dalam order pengiriman meskipun statusnya masih draft
             # Untuk membantu proses perubahan atau update biaya fee (jika ada)
             record.nomor_setoran = result.kode_order_setoran
