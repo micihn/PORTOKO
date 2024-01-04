@@ -71,19 +71,19 @@ class OrderSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    total_ongkos = fields.Integer('Total Ongkos', default=90, tracking=True, states={
+    total_ongkos = fields.Float('Total Ongkos', default=90, tracking=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     })
 
-    komisi_sopir_percentage = fields.Integer(tracking=True, states={
+    komisi_sopir_percentage = fields.Float(tracking=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     })
 
-    komisi_kenek_percentage = fields.Integer(tracking=True, states={
+    komisi_kenek_percentage = fields.Float(tracking=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
