@@ -138,6 +138,7 @@
                 <header>
                     <field name="state" widget="statusbar" statusbar_visible="order_baru, dalam_perjalanan, selesai"/>
                     <button name="konfirmasi_pengiriman" type="object" string="Konfirmasi Pengiriman" class="btn-primary" attrs="{'invisible': [('state', 'in', ('order_baru', 'selesai', 'sudah_setor', 'batal'))]}"/>
+                    <button name="cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ('batal'))]}"/>
                 </header>
 
                 <sheet>

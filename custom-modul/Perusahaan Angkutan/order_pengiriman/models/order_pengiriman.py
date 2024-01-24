@@ -125,14 +125,14 @@ class OrderPengiriman(models.Model):
 
     detail_order_do = fields.One2many('detail.order.do', 'order_pengiriman', copy=True, states={
         'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', False)],
         'selesai': [('readonly', True)],
         'sudah_setor': [('readonly', True)],
     })
 
     detail_order_reguler = fields.One2many('detail.order.reguler', 'order_pengiriman', copy=True, states={
         'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', False)],
         'selesai': [('readonly', True)],
         'sudah_setor': [('readonly', True)],
     })
@@ -514,22 +514,81 @@ class OrderPengiriman(models.Model):
     def konfirmasi_pengiriman(self):
         self.state = 'selesai'
 
+    def cancel(self):
+        for record in self:
+            # Cancel Uang Jalan
+            if self.uang_jalan:
+                # Cancel Order Setoran
+                order_setoran = self.env['detail.order'].search([('order_pengiriman','=',self.order_pengiriman_name)])
+                for order in order_setoran:
+                    order.order_setoran.cancel()
+
+                    # Cancel Invoice
+                    invoices = self.env['account.move'].search([('nomor_setoran', '=', order.order_setoran.kode_order_setoran), ('move_type', '=', 'out_invoice')])
+                    if bool(invoices):
+                        for invoice in invoices:
+                            invoice.button_cancel()
+
+                    # Cancel Vendor Bill
+                    bills = self.env['account.move'].search([('nomor_setoran', '=', order.order_setoran.kode_order_setoran), ('move_type', '=', 'in_invoice')])
+                    if bool(bills):
+                        for bill in bills:
+                            bill.button_draft()
+                            bill.button_cancel()
+
+                    # Cancel Expense
+                    expenses = self.env['hr.expense'].search([('reference', '=', order.order_setoran.kode_order_setoran)])
+                    if bool(bills):
+                        for expense in expenses:
+                            expense.unlink()
+
+                # Cancel Uang Jalan
+                for record in self.uang_jalan:
+                    record.cancel()
+
+            elif self.oper_order:
+                oper_setoran = self.env['detail.order.setoran'].search([('order_pengiriman', '=', self.order_pengiriman_name)])
+                for order in oper_setoran:
+                    order.oper_setoran.cancel()
+
+                    # Cancel Invoice
+                    invoices = self.env['account.move'].search([('nomor_setoran', '=', order.oper_setoran.kode_oper_setoran), ('move_type', '=', 'out_invoice')])
+                    if bool(invoices):
+                        for invoice in invoices:
+                            invoice.button_cancel()
+
+                    # Cancel Vendor Bill
+                    bills = self.env['account.move'].search([('nomor_setoran', '=', order.oper_setoran.kode_oper_setoran), ('move_type', '=', 'in_invoice')])
+                    if bool(bills):
+                        for bill in bills:
+                            bill.button_draft()
+                            bill.button_cancel()
+
+                # Cancel Oper Order
+                for record in self.oper_order:
+                    record.cancel()
+
+            self.state = 'batal'
+
     # Method untuk auto name assignment
     @api.model
     def create(self, vals):
         vals['order_pengiriman_name'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('order.pengiriman.sequence')
 
-        if bool(vals['uang_jalan'][0][2]):
-            vals['state'] = 'dalam_perjalanan'
-            if len(vals['uang_jalan'][0][2]) > 1:
-                raise UserError('Uang jalan "Nominal Saja" harus menggunakan satu surat jalan saja pada Order Pengiriman ini.')
-            else:
-                uang_jalan = self.env['uang.jalan'].search([('id', '=',vals['uang_jalan'][0][2][0])])
-                vals['sopir'] = uang_jalan.sopir.id
-                vals['kenek'] = uang_jalan.kenek.id
-                vals['nomor_kendaraan'] = uang_jalan.kendaraan.license_plate
-                vals['model_kendaraan'] = uang_jalan.kendaraan.model_id.name
-                vals['kendaraan'] = uang_jalan.kendaraan.id
+        try:
+            if bool(vals['uang_jalan'][0][2]):
+                vals['state'] = 'dalam_perjalanan'
+                if len(vals['uang_jalan'][0][2]) > 1:
+                    raise UserError('Uang jalan "Nominal Saja" harus menggunakan satu surat jalan saja pada Order Pengiriman ini.')
+                else:
+                    uang_jalan = self.env['uang.jalan'].search([('id', '=',vals['uang_jalan'][0][2][0])])
+                    vals['sopir'] = uang_jalan.sopir.id
+                    vals['kenek'] = uang_jalan.kenek.id
+                    vals['nomor_kendaraan'] = uang_jalan.kendaraan.license_plate
+                    vals['model_kendaraan'] = uang_jalan.kendaraan.model_id.name
+                    vals['kendaraan'] = uang_jalan.kendaraan.id
+        except:
+            pass
 
         result = super(OrderPengiriman, self).create(vals)
 

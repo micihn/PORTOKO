@@ -116,7 +116,7 @@
                                 <separator string="Rincian Biaya"/>
                                 <div style="display: flex; justify-content: space-between; ">
                                     <label for="total_ongkos" string="Total Ongkos : "/>
-                                    <div style="width: 15%; text-align: center;">
+                                    <div style="width: 20%; text-align: center;">
                                         <field name="total_ongkos"/>
                                     </div>
                                     <label for="total_ongkos" string="%"/>
@@ -146,7 +146,7 @@
                                 <separator string="Komisi"/>
                                 <div style="display: flex; justify-content: space-between; ">
                                     <label for="komisi_sopir_percentage" string="Komisi Sopir : "/>
-                                    <div style="width: 15%; text-align: center; ">
+                                    <div style="width: 20%; text-align: center; ">
                                         <field name="komisi_sopir_percentage"/>
                                     </div>
                                     <label for="komisi_sopir_percentage" string="%"/>
@@ -162,7 +162,7 @@
 
                                 <div style="display: flex; justify-content: space-between; ">
                                     <label for="komisi_kenek_percentage" string="Komisi Kenek : "/>
-                                    <div style="width: 15%; text-align: center;">
+                                    <div style="width: 20%; text-align: center;">
                                         <field name="komisi_kenek_percentage"/>
                                     </div>
                                     <label for="komisi_kenek_percentage" string="%" />

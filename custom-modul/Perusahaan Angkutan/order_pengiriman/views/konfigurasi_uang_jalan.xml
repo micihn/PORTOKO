@@ -28,7 +28,7 @@
                 <field name="tol" string="Biaya Tol" optional="show"/>
                 <field name="tonase" string="Biaya Tonase" optional="show"/>
                 <field name="lain_lain" string="Biaya Lain-Lain" optional="show"/>
-                <field name="uang_jalan" string="Uang Jalan (Dibulatkan)" optional="show"/>
+                <field name="uang_jalan" string="Uang Jalan" optional="show"/>
             </tree>
         </field>
     </record>
@@ -68,6 +68,7 @@
                             <field name="uang_makan" string="Total Uang Makan" optional="show"/>
                             <field name="uang_solar" string="Total Uang Solar" optional="show"/>
                             <field name="uang_jalan" string="Total Uang Jalan" optional="show"/>
+                            <field name="aktifkan_pembulatan" />
 
 <!--                        <group>-->
 <!--                            <field name="hari"/>-->

@@ -10,6 +10,7 @@ class KonfigurasiUangJalan(models.Model):
     _rec_name = 'kode_uang_jalan'
 
     kode_uang_jalan = fields.Char('Kode Uang Jalan', store=True)
+    aktifkan_pembulatan = fields.Boolean()
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 
@@ -70,7 +71,6 @@ class KonfigurasiUangJalan(models.Model):
     tonase = fields.Integer('Biaya Tonase', default=0)
     lain_lain = fields.Integer('Biaya Lain-lain', default=0)
     uang_jalan = fields.Float('Uang Jalan', compute='_calculate_uang_jalan')
-    uang_jalan_pembulatan = fields.Float('Uang Jalan (Dibulatkan)')
 
     @api.depends('jarak')
     def _calculate_solar(self):
@@ -123,14 +123,14 @@ class KonfigurasiUangJalan(models.Model):
         for record in self:
             record.uang_makan = record.hari * record.uang_makan_per_hari
 
-    @api.depends('uang_makan', 'uang_solar', 'kuli', 'tol', 'tonase', 'lain_lain')
+    @api.depends('uang_makan', 'uang_solar', 'kuli', 'tol', 'tonase', 'lain_lain', 'aktifkan_pembulatan')
     def _calculate_uang_jalan(self):
         for record in self:
-            # record.uang_jalan = math.ceil(record.uang_makan + record.uang_solar + record.kuli + record.tol + record.tonase + record.lain_lain)
-
             computed_value = record.uang_makan + record.uang_solar + record.kuli + record.tol + record.tonase + record.lain_lain
 
-            # Round up to the nearest multiple of 10,000
-            rounded_value = math.ceil(computed_value / 10000) * 10000
-
-            record.uang_jalan = rounded_value
+            if bool(record.aktifkan_pembulatan):
+                # Round up to the nearest multiple of 10,000
+                rounded_value = math.ceil(computed_value / 10000) * 10000
+                record.uang_jalan = rounded_value
+            else:
+                record.uang_jalan = computed_value
