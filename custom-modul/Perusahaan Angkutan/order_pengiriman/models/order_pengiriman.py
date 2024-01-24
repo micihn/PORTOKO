@@ -125,14 +125,14 @@ class OrderPengiriman(models.Model):
 
     detail_order_do = fields.One2many('detail.order.do', 'order_pengiriman', copy=True, states={
         'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', False)],
         'selesai': [('readonly', True)],
         'sudah_setor': [('readonly', True)],
     })
 
     detail_order_reguler = fields.One2many('detail.order.reguler', 'order_pengiriman', copy=True, states={
         'order_baru': [('readonly', False)],
-        'dalam_perjalanan': [('readonly', True)],
+        'dalam_perjalanan': [('readonly', False)],
         'selesai': [('readonly', True)],
         'sudah_setor': [('readonly', True)],
     })
