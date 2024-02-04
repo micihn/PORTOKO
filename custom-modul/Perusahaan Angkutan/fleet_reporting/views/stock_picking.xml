@@ -2,15 +2,37 @@
 <odoo>
     <data>
 
-        <record model="ir.ui.view" id="picking_fleet_product">
-            <field name="name">picking.fleet.product</field>
+        <record model="ir.ui.view" id="picking_fleet_product_line">
+            <field name="name">picking.fleet.product.line</field>
             <field name="model">stock.picking</field>
             <field name="inherit_id" ref="stock.view_picking_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='name']" position="after">
-                    <field name="fleet_layer" />
-                    <field name="fleet_service_id" />
+
+
+                <xpath expr="//field[@name='description_picking']" position="after">
+                    <field name="nomor_kendaraan" optional="hide"/>
+                    <field name="harga_satuan" optional="hide"/>
+                    <field name="harga_total" optional="hide"/>
                 </xpath>
+
+                <!-- Total Jumlah & Total Bayar Dimuka -->
+                <xpath expr="//field[@name='move_ids_without_package']" position="after">
+                     <field name="is_permintaan_barang" invisible="1"/>
+
+                <div class="oe_right">
+                    <!-- Total Jumlah -->
+                    <div style="display: flex; justify-content: space-between;" attrs="{'invisible': [('is_permintaan_barang','!=', True)]}">
+                        <label for="nominal_permintaan" string="Total" class="oe_edit_only"/>
+
+                        <div class="oe_total_field" style="margin-left: auto;">
+                            <field name="nominal_permintaan" style="text-align: right;" string="Total"/>
+                        </div>
+
+                    </div>
+
+                </div>
+                </xpath>
+
             </field>
         </record>
     </data>

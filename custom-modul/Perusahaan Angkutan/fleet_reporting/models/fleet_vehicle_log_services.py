@@ -97,7 +97,8 @@ class FleetVehicleLogServiceProduct(models.Model):
                 'location_id': fleet_settings.operation_type.default_location_src_id.id,
                 'location_dest_id': fleet_settings.operation_type.default_location_dest_id.id,
                 'picking_type_id': fleet_settings.operation_type.id,
-                'origin': self.name
+                'origin': self.name,
+                'is_permintaan_barang': True,
             })
             stock_move = self.env['stock.move'].create({
                 'name': self.name + str(' - ' + self.description),
@@ -105,6 +106,9 @@ class FleetVehicleLogServiceProduct(models.Model):
                 'product_uom_qty': self.product_qty,
                 'product_uom': self.product_id.product_tmpl_id.uom_id.id,
                 'picking_id': picking.id,
+                'nomor_kendaraan': self.vehicle_id.license_plate,
+                'harga_satuan': self.amount,
+                'harga_total': self.total_amount,
                 'picking_type_id': fleet_settings.operation_type.id,
                 'location_id': fleet_settings.operation_type.default_location_src_id.id,
                 'location_dest_id': fleet_settings.operation_type.default_location_dest_id.id,
