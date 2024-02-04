@@ -98,6 +98,7 @@ class FleetVehicleLogServiceProduct(models.Model):
                 'location_dest_id': fleet_settings.operation_type.default_location_dest_id.id,
                 'picking_type_id': fleet_settings.operation_type.id,
                 'origin': self.name,
+                'is_permintaan_barang': True,
             })
             stock_move = self.env['stock.move'].create({
                 'name': self.name + str(' - ' + self.description),
