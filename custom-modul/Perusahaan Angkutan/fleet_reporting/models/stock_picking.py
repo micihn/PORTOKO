@@ -7,6 +7,7 @@ class InternalTransferFleet(models.Model):
     fleet_layer = fields.Integer() # there are 2 'layer' which the first are 'Permintaan Barang' and the second is 'Barang Keluar'. layer means stock.picking
     fleet_service_id = fields.Many2one('fleet.vehicle.log.services') # fleet service ID (Fleet Module > Fleet > Services), for easier cancellation or any state-changing through picking
 
+
     def action_cancel(self):
         res = super(InternalTransferFleet, self).action_cancel()
 
@@ -53,3 +54,11 @@ class InternalTransferFleet(models.Model):
         else:
             pass
         return res
+
+
+class FleetMove(models.Model):
+    _inherit = 'stock.move'
+
+    nomor_kendaraan = fields.Char()
+    harga_satuan = fields.Float('Harga Satuan', digits=(6, 0))
+    harga_total = fields.Float('Harga Total', digits=(6, 0))
