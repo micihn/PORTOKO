@@ -6,14 +6,14 @@ class InternalTransferFleet(models.Model):
     origin = fields.Char(readonly=True)
     fleet_layer = fields.Integer() # there are 2 'layer' which the first are 'Permintaan Barang' and the second is 'Barang Keluar'. layer means stock.picking
     fleet_service_id = fields.Many2one('fleet.vehicle.log.services') # fleet service ID (Fleet Module > Fleet > Services), for easier cancellation or any state-changing through picking
-    nominal_permintaan = fields.Float('Harga Satuan', digits=(6, 0), compute="compute_nominal_permintaan")
     is_permintaan_barang = fields.Boolean()
+    nominal_permintaan = fields.Float('Harga Satuan', digits=(6, 0), compute="compute_nominal_permintaan")
 
     @api.depends('move_ids_without_package.harga_total')
     def compute_nominal_permintaan(self):
-        for record in self.move_ids_without_package:
-            self.nominal_permintaan += record.harga_total
-
+        for record in self:
+            total_harga = sum(record.move_ids_without_package.mapped('harga_total'))
+            record.nominal_permintaan = total_harga
 
     def action_cancel(self):
         res = super(InternalTransferFleet, self).action_cancel()
