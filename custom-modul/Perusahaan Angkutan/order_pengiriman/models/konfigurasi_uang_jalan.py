@@ -14,6 +14,11 @@ class KonfigurasiUangJalan(models.Model):
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 
+    # rumus_solar = fields.Selection([
+    #     ('solar_dikali_harga', 'Kebutuhan Solar x Harga Per Liter'),
+    #     ('degressive', 'Degressive')],
+    #     string='Computation Method', required=True, default='linear')
+
     @api.model
     def create(self, vals):
         existing_record = self.search([

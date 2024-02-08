@@ -27,6 +27,7 @@
         'views/konfigurasi_solar_uang_makan.xml',
         'views/konfigurasi_uang_jalan.xml',
         'views/konfigurasi_account.xml',
+        'wizard/close_uang_jalan.xml',
         'views/oper_order.xml',
         'views/uang_jalan.xml',
         'views/menu.xml',

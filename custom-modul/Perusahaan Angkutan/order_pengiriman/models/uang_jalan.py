@@ -17,6 +17,7 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     uang_jalan_name = fields.Char(readonly=True, required=True, copy=False, default='New')
@@ -25,6 +26,7 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     sopir = fields.Many2one('hr.employee', 'Sopir', copy=True, ondelete='restrict', states={
@@ -32,6 +34,7 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     kenek = fields.Many2one('hr.employee', 'Kenek', copy=True, ondelete='restrict', states={
@@ -39,6 +42,7 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     keterangan = fields.Text('Keterangan', copy=False, states={
@@ -46,6 +50,7 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     uang_jalan_line = fields.One2many('uang.jalan.line', 'uang_jalan', required=True, copy=False, states={
@@ -53,14 +58,15 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
-    uang_jalan_nominal_tree = fields.One2many('uang.jalan.nominal.saja', 'uang_jalan_nominal_saja', required=True,
-                                              copy=False, states={
+    uang_jalan_nominal_tree = fields.One2many('uang.jalan.nominal.saja', 'uang_jalan_nominal_saja', required=True, copy=False, states={
             'to_submit': [('readonly', False)],
             'submitted': [('readonly', True)],
             'validated': [('readonly', True)],
             'paid': [('readonly', True)],
+            'closed': [('readonly', True)],
         })
 
     biaya_tambahan_standar = fields.Float('Biaya Tambahan', default=0, copy=False, digits=(6, 0), states={
@@ -68,6 +74,7 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     biaya_tambahan_nominal_saja = fields.Float('Biaya Tambahan', default=0, copy=False, digits=(6, 0), states={
@@ -75,6 +82,7 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     total_uang_jalan_standar = fields.Float('Total', compute='_compute_total_uang_jalan_standar', default=0, digits=(6, 0))
@@ -84,9 +92,21 @@ class UangJalan(models.Model):
         ('submitted', "Submitted"),
         ('validated', "Validated"),
         ('paid', "Paid"),
+        ('closed', "Closed"),
         ('paid_no_order', "Paid, No Order"),
         ('cancel', "Cancelled"),
     ], default='to_submit', string="State", hide=True, tracking=True)
+
+    balance_uang_jalan = fields.Float('Saldo Uang Jalan Tersisa', compute="compute_nominal_close_accumulation" ,default=0, digits=(6, 0))
+    balance_history = fields.One2many('uang.jalan.balance.history', 'uang_jalan_id', copy=False, readonly=True)
+
+    @api.depends('balance_history')
+    def compute_nominal_close_accumulation(self):
+        for record in self:
+            saldo = 0
+            for history_record in record.balance_history:
+                saldo += history_record.nominal_close
+            record.balance_uang_jalan = saldo
 
     total_uang_jalan_nominal_saja = fields.Float('Total', compute='_compute_total_nominal_uang_jalan_saja', copy=False, default=0, store=True, digits=(6, 0))
     total = fields.Float('Total', default=0, copy=False, compute='_compute_total', store=True, digits=(6, 0))
@@ -266,7 +286,25 @@ class UangJalan(models.Model):
 
             journal_entry.action_post()
 
+        # Create Uang Jalan Balance History
+        self.env['uang.jalan.balance.history'].create({
+            'uang_jalan_id': self.id,
+            'company_id': self.company_id.id,
+            'keterangan': "Penyerahan Uang Jalan Kepada Sopir Dan Kenek",
+            'tanggal_pencatatan': fields.Date.today(),
+            'nominal_close': self.total,
+        })
+
         self.state = 'paid'
+
+    def close(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'uang.jalan.close',
+            'view_mode': 'form',
+            'target': 'new',
+            'name': 'Catat Penggunaan Uang Jalan',
+        }
 
     def cancel(self):
 
@@ -409,4 +447,15 @@ class UangJalanNominalSaja(models.Model):
     muat = fields.Many2one('konfigurasi.lokasi', 'Muat')
     bongkar = fields.Many2one('konfigurasi.lokasi', 'Bongkar')
     nominal_uang_jalan = fields.Float('Nominal UJ', default=0, digits=(6, 0))
+
+class UangJalanBalanceHistory(models.Model):
+    _name = 'uang.jalan.balance.history'
+    _description = 'History Uang Jalan'
+
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+    uang_jalan_id = fields.Many2one('uang.jalan', invisible=True)
+
+    tanggal_pencatatan = fields.Date()
+    keterangan = fields.Char()
+    nominal_close = fields.Float(digits=(6, 0))
 

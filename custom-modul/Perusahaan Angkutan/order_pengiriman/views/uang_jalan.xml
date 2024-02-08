@@ -22,7 +22,8 @@
                 <field name="kendaraan" string="Kendaraan" optional="show"/>
                 <field name="keterangan" string="Keterangan" optional="show"/>
                 <field name="total" string="Nominal" optional="show"/>
-                <field name="state" string="State" optional="show" widget="badge" decoration-info="state=='to_submit'" decoration-warning="state=='submitted'" decoration-muted="state=='cancel'" decoration-success="state in ['validated', 'paid']"/>
+                <field name="balance_uang_jalan" string="Balance Uang Jalan" optional="show"/>
+                <field name="state" string="State" optional="show" widget="badge" decoration-info="state=='to_submit'" decoration-warning="state=='submitted'" decoration-muted="state=='cancel'" decoration-success="state in ['validated', 'paid', 'closed']"/>
             </tree>
         </field>
     </record>
@@ -34,13 +35,14 @@
             <form delete="1">
 
                 <header>
-                    <field name="state" widget="statusbar" statusbar_visible="to_submit, submitted, validated, paid"/>
-                    <button name="submit" type="object" string="Submit" class="btn-primary" attrs="{'invisible': [('state', 'in', ('submitted', 'validated', 'paid', 'cancel'))]}"/>
-                    <button name="hitung_ulang_nominal_uj" type="object" string="Hitung Ulang Uang Jalan" attrs="{'invisible': ['|', ('state', 'in', ('submitted', 'validated', 'paid', 'cancel')), ('tipe_uang_jalan', '=', 'nominal_saja')]}"/>
-                    <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'validated', 'paid', 'cancel'))]}"/>
-                    <button name="paid" type="object" string="Submit Payment" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', 'cancel'))]}"/>
-                    <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', ))]}"/>
-                    <button name="cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ('cancel',))]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="to_submit, submitted, validated, paid, closed"/>
+                    <button name="submit" type="object" string="Submit" class="btn-primary" attrs="{'invisible': [('state', 'in', ('submitted', 'validated', 'paid', 'closed', 'cancel'))]}"/>
+                    <button name="hitung_ulang_nominal_uj" type="object" string="Hitung Ulang Uang Jalan" attrs="{'invisible': ['|', ('state', 'in', ('submitted', 'validated', 'paid', 'closed', 'cancel')), ('tipe_uang_jalan', '=', 'nominal_saja')]}"/>
+                    <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'validated', 'paid', 'closed', 'cancel'))]}"/>
+                    <button name="paid" type="object" string="Submit Payment" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', 'closed', 'cancel'))]}"/>
+                    <button name="close" type="object" string="Close Uang Jalan" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'closed', 'cancel'))]}"/>
+                    <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', 'closed'))]}"/>
+                    <button name="cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ('cancel'))]}"/>
                 </header>
 
                 <sheet>
@@ -82,7 +84,7 @@
                                 </tree>
                             </field>
 
-                        <div class="oe_left">
+                            <div class="oe_left">
                                 <!-- Biaya Tambahan Nominal Saja -->
                                 <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000" attrs="{'invisible': [('tipe_uang_jalan', '=', 'nominal_saja')]}">
                                     <label for="biaya_tambahan_standar" string="Biaya Tambahan "/>
@@ -135,7 +137,39 @@
                                 </div>
                             </div>
 
+                            <div class="oe_right">
+                                <!-- Biaya Tambahan Nominal Saja -->
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000" attrs="{'invisible': [('tipe_uang_jalan', '=', 'nominal_saja')]}">
+                                    <label for="balance_uang_jalan" string="Balance Uang Jalan "/>
+                                </div>
+                                <div class="oe_total_field" style="display: inline-block;" attrs="{'invisible': [('tipe_uang_jalan', '=', 'nominal_saja')]}">
+                                    <field name="balance_uang_jalan" />
+                                </div>
+                            </div>
+
                         </page>
+
+                        <page string="History Balance">
+                            <field name="balance_history">
+                                <tree editable="bottom">
+                                    <field name="uang_jalan_id" invisible="1"/>
+                                    <field name="tanggal_pencatatan" width="100%" optional="show"/>
+                                    <field name="keterangan" width="100%" optional="show"/>
+                                    <field name="nominal_close" width="100%" optional="show"/>
+                                </tree>
+                            </field>
+
+                            <div class="oe_right">
+                                <!-- Biaya Tambahan Nominal Saja -->
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000" attrs="{'invisible': [('tipe_uang_jalan', '=', 'nominal_saja')]}">
+                                    <label for="balance_uang_jalan" string="Balance Uang Jalan "/>
+                                </div>
+                                <div class="oe_total_field" style="display: inline-block;" attrs="{'invisible': [('tipe_uang_jalan', '=', 'nominal_saja')]}">
+                                    <field name="balance_uang_jalan" />
+                                </div>
+                            </div>
+                        </page>
+
                     </notebook>
 
                 </sheet>

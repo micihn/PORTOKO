@@ -1,0 +1,29 @@
+<odoo>
+    <record id="uang_jalan_close_form" model="ir.ui.view">
+         <field name="name">uang.jalan.close.form</field>
+         <field name="model">uang.jalan.close</field>
+         <field name="arch" type="xml">
+             <form string="Catat Penggunaan Uang Jalan">
+                     <group>
+                         <group>
+                             <field name="tanggal_penggunaan" />
+                             <field name="nominal_close" />
+                         </group>
+                     </group>
+
+                 <footer>
+                     <button string="Validate" type="object" class="btn-primary" name="close_uang_jalan" />
+                     <button string="Cancel" special="cancel" class="btn btn-secondary" />
+                 </footer>
+             </form>
+         </field>
+    </record>
+
+<!--    <record id="action_accounting_invoice_payment" model="ir.actions.act_window">-->
+<!--        <field name="name">Accounting Invoice Payment</field>-->
+<!--        <field name="res_model">account.invoice.payment</field>-->
+<!--        <field name="view_mode">form</field>-->
+<!--        <field name="target">new</field>-->
+<!--    </record>-->
+</odoo>
+
