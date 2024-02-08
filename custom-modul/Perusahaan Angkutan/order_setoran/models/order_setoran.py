@@ -262,12 +262,14 @@ class OrderSetoran(models.Model):
     @api.depends('sisa', 'komisi_kenek_percentage')
     def _compute_komisi_kenek(self):
         for record in self:
-            record.komisi_kenek = (record.komisi_kenek_percentage * record.sisa) / 100
+            komisi_kenek = (record.komisi_kenek_percentage * record.sisa) / 100
+            record.komisi_sopir = round(komisi_kenek / 1000) * 1000
 
     @api.depends('sisa', 'komisi_sopir_percentage')
     def _compute_komisi_sopir(self):
         for record in self:
-            record.komisi_sopir = (record.komisi_sopir_percentage * record.sisa) / 100
+            komisi_sopir = (record.komisi_sopir_percentage * record.sisa) / 100
+            record.komisi_sopir = round(komisi_sopir / 1000) * 1000
 
     @api.depends('total_ongkos_calculated', 'total_pengeluaran', 'total_pembelian', 'total_biaya_fee')
     def _calculate_sisa(self):
