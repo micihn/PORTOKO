@@ -40,7 +40,7 @@
                     <button name="hitung_ulang_nominal_uj" type="object" string="Hitung Ulang Uang Jalan" attrs="{'invisible': ['|', ('state', 'in', ('submitted', 'validated', 'paid', 'closed', 'cancel')), ('tipe_uang_jalan', '=', 'nominal_saja')]}"/>
                     <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'validated', 'paid', 'closed', 'cancel'))]}"/>
                     <button name="paid" type="object" string="Submit Payment" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', 'closed', 'cancel'))]}"/>
-                    <button name="close" type="object" string="Close Uang Jalan" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'closed', 'cancel'))]}"/>
+                    <button name="close" type="object" string="Close Uang Jalan" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'validated', 'closed', 'cancel'))]}"/>
                     <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', 'closed'))]}"/>
                     <button name="cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ('cancel'))]}"/>
                 </header>

@@ -8,4 +8,6 @@ class KonfigurasiAccount(models.Model):
     name = fields.Char(default="Konfigurasi Account Uang Jalan")
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     account_uang_jalan = fields.Many2one('account.account', 'Account Uang Jalan')
+    journal_uang_jalan = fields.Many2one('account.journal', 'Journal Uang Jalan')
     account_kas = fields.Many2one('account.account', 'Account Cash/Bank')
+

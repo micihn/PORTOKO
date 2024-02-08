@@ -200,6 +200,7 @@ class UangJalan(models.Model):
     def paid(self):
         account_settings = self.env['konfigurasi.account.uang.jalan'].search([('company_id', '=', self.company_id.id)])
         account_uang_jalan = account_settings.account_uang_jalan
+        journal_uang_jalan = account_settings.journal_uang_jalan
         account_kas = account_settings.account_kas
 
         if bool(account_uang_jalan) == False:
@@ -235,6 +236,7 @@ class UangJalan(models.Model):
             journal_entry = self.env['account.move'].create({
                 'company_id': self.company_id.id,
                 'move_type': 'entry',
+                'journal_id': journal_uang_jalan.id,
                 'date': self.create_date,
                 'ref': self.uang_jalan_name,
                 'line_ids': [
@@ -263,6 +265,7 @@ class UangJalan(models.Model):
             journal_entry = self.env['account.move'].create({
                 'company_id': self.company_id.id,
                 'move_type': 'entry',
+                'journal_id': journal_uang_jalan.id,
                 'date': self.create_date,
                 'ref': self.uang_jalan_name,
                 'line_ids': [
@@ -307,7 +310,6 @@ class UangJalan(models.Model):
         }
 
     def cancel(self):
-
         uang_jalan_list = []
         for rec in self.uang_jalan_line:
             for uang_jalan in rec.sudo().order_pengiriman.uang_jalan:
@@ -337,6 +339,10 @@ class UangJalan(models.Model):
             for record in self.env['account.move'].search([('ref', '=', str(self.uang_jalan_name))]):
                 record.button_draft()
                 record.button_cancel()
+
+        # Delete History Balance
+        for record in self.balance_history:
+            record.unlink()
 
         self.state = 'cancel'
 

@@ -4,7 +4,7 @@ class CloseUangJalan(models.TransientModel):
     _name = 'uang.jalan.close'
     _description = 'Close Uang Jalan'
 
-    nominal_close = fields.Float('Saldo Yang Digunakan', default=0, digits=(6, 0))
+    nominal_close = fields.Float('Saldo Yang Digunakan', default=0, digits=(6, 0), required=True)
     tanggal_penggunaan = fields.Date(required=True)
 
     def close_uang_jalan(self):
