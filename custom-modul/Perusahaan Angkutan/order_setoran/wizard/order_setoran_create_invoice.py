@@ -320,6 +320,9 @@ class AccountInvoicePayment(models.TransientModel):
                 if line.uang_jalan_name.order_disetor == line.uang_jalan_name.lines_count:
                     line.uang_jalan_name.state = 'closed'
 
+            # Deakumulasi kas gantung kepada kendaraan
+            setoran.kendaraan.kas_gantung_vehicle -= setoran.total_uang_jalan
+
             setoran.state = 'done'
 
 class AccountInvoicePaymentLine(models.TransientModel):

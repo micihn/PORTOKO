@@ -44,6 +44,14 @@ class UangJalan(models.Model):
         'closed': [('readonly', True)],
     })
 
+    kas_gantung = fields.Float(digits=(6, 0), copy=False, compute="compute_kas_gantung_kendaraan")
+
+    @api.depends('kendaraan')
+    def compute_kas_gantung_kendaraan(self):
+        for record in self:
+            record.kas_gantung = record.kendaraan.kas_gantung_vehicle
+
+
     sopir = fields.Many2one('hr.employee', 'Sopir', copy=True, ondelete='restrict', states={
         'to_submit': [('readonly', False)],
         'submitted': [('readonly', True)],
@@ -200,6 +208,7 @@ class UangJalan(models.Model):
         for record in self.balance_history:
             record.unlink()
 
+        self.can_use_all_balance = True
         self.state = 'to_submit'
 
     def submit(self):
@@ -226,7 +235,7 @@ class UangJalan(models.Model):
             raise ValidationError("Konfigurasi Account belum diisi")
 
         if bool(account_kas) == False:
-            raise ValidationError("Konfigurasi Account belum diisi")
+            raise ValidationError("Konfigurasi Account Kas belum diisi")
 
         if self.tipe_uang_jalan == 'standar':
             uang_jalan_list = []
@@ -316,6 +325,9 @@ class UangJalan(models.Model):
             'tanggal_pencatatan': fields.Date.today(),
             'nominal_close': self.total,
         })
+
+        # Akumulasi kas gantung kepada kendaraan
+        self.kendaraan.kas_gantung_vehicle += self.balance_uang_jalan
 
         self.state = 'paid'
 
@@ -409,6 +421,9 @@ class UangJalan(models.Model):
                 'tanggal_pencatatan': fields.Date.today(),
                 'nominal_close': self.balance_uang_jalan * -1,
             })
+
+            # Deakumulasi kas gantung kepada kendaraan
+            self.kendaraan.kas_gantung_vehicle -= self.balance_uang_jalan
 
             self.state = 'cancel'
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="fleet_vehicle_kas_gantung">
+            <field name="name">fleet.vehicle.kas.gantung</field>
+            <field name="model">fleet.vehicle</field>
+            <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='horsepower_tax']" position="after">
+                    <separator string="Uang Kas Gantung" />
+                    <field name="kas_gantung_vehicle" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

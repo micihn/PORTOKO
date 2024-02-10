@@ -59,6 +59,7 @@
                         <group>
                             <field name="tipe_uang_jalan" />
                             <field name="kendaraan" />
+                            <field name="kas_gantung" />
                             <field name="sopir" />
                             <field name="kenek" />
                         </group>

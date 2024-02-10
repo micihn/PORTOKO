@@ -8,3 +8,4 @@ from . import oper_order
 from . import uang_jalan
 from . import res_company
 from . import konfigurasi_account
+from . import fleet_vehicle

@@ -79,5 +79,5 @@ class CloseUangJalan(models.TransientModel):
                         'nominal_close': self.nominal_close * -1,
                     })
 
-                    record.can_use_all_balance = False
+                record.can_use_all_balance = False
 

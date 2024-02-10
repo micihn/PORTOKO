@@ -29,6 +29,7 @@
         'views/konfigurasi_account.xml',
         'wizard/close_uang_jalan.xml',
         'views/oper_order.xml',
+        'views/fleet_vehicle.xml',
         'views/uang_jalan.xml',
         'views/menu.xml',
         'report/report_uang_jalan.xml',

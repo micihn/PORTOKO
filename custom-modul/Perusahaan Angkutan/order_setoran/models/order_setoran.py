@@ -373,7 +373,7 @@ class OrderSetoran(models.Model):
                         if str(record.order_pengiriman_name) in balance.keterangan:
                             balance_spend += balance.nominal_close
                         elif balance.keterangan == 'Penggunaan Saldo Uang Jalan Untuk Seluruh Order Pengiriman':
-                            balance_spend = balance.nominal_close
+                            balance_spend += balance.nominal_close
                         elif balance.keterangan == 'Penggunaan Saldo Uang Jalan Di luar nominal yang diberikan':
                             balance_spend += balance.nominal_close
 
@@ -536,7 +536,7 @@ class OrderSetoran(models.Model):
                             if str(record.order_pengiriman_name) in balance.keterangan:
                                 balance_spend += balance.nominal_close
                             elif balance.keterangan == 'Penggunaan Saldo Uang Jalan Untuk Seluruh Order Pengiriman':
-                                balance_spend = balance.nominal_close
+                                balance_spend += balance.nominal_close
                             elif balance.keterangan == 'Penggunaan Saldo Uang Jalan Di luar nominal yang diberikan':
                                 balance_spend += balance.nominal_close
 
