@@ -20,22 +20,64 @@ class CloseUangJalan(models.TransientModel):
             if self.specific_order_pengiriman == True and self.order_pengiriman.id not in order_ids:
                 raise ValidationError('Order Pengiriman Terpilih tidak merupakan bagian dari Surat Jalan')
 
-            if self.specific_order_pengiriman:
+            if record.balance_uang_jalan < self.nominal_close:
+                account_settings = self.env['konfigurasi.account.uang.jalan'].search([('company_id', '=', record.company_id.id)])
+                account_uang_jalan = account_settings.account_uang_jalan
+                journal_uang_jalan = account_settings.journal_uang_jalan
+                account_kas = account_settings.account_kas
+
                 self.env['uang.jalan.balance.history'].create({
                     'uang_jalan_id': record.id,
                     'company_id': record.company_id.id,
-                    'keterangan': "Penggunaan Saldo Uang Jalan Untuk " + str(self.order_pengiriman.order_pengiriman_name),
-                    'tanggal_pencatatan': self.tanggal_penggunaan,
-                    'nominal_close': self.nominal_close * -1,
-                })
-            else:
-                self.env['uang.jalan.balance.history'].create({
-                    'uang_jalan_id': record.id,
-                    'company_id': record.company_id.id,
-                    'keterangan': "Penggunaan Saldo Uang Jalan Untuk Seluruh Order Pengiriman",
+                    'keterangan': "Penggunaan Saldo Uang Jalan Di luar nominal yang diberikan",
                     'tanggal_pencatatan': self.tanggal_penggunaan,
                     'nominal_close': self.nominal_close * -1,
                 })
 
-                record.can_use_all_balance = False
+                journal_entry = self.env['account.move'].create({
+                    'company_id': record.company_id.id,
+                    'move_type': 'entry',
+                    'journal_id': journal_uang_jalan.id,
+                    'date': record.create_date,
+                    'ref': record.uang_jalan_name,
+                    'line_ids': [
+                        (0, 0, {
+                            'name': record.uang_jalan_name,
+                            'date': record.create_date,
+                            'account_id': account_kas.id,
+                            'company_id': record.company_id.id,
+                            'credit': self.nominal_close,
+                        }),
+
+                        (0, 0, {
+                            'name': record.uang_jalan_name,
+                            'date': record.create_date,
+                            'account_id': account_uang_jalan.id,
+                            'company_id': record.company_id.id,
+                            'debit': self.nominal_close,
+                        }),
+                    ],
+                })
+
+                journal_entry.action_post()
+
+            else:
+                if self.specific_order_pengiriman:
+                    self.env['uang.jalan.balance.history'].create({
+                        'uang_jalan_id': record.id,
+                        'company_id': record.company_id.id,
+                        'keterangan': "Penggunaan Saldo Uang Jalan Untuk " + str(self.order_pengiriman.order_pengiriman_name),
+                        'tanggal_pencatatan': self.tanggal_penggunaan,
+                        'nominal_close': self.nominal_close * -1,
+                    })
+                else:
+                    self.env['uang.jalan.balance.history'].create({
+                        'uang_jalan_id': record.id,
+                        'company_id': record.company_id.id,
+                        'keterangan': "Penggunaan Saldo Uang Jalan Untuk Seluruh Order Pengiriman",
+                        'tanggal_pencatatan': self.tanggal_penggunaan,
+                        'nominal_close': self.nominal_close * -1,
+                    })
+
+                    record.can_use_all_balance = False
 
