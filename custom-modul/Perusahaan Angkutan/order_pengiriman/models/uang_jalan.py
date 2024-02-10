@@ -196,6 +196,10 @@ class UangJalan(models.Model):
         return result
 
     def set_to_draft(self):
+        # Delete History Balance
+        for record in self.balance_history:
+            record.unlink()
+
         self.state = 'to_submit'
 
     def submit(self):
@@ -326,41 +330,87 @@ class UangJalan(models.Model):
         }
 
     def cancel(self):
-        uang_jalan_list = []
-        for rec in self.uang_jalan_line:
-            for uang_jalan in rec.sudo().order_pengiriman.uang_jalan:
-                if uang_jalan.id != self.id:
-                    uang_jalan_list.append((6, 0, [uang_jalan.id]))
-                else:
-                    pass
+        if self.state == 'to_submit' or self.state == 'submitted' or self.state == 'validated':
+            self.state = 'cancel'
+        else:
+            account_settings = self.env['konfigurasi.account.uang.jalan'].search([('company_id', '=', self.company_id.id)])
+            account_uang_jalan = account_settings.account_uang_jalan
+            journal_uang_jalan = account_settings.journal_uang_jalan
+            account_kas = account_settings.account_kas
 
-        if self.tipe_uang_jalan == 'standar':
-            for record in self.uang_jalan_line:
-                record.sudo().order_pengiriman.write({
-                    'is_uang_jalan_terbit': False,
-                    'state': 'order_baru',
-                    'uang_jalan': uang_jalan_list or None,
-                    'kendaraan': None,
-                    'sopir': None,
-                    'kenek': None,
-                    'nomor_kendaraan': None,
-                    'model_kendaraan': None,
+            uang_jalan_list = []
+            for rec in self.uang_jalan_line:
+                for uang_jalan in rec.sudo().order_pengiriman.uang_jalan:
+                    if uang_jalan.id != self.id:
+                        uang_jalan_list.append((6, 0, [uang_jalan.id]))
+                    else:
+                        pass
+
+            if self.tipe_uang_jalan == 'standar':
+                for record in self.uang_jalan_line:
+                    record.sudo().order_pengiriman.write({
+                        'is_uang_jalan_terbit': False,
+                        'state': 'order_baru',
+                        'uang_jalan': uang_jalan_list or None,
+                        'kendaraan': None,
+                        'sopir': None,
+                        'kenek': None,
+                        'nomor_kendaraan': None,
+                        'model_kendaraan': None,
+                    })
+
+                    message = "Uang jalan nomor " + str(self.uang_jalan_name) + " untuk pengiriman ini dibatalkan."
+                    record.sudo().order_pengiriman.message_post(body=message)
+
+            # Batalkan journal entry pembuatan advanced pihut (Jika ada)
+            if self.state == 'paid':
+                for record in self.env['account.move'].search([('ref', '=', str(self.uang_jalan_name))]):
+                    record.button_draft()
+                    record.button_cancel()
+
+            # Add Cancel Balance
+            uang_jalan_terpakai = 0
+            for history in self.balance_history:
+                if history.nominal_close < 0:
+                    uang_jalan_terpakai += history.nominal_close
+
+            if uang_jalan_terpakai < 0:
+                journal_entry = self.env['account.move'].create({
+                    'company_id': self.company_id.id,
+                    'move_type': 'entry',
+                    'journal_id': journal_uang_jalan.id,
+                    'date': self.create_date,
+                    'ref': self.uang_jalan_name,
+                    'line_ids': [
+                        (0, 0, {
+                            'name': self.uang_jalan_name,
+                            'date': self.create_date,
+                            'account_id': account_kas.id,
+                            'company_id': self.company_id.id,
+                            'credit': self.balance_uang_jalan,
+                        }),
+
+                        (0, 0, {
+                            'name': self.uang_jalan_name,
+                            'date': self.create_date,
+                            'account_id': account_uang_jalan.id,
+                            'company_id': self.company_id.id,
+                            'debit': self.balance_uang_jalan,
+                        }),
+                    ],
                 })
 
-                message = "Uang jalan nomor " + str(self.uang_jalan_name) + " untuk pengiriman ini dibatalkan."
-                record.sudo().order_pengiriman.message_post(body=message)
+                journal_entry.action_post()
 
-        # Batalkan journal entry pembuatan advanced pihut (Jika ada)
-        if self.state == 'paid':
-            for record in self.env['account.move'].search([('ref', '=', str(self.uang_jalan_name))]):
-                record.button_draft()
-                record.button_cancel()
+            self.env['uang.jalan.balance.history'].create({
+                'uang_jalan_id': self.id,
+                'company_id': self.company_id.id,
+                'keterangan': "Pembatalan Uang Jalan " + str(self.uang_jalan_name) + ". Sisa saldo otomatis dikembalikan ke " + str(journal_uang_jalan.name),
+                'tanggal_pencatatan': fields.Date.today(),
+                'nominal_close': self.balance_uang_jalan * -1,
+            })
 
-        # Delete History Balance
-        for record in self.balance_history:
-            record.unlink()
-
-        self.state = 'cancel'
+            self.state = 'cancel'
 
     def hitung_ulang_nominal_uj(self):
         for record in self.uang_jalan_line:

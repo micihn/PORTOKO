@@ -19,8 +19,8 @@
         <field name="arch" type="xml">
             <tree create="0" delete="0">
                 <field name="name" />
-                <field name="account_uang_jalan" string="Account Uang Jalan" optional="show"/>
                 <field name="journal_uang_jalan" string="Journal Uang Jalan" optional="show"/>
+                <field name="account_uang_jalan" string="Account Uang Jalan" optional="show"/>
                 <field name="account_kas" string="Account Cash/Bank" optional="show"/>
             </tree>
         </field>
@@ -34,8 +34,8 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="account_uang_jalan" string="Account Uang Jalan" />
                             <field name="journal_uang_jalan" string="Journal Uang Jalan" />
+                            <field name="account_uang_jalan" string="Account Uang Jalan" />
                             <field name="account_kas" string="Account Cash/Bank"/>
                         </group>
                     </group>
