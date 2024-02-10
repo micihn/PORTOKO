@@ -313,6 +313,13 @@ class AccountInvoicePayment(models.TransientModel):
                 })
                 journal_entry_total_pengeluaran.action_post()
 
+            # This will close uang jalan
+            for line in setoran.list_uang_jalan:
+                line.uang_jalan_name.order_disetor += 1
+
+                if line.uang_jalan_name.order_disetor == line.uang_jalan_name.lines_count:
+                    line.uang_jalan_name.state = 'closed'
+
             setoran.state = 'done'
 
 class AccountInvoicePaymentLine(models.TransientModel):

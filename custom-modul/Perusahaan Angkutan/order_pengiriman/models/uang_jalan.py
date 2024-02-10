@@ -20,6 +20,21 @@ class UangJalan(models.Model):
         'closed': [('readonly', True)],
     })
 
+    lines_count = fields.Integer(compute='compute_total_line')
+    order_disetor = fields.Integer()
+    can_use_all_balance = fields.Boolean(default=True)
+
+    @api.depends('uang_jalan_line', 'uang_jalan_nominal_tree')
+    def compute_total_line(self):
+        count = 0
+        for record in self.uang_jalan_line:
+            count += 1
+
+        for rec in self.uang_jalan_nominal_tree:
+            count += 1
+
+        self.lines_count = count
+
     uang_jalan_name = fields.Char(readonly=True, required=True, copy=False, default='New')
     kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', copy=True, ondelete='restrict', states={
         'to_submit': [('readonly', False)],
@@ -307,6 +322,7 @@ class UangJalan(models.Model):
             'view_mode': 'form',
             'target': 'new',
             'name': 'Catat Penggunaan Uang Jalan',
+            'context': {'default_can_use_all_balance_wizard': self.can_use_all_balance},
         }
 
     def cancel(self):

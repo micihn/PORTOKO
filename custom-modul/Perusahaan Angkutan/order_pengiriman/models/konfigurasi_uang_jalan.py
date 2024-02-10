@@ -14,10 +14,6 @@ class KonfigurasiUangJalan(models.Model):
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 
-    # rumus_solar = fields.Selection([
-    #     ('solar_dikali_harga', 'Kebutuhan Solar x Harga Per Liter'),
-    #     ('degressive', 'Degressive')],
-    #     string='Computation Method', required=True, default='linear')
 
     @api.model
     def create(self, vals):
@@ -76,11 +72,15 @@ class KonfigurasiUangJalan(models.Model):
     tonase = fields.Integer('Biaya Tonase', default=0)
     lain_lain = fields.Integer('Biaya Lain-lain', default=0)
     uang_jalan = fields.Float('Uang Jalan', compute='_calculate_uang_jalan')
+    pembagi_solar = fields.Float(digits=(6, 0), required=True, default=0)
 
-    @api.depends('jarak')
+    @api.depends('jarak', 'pembagi_solar')
     def _calculate_solar(self):
         for record in self:
-            record.solar = record.jarak / 2
+            if record.pembagi_solar != 0:
+                record.solar = record.jarak / record.pembagi_solar
+            else:
+                record.solar = record.solar
 
     @api.depends('jarak')
     def _calculate_uang_solar_per_liter(self):

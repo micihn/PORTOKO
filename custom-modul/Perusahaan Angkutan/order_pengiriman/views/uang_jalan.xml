@@ -66,6 +66,10 @@
                         <group>
                             <field name="create_date" />
                             <field name="keterangan" />
+                            <!-- Line dibawah ini untuk menghitung status closed-->
+                            <field name="can_use_all_balance" />
+                            <field name="lines_count" invisible="1"/>
+                            <field name="order_disetor" invisible="1"/>
                         </group>
                     </group>
 

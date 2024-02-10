@@ -158,7 +158,7 @@ class OrderPengiriman(models.Model):
         'sudah_setor': [('readonly', True)],
     })
 
-    uang_jalan = fields.Many2many('uang.jalan', string='No. Uang Jalan', readonly=False, store=True, copy=False, domain=[('state', '=', 'paid')], states={
+    uang_jalan = fields.Many2many('uang.jalan', string='No. Uang Jalan', readonly=False, store=True, copy=False, domain=[('state', 'in', ['paid', 'closed'])], states={
         'order_baru': [('readonly', False)],
         'dalam_perjalanan': [('readonly', False)],
         'selesai': [('readonly', True)],

@@ -7,7 +7,10 @@
                      <group>
                          <group>
                              <field name="tanggal_penggunaan" />
+                             <field name="specific_order_pengiriman" string="Catat Penggunaan UJ Untuk Order Pengiriman Tertentu" attrs="{'invisible': [('can_use_all_balance_wizard', '==', False)]}" />
+                             <field name="order_pengiriman" attrs="{'invisible': [('specific_order_pengiriman', '==', False)]}"/>
                              <field name="nominal_close" />
+                             <field name="can_use_all_balance_wizard" />
                          </group>
                      </group>
 

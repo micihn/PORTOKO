@@ -47,6 +47,7 @@
                                 <field name="lokasi_muat" />
                                 <field name="lokasi_bongkar" />
                                 <field name="jarak" />
+                                <field name="pembagi_solar" />
 
                             <separator string="Detail Biaya Tambahan" />
                                 <field name="kuli" />
