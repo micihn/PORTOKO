@@ -44,14 +44,6 @@ class ServiceFleetReport(models.TransientModel):
             }
             service_list.append(service_dictionary)
 
-            # print(record.service_type_id.name)
-            # print(record.date)
-            # print(record.product_id.default_code) # False Potential
-            # print(record.product_id.name) # False Potential
-            # print(record.product_qty)
-            # print(record.amount)
-            # print(record.total_amount)
-
         data = {'tanggal_start': self.tanggal_start.strftime('%d-%m-%Y'),
                 'tanggal_finish': self.tanggal_finish.strftime('%d-%m-%Y'),
                 'kendaraan': self.kendaraan.name,

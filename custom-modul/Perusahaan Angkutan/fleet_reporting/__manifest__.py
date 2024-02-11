@@ -10,6 +10,7 @@
     'category': 'Fleet',
     'website': 'https://www.altelasoftware.com',
     'depends': [
+        'order_setoran',
         'fleet',
         'hr_fleet',
         'stock',
@@ -22,6 +23,9 @@
         'views/fleet_configuration_service.xml',
         'views/stock_picking.xml',
         'wizard/service_fleet_report.xml',
+        'wizard/fleet_pendapatan.xml',
+        'report/report_fleet_pendapatan.xml',
+        'report/report_fleet_pendapatan_action.xml',
         'report/report_service_fleet.xml',
         'report/report_service_fleet_action.xml',
         'views/menu.xml',

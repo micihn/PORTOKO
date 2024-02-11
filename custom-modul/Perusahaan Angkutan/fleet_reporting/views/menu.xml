@@ -8,6 +8,14 @@
       parent="fleet.menu_fleet_reporting">
     </menuitem>
 
+    <menuitem id="menu_pendapatan_per_truck"
+      groups="fleet.fleet_group_manager"
+      sequence="1"
+      name="Pendapatan Per Truck"
+      action="action_fleet_pendapatan"
+      parent="fleet.menu_fleet_reporting">
+    </menuitem>
+
     <menuitem id="menu_service_configuration"
       groups="fleet.fleet_group_manager"
       sequence="20"
