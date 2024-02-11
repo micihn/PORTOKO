@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <tree string="Konfigurasi Tipe Muatan" editable="bottom">
                 <field name="tipe_muatan" optional="show"/>
+                <field name="pembagi_solar" optional="show"/>
             </tree>
         </field>
     </record>

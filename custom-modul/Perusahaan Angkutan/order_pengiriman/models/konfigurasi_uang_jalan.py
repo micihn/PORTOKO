@@ -72,13 +72,12 @@ class KonfigurasiUangJalan(models.Model):
     tonase = fields.Integer('Biaya Tonase', default=0)
     lain_lain = fields.Integer('Biaya Lain-lain', default=0)
     uang_jalan = fields.Float('Uang Jalan', compute='_calculate_uang_jalan')
-    pembagi_solar = fields.Float(digits=(6, 0), required=True, default=0)
 
-    @api.depends('jarak', 'pembagi_solar')
+    @api.depends('jarak', 'tipe_muatan')
     def _calculate_solar(self):
         for record in self:
-            if record.pembagi_solar != 0:
-                record.solar = record.jarak / record.pembagi_solar
+            if record.tipe_muatan.pembagi_solar != 0:
+                record.solar = record.jarak / record.tipe_muatan.pembagi_solar
             else:
                 record.solar = record.solar
 
