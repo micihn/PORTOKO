@@ -4,7 +4,9 @@ class FleetPendapatan(models.TransientModel):
     _name = 'fleet.pendapatan'
     _description = 'Pendapatan Per Truck Wizard'
 
-    kendaraan = fields.Many2one('fleet.vehicle')
+    kendaraan_many = fields.Many2many('fleet.vehicle')
+    nopol_start = fields.Char()
+    nopol_finish = fields.Char()
     tanggal_start = fields.Date()
     tanggal_finish = fields.Date()
     order_setoran = fields.Many2many('order.setoran')
@@ -41,12 +43,25 @@ class FleetPendapatan(models.TransientModel):
                 kendaraan_list.append(record.kendaraan.id)
 
         for kendaraan in kendaraan_list:
+            # Set initial variable untuk tiap fields
             hasil_jasa = 0
             pengeluaran = 0
             pembelian = 0
             biaya_fee = 0
             komisi = 0
             total_jumlah = 0
+            sparepart = 0
+
+            sparepart_service = self.env['fleet.vehicle.log.services'].search([
+                ('vehicle_id','=', kendaraan),
+                ('date', '>=', self.tanggal_start),
+                ('date', '<=', self.tanggal_finish),
+                ('state_record', '=', 'selesai'),
+            ])
+
+            for item in sparepart_service:
+                sparepart += sparepart_service.total_amount
+
             for record in self.order_setoran:
                 if kendaraan == record.kendaraan.id:
                     nomor_polisi = record.kendaraan.license_plate
@@ -55,7 +70,8 @@ class FleetPendapatan(models.TransientModel):
                     pembelian += record.total_pembelian
                     biaya_fee += record.total_biaya_fee
                     komisi += record.komisi_kenek + record.komisi_sopir
-                    total_jumlah = hasil_jasa - (pengeluaran + pembelian + biaya_fee + komisi)
+                    spare_part = sparepart
+                    total_jumlah = hasil_jasa - (pengeluaran + pembelian + biaya_fee + komisi + spare_part)
 
             setoran_dictionary = {
                 'nomor_polisi': nomor_polisi,
@@ -64,6 +80,7 @@ class FleetPendapatan(models.TransientModel):
                 'pembelian': pembelian,
                 'biaya_fee': biaya_fee,
                 'komisi': komisi,
+                'spare_part': sparepart,
                 'total_jumlah': total_jumlah,
             }
 

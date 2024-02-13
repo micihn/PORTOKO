@@ -9,7 +9,9 @@
                     <field name="semua_kendaraan"/>
                     <field name="urutkan_kendaraan"/>
                     <field name="cetak_rincian"/>
-                    <field name="kendaraan" attrs="{'invisible': [('semua_kendaraan', '==', True)]}"/>
+                    <field name="kendaraan_many" widget="many2many_tags" />
+                    <field name="nopol_start" />
+                    <field name="nopol_finish" />
                     <field name="tanggal_start"/>
                     <field name="tanggal_finish"/>
                     <field name="order_setoran" invisible="0"/>

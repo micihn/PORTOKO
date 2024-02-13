@@ -3,7 +3,8 @@
     <data>
         <template id="report_fleet_pendapatan">
                 <t t-call="web.html_container">
-                    <t t-call="web.internal_layout">
+                    <page>
+                        <t t-call="web.internal_layout">
                         <style type="text/css">
                         .default-font {
                         font-family: Lato, sans-serif;
@@ -51,12 +52,12 @@
                     </style>
 
                         <div class="default-font-size bottom-spacing">
-                            Laporan Pemakaian Per-Truck
+                            Laporan Pendapatan Kendaraan
                         </div>
 
                         <div class="default-font-size bottom-spacing-extra">
                             <t t-if="tanggal_start and tanggal_finish">
-                                Tanggal
+                                Tanggal :
                                 <t t-esc="tanggal_start"/>
                                 -
                                 <t t-esc="tanggal_finish"/>
@@ -74,78 +75,245 @@
                                     <th style="text-align:left;">Pembelian</th>
                                     <th style="text-align:right;">Biaya Fee</th>
                                     <th style="text-align:right;">Komisi</th>
+                                    <th style="text-align:right;">Sparepart &#38; Service</th>
                                     <th style="text-align:right;">Jumlah</th>
                                 </tr>
                             </thead>
                             <tbody style="text-align:left">
-                                <tr t-foreach='setoran_list' t-as='setoran' class="default-tablefont-size">
+                                <t t-set="total_hasil_jasa" t-value="0" />
+                                <t t-set="total_pengeluaran" t-value="0" />
+                                <t t-set="total_pembelian" t-value="0" />
+                                <t t-set="total_biaya_fee" t-value="0" />
+                                <t t-set="total_komisi" t-value="0" />
+                                <t t-set="total_service" t-value="0" />
+                                <t t-set="total_jumlah_akhir" t-value="0" />
+
+                                <tr t-foreach='setoran_list' t-as='setoran' style="font-weight:bold" class="default-tablefont-size">
                                     <td style="text-align:left;">
                                         <t t-esc="setoran['nomor_polisi']"/>
                                     </td>
-                                    <td style="text-align:left;">
+                                    <td style="text-align:center;">
                                         <t t-esc="'{:,}'.format(int(setoran['hasil_jasa']))"/>
+                                        <t t-set="total_hasil_jasa" t-value="total_hasil_jasa + int(setoran['hasil_jasa'])" />
                                     </td>
-                                    <td style="text-align:left;">
+                                    <td style="text-align:center;">
                                         <t t-esc="'{:,}'.format(int(setoran['pengeluaran']))"/>
+                                        <t t-set="total_pengeluaran" t-value="total_pengeluaran + int(setoran['pengeluaran'])" />
                                     </td>
-                                    <td style="text-align:left;">
+                                    <td style="text-align:center;">
                                         <t t-esc="'{:,}'.format(int(setoran['pembelian']))"/>
+                                        <t t-set="total_pembelian" t-value="total_pembelian + int(setoran['pembelian'])" />
                                     </td>
-                                    <td style="text-align:right;">
+                                    <td style="text-align:center;">
                                         <t t-esc="'{:,}'.format(int(setoran['biaya_fee']))"/>
+                                        <t t-set="total_biaya_fee" t-value="total_biaya_fee + int(setoran['biaya_fee'])" />
                                     </td>
-                                    <td style="text-align:right;">
+                                    <td style="text-align:center;">
                                         <t t-esc="'{:,}'.format(int(setoran['komisi']))"/>
+                                        <t t-set="total_komisi" t-value="total_komisi + int(setoran['komisi'])" />
                                     </td>
-                                    <td style="text-align:right;">
+                                    <td style="text-align:center;">
+                                        <t t-esc="'{:,}'.format(int(setoran['spare_part']))"/>
+                                        <t t-set="total_service" t-value="total_service + int(setoran['spare_part'])" />
+                                    </td>
+                                    <td style="text-align:center;">
                                         <t t-esc="'{:,}'.format(int(setoran['total_jumlah']))"/>
-<!--                                        <t t-set="pengeluaran_sparepart" t-value="pengeluaran_sparepart + float(setoran['total_amount'])"/>-->
+                                        <t t-set="total_jumlah_akhir" t-value="total_jumlah_akhir + int(setoran['total_jumlah'])" />
                                     </td>
                                 </tr>
                             </tbody>
 
-<!--                            <tbody style="text-align:left" class="default-tablefont-size">-->
-<!--                                <tr t-foreach='services' t-as='service'>-->
-<!--                                    <t t-if="service['service_category'] == 'service' ">-->
-<!--                                        <td>-->
-<!--                                        </td>-->
-<!--                                        <td style="text-align:left;">-->
-<!--                                            <t t-esc="service['date']"/>-->
-<!--                                        </td>-->
-<!--                                        <td>-->
-<!--                                        </td>-->
-<!--                                        <td style="text-align:left;">-->
-<!--                                            <t t-esc="service['description']"/>-->
-<!--                                        </td>-->
-<!--                                        <td>-->
-
-<!--                                        </td>-->
-<!--                                        <td>-->
-
-<!--                                        </td>-->
-<!--                                        <td style="text-align:right;">-->
-<!--                                            <t t-esc="'{:,}'.format(int(service['total_amount']))"/>-->
-<!--                                            <t t-set="pengeluaran_service" t-value="pengeluaran_service + float(service['total_amount'])"/>-->
-<!--                                        </td>-->
-<!--                                    </t>-->
-<!--                                </tr>-->
-<!--                                <t t-if="service['service_category'] == 'service' ">-->
-<!--                                    <tr class="default-tablefont-size " style="border-top: 1px solid #000;">-->
-<!--                                        <td></td>-->
-<!--                                        <td></td>-->
-<!--                                        <td></td>-->
-<!--                                        <td></td>-->
-<!--                                        <td></td>-->
-<!--                                        <td>Total :</td>-->
-<!--                                        <td style="text-align:right;">-->
-<!--                                            <t t-esc="'{:,}'.format(int(pengeluaran_service))"/>-->
-<!--                                        </td>-->
-<!--                                    </tr>-->
-<!--                                </t>-->
-<!--                            </tbody>-->
+                            <tbody class="default-tablefont-size">
+                                <td style="text-align:left;">
+                                    Total
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_hasil_jasa" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_pengeluaran" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_pembelian" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_biaya_fee" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_komisi" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_service" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_jumlah_akhir" />
+                                </td>
+                            </tbody>
                         </table>
 
                     </t>
+                    </page>
+
+                    <page>
+                        <t t-call="web.internal_layout">
+                        <style type="text/css">
+                        .default-font {
+                        font-family: Lato, sans-serif;
+                        }
+
+                        .default-font-size{
+                        font-size:14px
+                        }
+
+                        .default-tablefont-size{
+                        font-size:13px
+                        }
+
+                        .bottom-spacing{
+                        margin-bottom: 4px;
+                        }
+
+                        .bottom-spacing-extra{
+                        margin-bottom: 12px;
+                        }
+
+                        .custom-table th {
+                        border-top: 1px solid #000; /* Adjust color and width as needed */
+                        border-bottom: 1px solid #000; /* Adjust color and width as needed */
+                        }
+
+                        .custom-table {
+                        --bs-table-bg: transparent;
+                        --bs-table-accent-bg: transparent;
+                        --bs-table-striped-color: #212529;
+                        --bs-table-striped-bg: rgba(0, 0, 0, 0.05);
+                        --bs-table-active-color: #212529;
+                        --bs-table-active-bg: rgba(0, 0, 0, 0.1);
+                        --bs-table-hover-color: #212529;
+                        --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
+                        width: 100%;
+                        color: #212529;
+                        vertical-align: middle;
+                        border-color: #ffffff;
+                        }
+
+                        .custom-table-sm > :not(caption) > * > * {
+                        padding: 0.4rem 0.4rem;
+                        }
+                    </style>
+
+                        <div class="default-font-size bottom-spacing">
+                            Laporan Pendapatan Kendaraan Rincian
+                        </div>
+
+                        <div class="default-font-size bottom-spacing-extra">
+                            <t t-if="tanggal_start and tanggal_finish">
+                                Tanggal :
+                                <t t-esc="tanggal_start"/>
+                                -
+                                <t t-esc="tanggal_finish"/>
+                            </t>
+                        </div>
+
+                        <div class="default-font-size bottom-spacing-extra">
+                            <t t-if="tanggal_start and tanggal_finish">
+                                Tanggal :
+                                <t t-esc="tanggal_start"/>
+                                -
+                                <t t-esc="tanggal_finish"/>
+                            </t>
+                        </div>
+
+                        <t t-set="pengeluaran_sparepart" t-value="0"/>
+                        <t t-set="pengeluaran_service" t-value="0"/>
+                        <table class="custom-table custom-table-sm">
+                            <thead style="ext-align:left" class="default-tablefont-size">
+                                <tr>
+                                    <th style="text-align:left;">No Polisi</th>
+                                    <th style="text-align:left;">Hasil Jasa</th>
+                                    <th style="text-align:left;">Pengeluaran</th>
+                                    <th style="text-align:left;">Pembelian</th>
+                                    <th style="text-align:right;">Biaya Fee</th>
+                                    <th style="text-align:right;">Komisi</th>
+                                    <th style="text-align:right;">Sparepart &#38; Service</th>
+                                    <th style="text-align:right;">Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody style="text-align:left">
+                                <t t-set="total_hasil_jasa" t-value="0" />
+                                <t t-set="total_pengeluaran" t-value="0" />
+                                <t t-set="total_pembelian" t-value="0" />
+                                <t t-set="total_biaya_fee" t-value="0" />
+                                <t t-set="total_komisi" t-value="0" />
+                                <t t-set="total_service" t-value="0" />
+                                <t t-set="total_jumlah_akhir" t-value="0" />
+
+                                <tr t-foreach='setoran_list' t-as='setoran' style="font-weight:bold" class="default-tablefont-size">
+                                    <td style="text-align:left;">
+                                        <t t-esc="setoran['nomor_polisi']"/>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <t t-esc="'{:,}'.format(int(setoran['hasil_jasa']))"/>
+                                        <t t-set="total_hasil_jasa" t-value="total_hasil_jasa + int(setoran['hasil_jasa'])" />
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <t t-esc="'{:,}'.format(int(setoran['pengeluaran']))"/>
+                                        <t t-set="total_pengeluaran" t-value="total_pengeluaran + int(setoran['pengeluaran'])" />
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <t t-esc="'{:,}'.format(int(setoran['pembelian']))"/>
+                                        <t t-set="total_pembelian" t-value="total_pembelian + int(setoran['pembelian'])" />
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <t t-esc="'{:,}'.format(int(setoran['biaya_fee']))"/>
+                                        <t t-set="total_biaya_fee" t-value="total_biaya_fee + int(setoran['biaya_fee'])" />
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <t t-esc="'{:,}'.format(int(setoran['komisi']))"/>
+                                        <t t-set="total_komisi" t-value="total_komisi + int(setoran['komisi'])" />
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <t t-esc="'{:,}'.format(int(setoran['spare_part']))"/>
+                                        <t t-set="total_service" t-value="total_service + int(setoran['spare_part'])" />
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <t t-esc="'{:,}'.format(int(setoran['total_jumlah']))"/>
+                                        <t t-set="total_jumlah_akhir" t-value="total_jumlah_akhir + int(setoran['total_jumlah'])" />
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                            <tbody class="default-tablefont-size">
+                                <td style="text-align:left;">
+                                    Total
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_hasil_jasa" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_pengeluaran" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_pembelian" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_biaya_fee" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_komisi" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_service" />
+                                </td>
+                               <td style="text-align:center;">
+                                    <t t-esc="total_jumlah_akhir" />
+                                </td>
+                            </tbody>
+                        </table>
+
+                    </t>
+                    </page>
+
                 </t>
         </template>
     </data>
