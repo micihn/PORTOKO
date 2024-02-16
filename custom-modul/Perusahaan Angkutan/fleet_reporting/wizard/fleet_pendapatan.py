@@ -1,4 +1,5 @@
 from odoo import api, fields, models
+from datetime import datetime
 
 class FleetPendapatan(models.TransientModel):
     _name = 'fleet.pendapatan'
@@ -46,12 +47,10 @@ class FleetPendapatan(models.TransientModel):
         else:
             self.order_setoran = [(5, 0, 0)]
 
-
     def generate_report_pendapatan(self):
-        # pendapatan_list = []
-
         kendaraan_list = []
         setoran_list = []
+        sparepart_rincian = 0
         for record in self.order_setoran:
             if record.kendaraan.id not in kendaraan_list:
                 kendaraan_list.append(record.kendaraan.id)
@@ -75,6 +74,7 @@ class FleetPendapatan(models.TransientModel):
 
             for item in sparepart_service:
                 sparepart += sparepart_service.total_amount
+                sparepart_rincian += sparepart_service.total_amount
 
             for record in self.order_setoran:
                 if kendaraan == record.kendaraan.id:
@@ -102,18 +102,59 @@ class FleetPendapatan(models.TransientModel):
 
         sorted_setoran_list = sorted(setoran_list, key=lambda x: x['nomor_polisi'])
 
-        data = {'tanggal_start': self.tanggal_start.strftime('%d-%m-%Y'),
-                'tanggal_finish': self.tanggal_finish.strftime('%d-%m-%Y'),
+        data = {'tanggal_start': self.tanggal_start.strftime('%d/%m/%Y'),
+                'tanggal_finish': self.tanggal_finish.strftime('%d/%m/%Y'),
                 'setoran_list': setoran_list,
                 }
 
-        data_sorted = {'tanggal_start': self.tanggal_start.strftime('%d-%m-%Y'),
-                'tanggal_finish': self.tanggal_finish.strftime('%d-%m-%Y'),
+        data_sorted = {'tanggal_start': self.tanggal_start.strftime('%d/%m/%Y'),
+                'tanggal_finish': self.tanggal_finish.strftime('%d/%m/%Y'),
                 'setoran_list': sorted_setoran_list,
                 }
 
         if bool(data_sorted):
-            return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data_sorted)
-        else:
-            return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data)
+            if self.cetak_rincian:
+                rincian_list = []
+                for setor in self.order_setoran:
+                    rincian = {
+                        'tanggal': setor.tanggal_st.strftime('%d/%m/%Y'),
+                        'nomor_setoran': setor.kode_order_setoran,
+                        'hasil': setor.total_jumlah,
+                        'pengeluaran': setor.total_pengeluaran,
+                        'pembelian': setor.total_pembelian,
+                        'biaya_fee': setor.total_biaya_fee,
+                        'komisi': setor.komisi_kenek + setor.komisi_sopir,
+                        'jumlah': setor.total_jumlah - setor.total_pengeluaran - setor.total_pembelian - setor.total_biaya_fee - (setor.komisi_kenek + setor.komisi_sopir)
+                    }
 
+                    rincian_list.append(rincian)
+
+                data_sorted['rincian'] = rincian_list
+                data_sorted['sparepart_rincian'] = sparepart_rincian
+
+                return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data_sorted)
+            else:
+                return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data_sorted)
+        else:
+            if self.cetak_rincian:
+                rincian_list = []
+                for setor in self.order_setoran:
+                    rincian = {
+                        'tanggal': setor.tanggal_st.strftime('%d/%m/%Y'),
+                        'nomor_setoran': setor.kode_order_setoran,
+                        'hasil': setor.total_jumlah,
+                        'pengeluaran': setor.total_pengeluaran,
+                        'pembelian': setor.total_pembelian,
+                        'biaya_fee': setor.total_biaya_fee,
+                        'komisi': setor.komisi_kenek + setor.komisi_sopir,
+                        'jumlah': setor.total_jumlah - setor.total_pengeluaran - setor.total_pembelian - setor.total_biaya_fee - (setor.komisi_kenek + setor.komisi_sopir)
+                    }
+
+                    rincian_list.append(rincian)
+
+                data['rincian'] = rincian_list
+                data['sparepart_rincian'] = sparepart_rincian
+
+                return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data)
+            else:
+                return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data)
