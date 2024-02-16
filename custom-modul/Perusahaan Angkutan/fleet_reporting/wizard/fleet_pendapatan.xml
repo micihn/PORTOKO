@@ -12,7 +12,7 @@
                     <field name="kendaraan_many" string="Kendaraan" widget="many2many_tags" attrs="{'invisible': [('semua_kendaraan', '==', True)]}"/>
                     <field name="tanggal_start"/>
                     <field name="tanggal_finish"/>
-                    <field name="order_setoran" invisible="0"/>
+                    <field name="order_setoran" invisible="1"/>
                 </group>
                 <footer>
                     <button name="generate_report_pendapatan" string="Print" type="object" class="btn-primary" data-hotkey="q"/>
@@ -23,7 +23,7 @@
     </record>
 
     <record id="action_fleet_pendapatan" model="ir.actions.act_window">
-        <field name="name">Pendapatan Per Truck</field>
+        <field name="name">Pendapatan Per Kendaraan</field>
         <field name="res_model">fleet.pendapatan</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
