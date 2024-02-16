@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="uang_jalan_gantung_report" model="ir.ui.view">
+        <field name="name">uang.jalan.gantung.report</field>
+        <field name="model">uang.jalan.gantung</field>
+        <field name="arch" type="xml">
+            <form string="Uang Jalan Gantung">
+                <group>
+                    <field name="tanggal_start"/>
+                    <field name="tanggal_finish"/>
+                    <field name="uang_jalan_tree" invisible="0"/>
+                </group>
+                <footer>
+                    <button name="generate_report" string="Print" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="report_uang_jalan_gantung_act" model="ir.actions.act_window">
+        <field name="name">Report Uang Jalan Gantung</field>
+        <field name="res_model">uang.jalan.gantung</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

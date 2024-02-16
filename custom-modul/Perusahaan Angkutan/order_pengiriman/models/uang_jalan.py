@@ -120,7 +120,7 @@ class UangJalan(models.Model):
         ('cancel', "Cancelled"),
     ], default='to_submit', string="State", hide=True, tracking=True)
 
-    balance_uang_jalan = fields.Float('Saldo Uang Jalan Tersisa', compute="compute_nominal_close_accumulation" ,default=0, digits=(6, 0))
+    balance_uang_jalan = fields.Float('Saldo Uang Jalan Tersisa', compute="compute_nominal_close_accumulation" ,default=0, digits=(6, 0), store=True)
     balance_history = fields.One2many('uang.jalan.balance.history', 'uang_jalan_id', copy=False, readonly=True)
 
     @api.depends('balance_history')
