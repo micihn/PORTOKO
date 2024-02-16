@@ -29,7 +29,7 @@ class ServiceFleetReport(models.TransientModel):
             self.services = [(5, 0, 0)]
 
     def generate_report(self):
-        service_list = []
+        service_list_unsorted = []
         for record in self.services:
             service_dictionary = {
                 'service_category': record.service_type_id.category,
@@ -42,7 +42,9 @@ class ServiceFleetReport(models.TransientModel):
                 'amount': record.amount,
                 'total_amount': record.total_amount,
             }
-            service_list.append(service_dictionary)
+            service_list_unsorted.append(service_dictionary)
+
+        service_list = sorted(service_list_unsorted, key=lambda x: x['date'], reverse=True)
 
         data = {'tanggal_start': self.tanggal_start.strftime('%d-%m-%Y'),
                 'tanggal_finish': self.tanggal_finish.strftime('%d-%m-%Y'),

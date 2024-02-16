@@ -35,6 +35,7 @@ class UangJalanGantung(models.TransientModel):
             'tanggal_uj': record.create_date,
             'nominal': record.balance_uang_jalan,
             }
+
             uj_list_unsorted.append(uj_dictionary)
 
         uj_list = sorted(uj_list_unsorted, key=lambda x: x['tanggal_uj'], reverse=True)
