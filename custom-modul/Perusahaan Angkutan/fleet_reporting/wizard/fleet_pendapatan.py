@@ -5,8 +5,6 @@ class FleetPendapatan(models.TransientModel):
     _description = 'Pendapatan Per Truck Wizard'
 
     kendaraan_many = fields.Many2many('fleet.vehicle')
-    nopol_start = fields.Char()
-    nopol_finish = fields.Char()
     tanggal_start = fields.Date()
     tanggal_finish = fields.Date()
     order_setoran = fields.Many2many('order.setoran')
@@ -14,7 +12,7 @@ class FleetPendapatan(models.TransientModel):
     urutkan_kendaraan = fields.Boolean()
     cetak_rincian = fields.Boolean()
 
-    @api.onchange('semua_kendaraan', 'tanggal_start', 'tanggal_finish')
+    @api.onchange('semua_kendaraan', 'tanggal_start', 'tanggal_finish', 'kendaraan_many')
     def _onchange_filters(self):
         # Cari Semua Kendaraan
         if self.semua_kendaraan and self.tanggal_start and self.tanggal_finish:
@@ -29,9 +27,25 @@ class FleetPendapatan(models.TransientModel):
             else:
                 # Clear the services field if no records are found
                 self.order_setoran = [(5, 0, 0)]
-        else:
-            # Clear the services field if any of the required fields is not set
+
+        elif self.kendaraan_many and self.tanggal_start and self.tanggal_finish:
             self.order_setoran = [(5, 0, 0)]
+
+            order_setoran = self.env['order.setoran'].search([
+                ('tanggal_st', '>=', self.tanggal_start),
+                ('tanggal_st', '<=', self.tanggal_finish),
+                ('state', '=', 'done'),
+            ])
+
+            if order_setoran:
+                ids = []
+                for rec in order_setoran:
+                    if rec.kendaraan.id in self.kendaraan_many.ids:
+                        ids.append((4, rec.id))
+                self.order_setoran = ids
+        else:
+            self.order_setoran = [(5, 0, 0)]
+
 
     def generate_report_pendapatan(self):
         # pendapatan_list = []
@@ -86,9 +100,20 @@ class FleetPendapatan(models.TransientModel):
 
             setoran_list.append(setoran_dictionary)
 
+        sorted_setoran_list = sorted(setoran_list, key=lambda x: x['nomor_polisi'])
+
         data = {'tanggal_start': self.tanggal_start.strftime('%d-%m-%Y'),
                 'tanggal_finish': self.tanggal_finish.strftime('%d-%m-%Y'),
                 'setoran_list': setoran_list,
                 }
-        return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data)
+
+        data_sorted = {'tanggal_start': self.tanggal_start.strftime('%d-%m-%Y'),
+                'tanggal_finish': self.tanggal_finish.strftime('%d-%m-%Y'),
+                'setoran_list': sorted_setoran_list,
+                }
+
+        if bool(data_sorted):
+            return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data_sorted)
+        else:
+            return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data)
 
