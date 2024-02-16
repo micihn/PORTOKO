@@ -9,7 +9,7 @@
                 <group>
                     <field name="tanggal_start"/>
                     <field name="tanggal_finish"/>
-                    <field name="uang_jalan_tree" invisible="0"/>
+                    <field name="uang_jalan_tree" invisible="1"/>
                 </group>
                 <footer>
                     <button name="generate_report" string="Print" type="object" class="btn-primary" data-hotkey="q"/>
