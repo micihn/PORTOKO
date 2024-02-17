@@ -61,6 +61,10 @@ class CloseUangJalan(models.TransientModel):
 
                 journal_entry.action_post()
 
+                record.kendaraan.kas_gantung_vehicle -= self.nominal_close
+
+                record.state = 'closed'
+
             else:
                 if self.specific_order_pengiriman:
                     self.env['uang.jalan.balance.history'].create({
@@ -80,4 +84,8 @@ class CloseUangJalan(models.TransientModel):
                     })
 
                 record.can_use_all_balance = False
+
+                record.kendaraan.kas_gantung_vehicle -= self.nominal_close
+
+                record.state = 'closed'
 

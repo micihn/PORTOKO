@@ -380,6 +380,9 @@ class UangJalan(models.Model):
                     record.button_draft()
                     record.button_cancel()
 
+            # Deakumulasi kas gantung kepada kendaraan
+            self.kendaraan.kas_gantung_vehicle -= self.balance_uang_jalan
+
             # Add Cancel Balance
             uang_jalan_terpakai = 0
             for history in self.balance_history:
@@ -421,9 +424,6 @@ class UangJalan(models.Model):
                 'tanggal_pencatatan': fields.Date.today(),
                 'nominal_close': self.balance_uang_jalan * -1,
             })
-
-            # Deakumulasi kas gantung kepada kendaraan
-            self.kendaraan.kas_gantung_vehicle -= self.balance_uang_jalan
 
             self.state = 'cancel'
 
