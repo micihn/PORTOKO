@@ -18,7 +18,7 @@
         <field name="arch" type="xml">
             <tree default_order="kode_order_setoran desc">
                 <field name="kode_order_setoran" string="No. Setoran" optional="show"/>
-                <field name="kendaraan" string="Tanggal" optional="show"/>
+                <field name="kendaraan" string="Kendaraan" optional="show"/>
                 <field name="sopir" optional="show"/>
                 <field name="kenek" optional="show"/>
                 <field name="tanggal_st" string="Tanggal ST" optional="show"/>

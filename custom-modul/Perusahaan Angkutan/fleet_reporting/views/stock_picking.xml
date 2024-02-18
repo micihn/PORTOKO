@@ -21,15 +21,15 @@
 
                 <div class="oe_right">
                     <!-- Total Jumlah -->
-                    <div style="display: flex; justify-content: space-between;" attrs="{'invisible': [('is_permintaan_barang','!=', True)]}">
-                        <label for="nominal_permintaan" string="Total" class="oe_edit_only"/>
+                    <div style="display: flex; justify-content: space-between; text-align:left; margin-bottom: 10px;" attrs="{'invisible': [('is_permintaan_barang','!=', True)]}">
+                        <div style="margin-right: 20px;">
+                            <label for="nominal_permintaan" string="Total" class="oe_edit_only"/>
+                        </div>
 
                         <div class="oe_total_field" style="margin-left: auto;">
                             <field name="nominal_permintaan" style="text-align: right;" string="Total"/>
                         </div>
-
                     </div>
-
                 </div>
                 </xpath>
 

@@ -7,3 +7,4 @@ class KonfigurasiTipeMuatan(models.Model):
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     tipe_muatan = fields.Char('Tipe Muatan')
+    pembagi_solar = fields.Float(digits=(6, 0), required=True, default=0)

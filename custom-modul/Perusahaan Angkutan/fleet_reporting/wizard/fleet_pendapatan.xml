@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="fleet_pendapatan_report" model="ir.ui.view">
+        <field name="name">fleet.pendapatan.report.form</field>
+        <field name="model">fleet.pendapatan</field>
+        <field name="arch" type="xml">
+            <form string="Fleet Pendapatan">
+                <group>
+                    <field name="semua_kendaraan"/>
+                    <field name="urutkan_kendaraan"/>
+                    <field name="cetak_rincian"/>
+                    <field name="kendaraan_many" string="Kendaraan" widget="many2many_tags" attrs="{'invisible': [('semua_kendaraan', '==', True)]}"/>
+                    <field name="tanggal_start"/>
+                    <field name="tanggal_finish"/>
+                    <field name="order_setoran" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="generate_report_pendapatan" string="Print" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fleet_pendapatan" model="ir.actions.act_window">
+        <field name="name">Pendapatan Per Kendaraan</field>
+        <field name="res_model">fleet.pendapatan</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

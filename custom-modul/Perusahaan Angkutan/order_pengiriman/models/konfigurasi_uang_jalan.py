@@ -14,6 +14,7 @@ class KonfigurasiUangJalan(models.Model):
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 
+
     @api.model
     def create(self, vals):
         existing_record = self.search([
@@ -72,10 +73,13 @@ class KonfigurasiUangJalan(models.Model):
     lain_lain = fields.Integer('Biaya Lain-lain', default=0)
     uang_jalan = fields.Float('Uang Jalan', compute='_calculate_uang_jalan')
 
-    @api.depends('jarak')
+    @api.depends('jarak', 'tipe_muatan')
     def _calculate_solar(self):
         for record in self:
-            record.solar = record.jarak / 2
+            if record.tipe_muatan.pembagi_solar != 0:
+                record.solar = record.jarak / record.tipe_muatan.pembagi_solar
+            else:
+                record.solar = record.solar
 
     @api.depends('jarak')
     def _calculate_uang_solar_per_liter(self):

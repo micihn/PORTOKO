@@ -254,6 +254,16 @@ class OrderSetoran(models.Model):
                 record.button_draft()
                 record.button_cancel()
 
+        # This will close uang jalan
+        try:
+            for line in self.list_uang_jalan:
+                line.uang_jalan_name.order_disetor -= 1
+
+                if line.uang_jalan_name.order_disetor != line.uang_jalan_name.lines_count:
+                    line.uang_jalan_name.state = 'paid'
+        except:
+            pass
+
         self.state = 'cancel'
 
     def set_to_draft(self):
@@ -262,12 +272,14 @@ class OrderSetoran(models.Model):
     @api.depends('sisa', 'komisi_kenek_percentage')
     def _compute_komisi_kenek(self):
         for record in self:
-            record.komisi_kenek = (record.komisi_kenek_percentage * record.sisa) / 100
+            komisi_kenek = (record.komisi_kenek_percentage * record.sisa) / 100
+            record.komisi_kenek = round(komisi_kenek / 1000) * 1000
 
     @api.depends('sisa', 'komisi_sopir_percentage')
     def _compute_komisi_sopir(self):
         for record in self:
-            record.komisi_sopir = (record.komisi_sopir_percentage * record.sisa) / 100
+            komisi_sopir = (record.komisi_sopir_percentage * record.sisa) / 100
+            record.komisi_sopir = round(komisi_sopir / 1000) * 1000
 
     @api.depends('total_ongkos_calculated', 'total_pengeluaran', 'total_pembelian', 'total_biaya_fee')
     def _calculate_sisa(self):
@@ -356,10 +368,19 @@ class OrderSetoran(models.Model):
 
             for uang_jalan in record.uang_jalan:
                 if uang_jalan.id not in record_uang_jalan:
+                    balance_spend = 0
+                    for balance in uang_jalan.balance_history:
+                        if str(record.order_pengiriman_name) in balance.keterangan:
+                            balance_spend += balance.nominal_close
+                        elif balance.keterangan == 'Penggunaan Saldo Uang Jalan Untuk Seluruh Order Pengiriman':
+                            balance_spend += balance.nominal_close
+                        elif balance.keterangan == 'Penggunaan Saldo Uang Jalan Di luar nominal yang diberikan':
+                            balance_spend += balance.nominal_close
+
                     list_uang_jalan_dict = {
                         'tanggal': uang_jalan.create_date,
                         'uang_jalan_name': uang_jalan.id,
-                        'total': uang_jalan.total,
+                        'total': balance_spend * -1,
                         'keterangan': uang_jalan.keterangan,
                     }
                     list_uang_jalan.append(list_uang_jalan_dict)
@@ -510,10 +531,19 @@ class OrderSetoran(models.Model):
 
                 for uang_jalan in record.uang_jalan:
                     if uang_jalan.id not in record_uang_jalan:
+                        balance_spend = 0
+                        for balance in uang_jalan.balance_history:
+                            if str(record.order_pengiriman_name) in balance.keterangan:
+                                balance_spend += balance.nominal_close
+                            elif balance.keterangan == 'Penggunaan Saldo Uang Jalan Untuk Seluruh Order Pengiriman':
+                                balance_spend += balance.nominal_close
+                            elif balance.keterangan == 'Penggunaan Saldo Uang Jalan Di luar nominal yang diberikan':
+                                balance_spend += balance.nominal_close
+
                         list_uang_jalan_dict = {
                             'tanggal': uang_jalan.create_date,
                             'uang_jalan_name': uang_jalan.id,
-                            'total': uang_jalan.total,
+                            'total': balance_spend * -1,
                             'keterangan': uang_jalan.keterangan,
                         }
                         list_uang_jalan.append(list_uang_jalan_dict)

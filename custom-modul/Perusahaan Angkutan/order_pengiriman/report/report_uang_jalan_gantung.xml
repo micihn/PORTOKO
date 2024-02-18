@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <template id="report_uang_jalan_gantung">
+            <t t-call="web.html_container">
+                <t t-call="web.internal_layout">
+                    <style type="text/css">
+                        .default-font {
+                        font-family: Lato, sans-serif;
+                        }
+
+                        .default-font-size{
+                        font-size:14px
+                        }
+
+                        .default-tablefont-size{
+                        font-size:13px
+                        }
+
+                        .bottom-spacing{
+                        margin-bottom: 4px;
+                        }
+
+                        .bottom-spacing-extra{
+                        margin-bottom: 12px;
+                        }
+
+                        .custom-table th {
+                        border-top: 1px solid #000; /* Adjust color and width as needed */
+                        border-bottom: 1px solid #000; /* Adjust color and width as needed */
+                        }
+
+                        .custom-table {
+                        --bs-table-bg: transparent;
+                        --bs-table-accent-bg: transparent;
+                        --bs-table-striped-color: #212529;
+                        --bs-table-striped-bg: rgba(0, 0, 0, 0.05);
+                        --bs-table-active-color: #212529;
+                        --bs-table-active-bg: rgba(0, 0, 0, 0.1);
+                        --bs-table-hover-color: #212529;
+                        --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
+                        width: 100%;
+                        color: #212529;
+                        vertical-align: middle;
+                        border-color: #ffffff;
+                        }
+
+                        .custom-table-sm > :not(caption) > * > * {
+                        padding: 0.4rem 0.4rem;
+                        }
+                    </style>
+
+                    <div class="page default-font">
+                        <div class="default-font-size bottom-spacing">
+                            Laporan Uang Jalan Gantung
+                        </div>
+
+                        <div class="default-font-size bottom-spacing-extra">
+                            <t t-if="tanggal_start and tanggal_finish">
+                                Periode
+                                <t t-esc="tanggal_start"/>
+                                s/d
+                                <t t-esc="tanggal_finish"/>
+                            </t>
+                        </div>
+
+                        <table class="custom-table custom-table-sm">
+                            <thead style="ext-align:left" class="default-tablefont-size">
+                                <tr>
+                                    <th style="text-align:left;">No Polisi</th>
+                                    <th style="text-align:left;">No UJ</th>
+                                    <th style="text-align:left;">Tanggal UJ</th>
+                                    <th style="text-align:right;">Nominal</th>
+                                </tr>
+                            </thead>
+                            <tbody style="text-align:left">
+                                <tr t-foreach='uj_list' t-as='uj' class="default-tablefont-size">
+                                    <td style="text-align:left;">
+                                        <t t-esc="uj['nomor_polisi']"/>
+                                    </td>
+                                    <td style="text-align:left;">
+                                        <t t-esc="uj['nomor_uj']"/>
+                                    </td>
+                                    <td style="text-align:left;">
+                                        <t t-esc="uj['tanggal_uj']"/>
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <t t-esc="'{:,}'.format(int(uj['nominal']))"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

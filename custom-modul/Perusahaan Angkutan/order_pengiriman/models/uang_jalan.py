@@ -17,7 +17,23 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
+
+    lines_count = fields.Integer(compute='compute_total_line')
+    order_disetor = fields.Integer()
+    can_use_all_balance = fields.Boolean(default=True)
+
+    @api.depends('uang_jalan_line', 'uang_jalan_nominal_tree')
+    def compute_total_line(self):
+        count = 0
+        for record in self.uang_jalan_line:
+            count += 1
+
+        for rec in self.uang_jalan_nominal_tree:
+            count += 1
+
+        self.lines_count = count
 
     uang_jalan_name = fields.Char(readonly=True, required=True, copy=False, default='New')
     kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', copy=True, ondelete='restrict', states={
@@ -25,13 +41,23 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
+
+    kas_gantung = fields.Float(digits=(6, 0), copy=False, compute="compute_kas_gantung_kendaraan")
+
+    @api.depends('kendaraan')
+    def compute_kas_gantung_kendaraan(self):
+        for record in self:
+            record.kas_gantung = record.kendaraan.kas_gantung_vehicle
+
 
     sopir = fields.Many2one('hr.employee', 'Sopir', copy=True, ondelete='restrict', states={
         'to_submit': [('readonly', False)],
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     kenek = fields.Many2one('hr.employee', 'Kenek', copy=True, ondelete='restrict', states={
@@ -39,6 +65,7 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     keterangan = fields.Text('Keterangan', copy=False, states={
@@ -46,6 +73,7 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     uang_jalan_line = fields.One2many('uang.jalan.line', 'uang_jalan', required=True, copy=False, states={
@@ -53,14 +81,15 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
-    uang_jalan_nominal_tree = fields.One2many('uang.jalan.nominal.saja', 'uang_jalan_nominal_saja', required=True,
-                                              copy=False, states={
+    uang_jalan_nominal_tree = fields.One2many('uang.jalan.nominal.saja', 'uang_jalan_nominal_saja', required=True, copy=False, states={
             'to_submit': [('readonly', False)],
             'submitted': [('readonly', True)],
             'validated': [('readonly', True)],
             'paid': [('readonly', True)],
+            'closed': [('readonly', True)],
         })
 
     biaya_tambahan_standar = fields.Float('Biaya Tambahan', default=0, copy=False, digits=(6, 0), states={
@@ -68,6 +97,7 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     biaya_tambahan_nominal_saja = fields.Float('Biaya Tambahan', default=0, copy=False, digits=(6, 0), states={
@@ -75,6 +105,7 @@ class UangJalan(models.Model):
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
         'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
     })
 
     total_uang_jalan_standar = fields.Float('Total', compute='_compute_total_uang_jalan_standar', default=0, digits=(6, 0))
@@ -84,9 +115,21 @@ class UangJalan(models.Model):
         ('submitted', "Submitted"),
         ('validated', "Validated"),
         ('paid', "Paid"),
+        ('closed', "Closed"),
         ('paid_no_order', "Paid, No Order"),
         ('cancel', "Cancelled"),
     ], default='to_submit', string="State", hide=True, tracking=True)
+
+    balance_uang_jalan = fields.Float('Saldo Uang Jalan Tersisa', compute="compute_nominal_close_accumulation" ,default=0, digits=(6, 0), store=True)
+    balance_history = fields.One2many('uang.jalan.balance.history', 'uang_jalan_id', copy=False, readonly=True)
+
+    @api.depends('balance_history')
+    def compute_nominal_close_accumulation(self):
+        for record in self:
+            saldo = 0
+            for history_record in record.balance_history:
+                saldo += history_record.nominal_close
+            record.balance_uang_jalan = saldo
 
     total_uang_jalan_nominal_saja = fields.Float('Total', compute='_compute_total_nominal_uang_jalan_saja', copy=False, default=0, store=True, digits=(6, 0))
     total = fields.Float('Total', default=0, copy=False, compute='_compute_total', store=True, digits=(6, 0))
@@ -161,6 +204,11 @@ class UangJalan(models.Model):
         return result
 
     def set_to_draft(self):
+        # Delete History Balance
+        for record in self.balance_history:
+            record.unlink()
+
+        self.can_use_all_balance = True
         self.state = 'to_submit'
 
     def submit(self):
@@ -180,13 +228,14 @@ class UangJalan(models.Model):
     def paid(self):
         account_settings = self.env['konfigurasi.account.uang.jalan'].search([('company_id', '=', self.company_id.id)])
         account_uang_jalan = account_settings.account_uang_jalan
+        journal_uang_jalan = account_settings.journal_uang_jalan
         account_kas = account_settings.account_kas
 
         if bool(account_uang_jalan) == False:
             raise ValidationError("Konfigurasi Account belum diisi")
 
         if bool(account_kas) == False:
-            raise ValidationError("Konfigurasi Account belum diisi")
+            raise ValidationError("Konfigurasi Account Kas belum diisi")
 
         if self.tipe_uang_jalan == 'standar':
             uang_jalan_list = []
@@ -215,6 +264,7 @@ class UangJalan(models.Model):
             journal_entry = self.env['account.move'].create({
                 'company_id': self.company_id.id,
                 'move_type': 'entry',
+                'journal_id': journal_uang_jalan.id,
                 'date': self.create_date,
                 'ref': self.uang_jalan_name,
                 'line_ids': [
@@ -243,6 +293,7 @@ class UangJalan(models.Model):
             journal_entry = self.env['account.move'].create({
                 'company_id': self.company_id.id,
                 'move_type': 'entry',
+                'journal_id': journal_uang_jalan.id,
                 'date': self.create_date,
                 'ref': self.uang_jalan_name,
                 'line_ids': [
@@ -266,41 +317,115 @@ class UangJalan(models.Model):
 
             journal_entry.action_post()
 
+        # Create Uang Jalan Balance History
+        self.env['uang.jalan.balance.history'].create({
+            'uang_jalan_id': self.id,
+            'company_id': self.company_id.id,
+            'keterangan': "Penyerahan Uang Jalan Kepada Sopir Dan Kenek",
+            'tanggal_pencatatan': fields.Date.today(),
+            'nominal_close': self.total,
+        })
+
+        # Akumulasi kas gantung kepada kendaraan
+        self.kendaraan.kas_gantung_vehicle += self.balance_uang_jalan
+
         self.state = 'paid'
 
+    def close(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'uang.jalan.close',
+            'view_mode': 'form',
+            'target': 'new',
+            'name': 'Catat Penggunaan Uang Jalan',
+            'context': {'default_can_use_all_balance_wizard': self.can_use_all_balance},
+        }
+
     def cancel(self):
+        if self.state == 'to_submit' or self.state == 'submitted' or self.state == 'validated':
+            self.state = 'cancel'
+        else:
+            account_settings = self.env['konfigurasi.account.uang.jalan'].search([('company_id', '=', self.company_id.id)])
+            account_uang_jalan = account_settings.account_uang_jalan
+            journal_uang_jalan = account_settings.journal_uang_jalan
+            account_kas = account_settings.account_kas
 
-        uang_jalan_list = []
-        for rec in self.uang_jalan_line:
-            for uang_jalan in rec.sudo().order_pengiriman.uang_jalan:
-                if uang_jalan.id != self.id:
-                    uang_jalan_list.append((6, 0, [uang_jalan.id]))
-                else:
-                    pass
+            uang_jalan_list = []
+            for rec in self.uang_jalan_line:
+                for uang_jalan in rec.sudo().order_pengiriman.uang_jalan:
+                    if uang_jalan.id != self.id:
+                        uang_jalan_list.append((6, 0, [uang_jalan.id]))
+                    else:
+                        pass
 
-        if self.tipe_uang_jalan == 'standar':
-            for record in self.uang_jalan_line:
-                record.sudo().order_pengiriman.write({
-                    'is_uang_jalan_terbit': False,
-                    'state': 'order_baru',
-                    'uang_jalan': uang_jalan_list or None,
-                    'kendaraan': None,
-                    'sopir': None,
-                    'kenek': None,
-                    'nomor_kendaraan': None,
-                    'model_kendaraan': None,
+            if self.tipe_uang_jalan == 'standar':
+                for record in self.uang_jalan_line:
+                    record.sudo().order_pengiriman.write({
+                        'is_uang_jalan_terbit': False,
+                        'state': 'order_baru',
+                        'uang_jalan': uang_jalan_list or None,
+                        'kendaraan': None,
+                        'sopir': None,
+                        'kenek': None,
+                        'nomor_kendaraan': None,
+                        'model_kendaraan': None,
+                    })
+
+                    message = "Uang jalan nomor " + str(self.uang_jalan_name) + " untuk pengiriman ini dibatalkan."
+                    record.sudo().order_pengiriman.message_post(body=message)
+
+            # Batalkan journal entry pembuatan advanced pihut (Jika ada)
+            if self.state == 'paid':
+                for record in self.env['account.move'].search([('ref', '=', str(self.uang_jalan_name))]):
+                    record.button_draft()
+                    record.button_cancel()
+
+            # Deakumulasi kas gantung kepada kendaraan
+            self.kendaraan.kas_gantung_vehicle -= self.balance_uang_jalan
+
+            # Add Cancel Balance
+            uang_jalan_terpakai = 0
+            for history in self.balance_history:
+                if history.nominal_close < 0:
+                    uang_jalan_terpakai += history.nominal_close
+
+            if uang_jalan_terpakai < 0:
+                journal_entry = self.env['account.move'].create({
+                    'company_id': self.company_id.id,
+                    'move_type': 'entry',
+                    'journal_id': journal_uang_jalan.id,
+                    'date': self.create_date,
+                    'ref': self.uang_jalan_name,
+                    'line_ids': [
+                        (0, 0, {
+                            'name': self.uang_jalan_name,
+                            'date': self.create_date,
+                            'account_id': account_kas.id,
+                            'company_id': self.company_id.id,
+                            'credit': self.balance_uang_jalan,
+                        }),
+
+                        (0, 0, {
+                            'name': self.uang_jalan_name,
+                            'date': self.create_date,
+                            'account_id': account_uang_jalan.id,
+                            'company_id': self.company_id.id,
+                            'debit': self.balance_uang_jalan,
+                        }),
+                    ],
                 })
 
-                message = "Uang jalan nomor " + str(self.uang_jalan_name) + " untuk pengiriman ini dibatalkan."
-                record.sudo().order_pengiriman.message_post(body=message)
+                journal_entry.action_post()
 
-        # Batalkan journal entry pembuatan advanced pihut (Jika ada)
-        if self.state == 'paid':
-            for record in self.env['account.move'].search([('ref', '=', str(self.uang_jalan_name))]):
-                record.button_draft()
-                record.button_cancel()
+            self.env['uang.jalan.balance.history'].create({
+                'uang_jalan_id': self.id,
+                'company_id': self.company_id.id,
+                'keterangan': "Pembatalan Uang Jalan " + str(self.uang_jalan_name) + ". Sisa saldo otomatis dikembalikan ke " + str(journal_uang_jalan.name),
+                'tanggal_pencatatan': fields.Date.today(),
+                'nominal_close': self.balance_uang_jalan * -1,
+            })
 
-        self.state = 'cancel'
+            self.state = 'cancel'
 
     def hitung_ulang_nominal_uj(self):
         for record in self.uang_jalan_line:
@@ -409,4 +534,15 @@ class UangJalanNominalSaja(models.Model):
     muat = fields.Many2one('konfigurasi.lokasi', 'Muat')
     bongkar = fields.Many2one('konfigurasi.lokasi', 'Bongkar')
     nominal_uang_jalan = fields.Float('Nominal UJ', default=0, digits=(6, 0))
+
+class UangJalanBalanceHistory(models.Model):
+    _name = 'uang.jalan.balance.history'
+    _description = 'History Uang Jalan'
+
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+    uang_jalan_id = fields.Many2one('uang.jalan', invisible=True)
+
+    tanggal_pencatatan = fields.Date()
+    keterangan = fields.Char()
+    nominal_close = fields.Float(digits=(6, 0))
 

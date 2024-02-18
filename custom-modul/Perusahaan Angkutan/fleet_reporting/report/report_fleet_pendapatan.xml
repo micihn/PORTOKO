@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <template id="report_fleet_pendapatan">
+                <t t-call="web.html_container">
+                    <page>
+                        <t t-call="web.internal_layout">
+                            <style type="text/css">
+                            .default-font {
+                            font-family: Lato, sans-serif;
+                            }
+
+                            .default-font-size{
+                            font-size:14px
+                            }
+
+                            .default-tablefont-size{
+                            font-size:13px
+                            }
+
+                            .bottom-spacing{
+                            margin-bottom: 4px;
+                            }
+
+                            .bottom-spacing-extra{
+                            margin-bottom: 12px;
+                            }
+
+                            .custom-table th {
+                            border-top: 1px solid #000; /* Adjust color and width as needed */
+                            border-bottom: 1px solid #000; /* Adjust color and width as needed */
+                            }
+
+                            .custom-table {
+                            --bs-table-bg: transparent;
+                            --bs-table-accent-bg: transparent;
+                            --bs-table-striped-color: #212529;
+                            --bs-table-striped-bg: rgba(0, 0, 0, 0.05);
+                            --bs-table-active-color: #212529;
+                            --bs-table-active-bg: rgba(0, 0, 0, 0.1);
+                            --bs-table-hover-color: #212529;
+                            --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
+                            width: 100%;
+                            color: #212529;
+                            vertical-align: middle;
+                            border-color: #ffffff;
+                            }
+
+                            .custom-table-sm > :not(caption) > * > * {
+                            padding: 0.4rem 0.4rem;
+                            }
+                        </style>
+
+                                <div class="default-font-size bottom-spacing">
+                                    Laporan Pendapatan Kendaraan
+                                </div>
+
+                                <div class="default-font-size bottom-spacing-extra">
+                                    <t t-if="tanggal_start and tanggal_finish">
+                                        Tanggal :
+                                        <t t-esc="tanggal_start"/>
+                                        -
+                                        <t t-esc="tanggal_finish"/>
+                                    </t>
+                                </div>
+
+
+                                <t t-set="pengeluaran_sparepart" t-value="0"/>
+                                <t t-set="pengeluaran_service" t-value="0"/>
+                                <table class="custom-table custom-table-sm">
+                                    <thead class="default-tablefont-size">
+                                        <tr>
+                                            <th style="text-align:center;">No Polisi</th>
+                                            <th style="text-align:right;">Hasil Jasa</th>
+                                            <th style="text-align:right;">Pengeluaran</th>
+                                            <th style="text-align:right;">Pembelian</th>
+                                            <th style="text-align:right;">Biaya Fee</th>
+                                            <th style="text-align:right;">Komisi</th>
+                                            <th style="text-align:right;">Sparepart &#38; Service</th>
+                                            <th style="text-align:right;">Jumlah</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="text-align:left">
+                                        <t t-set="total_hasil_jasa" t-value="0" />
+                                        <t t-set="total_pengeluaran" t-value="0" />
+                                        <t t-set="total_pembelian" t-value="0" />
+                                        <t t-set="total_biaya_fee" t-value="0" />
+                                        <t t-set="total_komisi" t-value="0" />
+                                        <t t-set="total_service" t-value="0" />
+                                        <t t-set="total_jumlah_akhir" t-value="0" />
+
+                                        <tr t-foreach='setoran_list' t-as='setoran' style="font-weight:bold" class="default-tablefont-size">
+                                            <td style="text-align:center;">
+                                                <t t-esc="setoran['nomor_polisi']"/>
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <t t-esc="'{:,}'.format(int(setoran['hasil_jasa']))"/>
+                                                <t t-set="total_hasil_jasa" t-value="total_hasil_jasa + int(setoran['hasil_jasa'])" />
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <t t-esc="'{:,}'.format(int(setoran['pengeluaran']))"/>
+                                                <t t-set="total_pengeluaran" t-value="total_pengeluaran + int(setoran['pengeluaran'])" />
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <t t-esc="'{:,}'.format(int(setoran['pembelian']))"/>
+                                                <t t-set="total_pembelian" t-value="total_pembelian + int(setoran['pembelian'])" />
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <t t-esc="'{:,}'.format(int(setoran['biaya_fee']))"/>
+                                                <t t-set="total_biaya_fee" t-value="total_biaya_fee + int(setoran['biaya_fee'])" />
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <t t-esc="'{:,}'.format(int(setoran['komisi']))"/>
+                                                <t t-set="total_komisi" t-value="total_komisi + int(setoran['komisi'])" />
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <t t-esc="'{:,}'.format(int(setoran['spare_part']))"/>
+                                                <t t-set="total_service" t-value="total_service + int(setoran['spare_part'])" />
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <t t-esc="'{:,}'.format(int(setoran['total_jumlah']))"/>
+                                                <t t-set="total_jumlah_akhir" t-value="total_jumlah_akhir + int(setoran['total_jumlah'])" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                    <tbody class="default-tablefont-size">
+                                        <td style="text-align:center; border-top: 1px solid black;">
+                                            Total
+                                        </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                           <t t-esc="'{:,}'.format(int(total_hasil_jasa))"/>
+                                        </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                           <t t-esc="'{:,}'.format(int(total_pengeluaran))"/>
+                                        </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                           <t t-esc="'{:,}'.format(int(total_pembelian))"/>
+                                        </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                           <t t-esc="'{:,}'.format(int(total_biaya_fee))"/>
+                                        </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                           <t t-esc="'{:,}'.format(int(total_komisi))"/>
+                                        </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                           <t t-esc="'{:,}'.format(int(total_service))"/>
+                                        </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                           <t t-esc="'{:,}'.format(int(total_jumlah_akhir))"/>
+                                        </td>
+                                    </tbody>
+                                </table>
+                            </t>
+
+                        <t t-if="urutkan_kendaran == True">
+                            <div class="default-font-size bottom-spacing">
+                                Laporan Pendapatan Kendaraan
+                            </div>
+
+                            <div class="default-font-size bottom-spacing-extra">
+                                <t t-if="tanggal_start and tanggal_finish">
+                                    Tanggal :
+                                    <t t-esc="tanggal_start"/>
+                                    -
+                                    <t t-esc="tanggal_finish"/>
+                                </t>
+                            </div>
+
+                            <t t-set="pengeluaran_sparepart" t-value="0"/>
+                            <t t-set="pengeluaran_service" t-value="0"/>
+                            <table class="custom-table custom-table-sm">
+                                <thead style="ext-align:left" class="default-tablefont-size">
+                                    <tr>
+                                        <th style="text-align:left;">No Polisi</th>
+                                        <th style="text-align:left;">Hasil Jasa</th>
+                                        <th style="text-align:left;">Pengeluaran</th>
+                                        <th style="text-align:left;">Pembelian</th>
+                                        <th style="text-align:right;">Biaya Fee</th>
+                                        <th style="text-align:right;">Komisi</th>
+                                        <th style="text-align:right;">Sparepart &#38; Service</th>
+                                        <th style="text-align:right;">Jumlah</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:left">
+                                    <t t-set="total_hasil_jasa" t-value="0" />
+                                    <t t-set="total_pengeluaran" t-value="0" />
+                                    <t t-set="total_pembelian" t-value="0" />
+                                    <t t-set="total_biaya_fee" t-value="0" />
+                                    <t t-set="total_komisi" t-value="0" />
+                                    <t t-set="total_service" t-value="0" />
+                                    <t t-set="total_jumlah_akhir" t-value="0" />
+
+                                    <tr t-foreach='setoran_list' t-as='setoran' style="font-weight:bold" class="default-tablefont-size">
+                                        <td style="text-align:center;">
+                                            <t t-esc="setoran['nomor_polisi']"/>
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(setoran['hasil_jasa']))"/>
+                                            <t t-set="total_hasil_jasa" t-value="total_hasil_jasa + int(setoran['hasil_jasa'])" />
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(setoran['pengeluaran']))"/>
+                                            <t t-set="total_pengeluaran" t-value="total_pengeluaran + int(setoran['pengeluaran'])" />
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(setoran['pembelian']))"/>
+                                            <t t-set="total_pembelian" t-value="total_pembelian + int(setoran['pembelian'])" />
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(setoran['biaya_fee']))"/>
+                                            <t t-set="total_biaya_fee" t-value="total_biaya_fee + int(setoran['biaya_fee'])" />
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(setoran['komisi']))"/>
+                                            <t t-set="total_komisi" t-value="total_komisi + int(setoran['komisi'])" />
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(setoran['spare_part']))"/>
+                                            <t t-set="total_service" t-value="total_service + int(setoran['spare_part'])" />
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(setoran['total_jumlah']))"/>
+                                            <t t-set="total_jumlah_akhir" t-value="total_jumlah_akhir + int(setoran['total_jumlah'])" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tbody class="default-tablefont-size">
+                                    <td style="text-align:center;">
+                                        Total
+                                    </td>
+                                   <td style="text-align:right;">
+                                        <t t-esc="total_hasil_jasa" />
+                                    </td>
+                                   <td style="text-align:right;">
+                                        <t t-esc="total_pengeluaran" />
+                                    </td>
+                                   <td style="text-align:right;">
+                                        <t t-esc="total_pembelian" />
+                                    </td>
+                                   <td style="text-align:right;">
+                                        <t t-esc="total_biaya_fee" />
+                                    </td>
+                                   <td style="text-align:right;">
+                                        <t t-esc="total_komisi" />
+                                    </td>
+                                   <td style="text-align:right;">
+                                        <t t-esc="total_service" />
+                                    </td>
+                                   <td style="text-align:right;">
+                                        <t t-esc="total_jumlah_akhir" />
+                                    </td>
+                                </tbody>
+                            </table>
+                        </t>
+                    </page>
+
+                    <t t-if="rincian">
+                        <page>
+                        <t t-call="web.internal_layout">
+                            <style type="text/css">
+                                .default-font {
+                                font-family: Lato, sans-serif;
+                                }
+
+                                .default-font-size{
+                                font-size:14px
+                                }
+
+                                .default-tablefont-size{
+                                font-size:13px
+                                }
+
+                                .bottom-spacing{
+                                margin-bottom: 4px;
+                                }
+
+                                .bottom-spacing-extra{
+                                margin-bottom: 12px;
+                                }
+
+                                .custom-table th {
+                                border-top: 1px solid #000; /* Adjust color and width as needed */
+                                border-bottom: 1px solid #000; /* Adjust color and width as needed */
+                                }
+
+                                .custom-table {
+                                --bs-table-bg: transparent;
+                                --bs-table-accent-bg: transparent;
+                                --bs-table-striped-color: #212529;
+                                --bs-table-striped-bg: rgba(0, 0, 0, 0.05);
+                                --bs-table-active-color: #212529;
+                                --bs-table-active-bg: rgba(0, 0, 0, 0.1);
+                                --bs-table-hover-color: #212529;
+                                --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
+                                width: 100%;
+                                color: #212529;
+                                vertical-align: middle;
+                                border-color: #ffffff;
+                                }
+
+                                .custom-table-sm > :not(caption) > * > * {
+                                padding: 0.4rem 0.4rem;
+                                }
+                            </style>
+
+                            <div class="default-font-size bottom-spacing">
+                                Laporan Pendapatan Kendaraan Rincian
+                            </div>
+
+                            <div class="default-font-size bottom-spacing-extra">
+                                <t t-if="tanggal_start and tanggal_finish">
+                                    Tanggal :
+                                    <t t-esc="tanggal_start"/>
+                                    -
+                                    <t t-esc="tanggal_finish"/>
+                                </t>
+                            </div>
+
+                            <table class="custom-table custom-table-sm">
+                                <thead style="ext-align:left" class="default-tablefont-size">
+                                    <tr>
+                                        <th style="text-align:center;">Tanggal</th>
+                                        <th style="text-align:center;">No Setoran</th>
+                                        <th style="text-align:right;">Hasil</th>
+                                        <th style="text-align:right;">Pengeluaran</th>
+                                        <th style="text-align:right;">Pembelian</th>
+                                        <th style="text-align:right;">Biaya Fee</th>
+                                        <th style="text-align:right;">Komisi</th>
+                                        <th style="text-align:right;">Sparepart &#38; Service</th>
+                                        <th style="text-align:right;">Jumlah</th>
+                                    </tr>
+                                </thead>
+
+                                <t t-set="total_rincian" t-value="0" />
+                                <t t-set="total_hasil_rincian" t-value="0" />
+                                <t t-set="total_pengeluaran_rincian" t-value="0" />
+                                <t t-set="total_pembelian_rincian" t-value="0" />
+                                <t t-set="total_biaya_fee_rincian" t-value="0" />
+                                <t t-set="total_komisi_rincian" t-value="0" />
+                                <tbody style="text-align:left">
+                                    <tr t-foreach='rincian' t-as='rin' style="font-weight:bold" class="default-tablefont-size">
+                                        <td style="text-align:center;">
+                                            <t t-esc="rin['tanggal']"/>
+                                        </td>
+
+                                        <td style="text-align:center;">
+                                            <t t-esc="rin['nomor_setoran']"/>
+                                        </td>
+
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(rin['hasil']))"/>
+                                            <t t-set="total_hasil_rincian" t-value="total_hasil_rincian + rin['hasil']" />
+                                        </td>
+
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(rin['pengeluaran']))"/>
+                                            <t t-set="total_pengeluaran_rincian" t-value="total_pengeluaran_rincian + rin['pengeluaran']" />
+                                        </td>
+
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(rin['pembelian']))"/>
+                                            <t t-set="total_pembelian_rincian" t-value="total_pembelian_rincian + rin['pembelian']" />
+                                        </td>
+
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(rin['biaya_fee']))"/>
+                                            <t t-set="total_biaya_fee_rincian" t-value="total_biaya_fee_rincian + rin['biaya_fee']" />
+                                        </td>
+
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(rin['komisi']))"/>
+                                            <t t-set="total_komisi_rincian" t-value="total_komisi_rincian + rin['komisi']" />
+                                        </td>
+
+                                        <td style="text-align:right;">
+                                        </td>
+
+                                        <td style="text-align:right;">
+                                            <t t-esc="'{:,}'.format(int(rin['jumlah']))"/>
+                                            <t t-set="total_rincian" t-value="total_rincian + rin['jumlah']" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tbody class="default-tablefont-size">
+                                    <tr>
+                                        <td style="text-align:center; border-top: 1px solid black;">
+                                        </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                       </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                       </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                       </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                       </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                       </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                       </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                       </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                           <t t-esc="'{:,}'.format(int(total_rincian))"/>
+                                       </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center;">
+                                        </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right; ">
+                                           <t t-esc="'{:,}'.format(int(sparepart_rincian))"/>
+                                       </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                    </tr>
+
+                                    <tr >
+                                        <td style="text-align:center; ">
+                                        </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                       </td>
+                                       <td style="text-align:right; border-top: 1px solid black;">
+                                           <t t-esc="'{:,}'.format(int(total_rincian - sparepart_rincian))"/>
+                                       </td>
+                                    </tr>
+
+                                    <tr >
+                                        <td style="text-align:center;">
+                                            <p style="font-size:14px; font-family:'arial';">
+                                                <b>GRAND TOTAL :</b>
+                                            </p>
+
+                                        </td>
+                                       <td style="text-align:right;">
+                                       </td>
+                                       <td style="text-align:right;">
+                                           <p style="font-size:14px; font-family:'arial';">
+                                                <b>
+                                                    <t t-esc="'{:,}'.format(int(total_hasil_rincian))"/>
+                                                </b>
+                                            </p>
+
+                                       </td>
+                                       <td style="text-align:right;">
+                                              <p style="font-size:14px; font-family:'arial';">
+                                                <b>
+                                                    <t t-esc="'{:,}'.format(int(total_pengeluaran_rincian))"/>
+                                                </b>
+                                            </p>
+                                       </td>
+                                       <td style="text-align:right;">
+                                            <p style="font-size:14px; font-family:'arial';">
+                                                <b>
+                                                    <t t-esc="'{:,}'.format(int(total_pembelian_rincian))"/>
+                                                </b>
+                                            </p>
+                                       </td>
+                                       <td style="text-align:right;">
+                                           <p style="font-size:14px; font-family:'arial';">
+                                                <b>
+                                                    <t t-esc="'{:,}'.format(int(total_biaya_fee_rincian))"/>
+                                                </b>
+                                            </p>
+
+
+                                       </td>
+                                       <td style="text-align:right;">
+
+                                           <p style="font-size:14px; font-family:'arial';">
+                                                <b>
+                                                    <t t-esc="'{:,}'.format(int(total_komisi_rincian))"/>
+                                                </b>
+                                            </p>
+
+                                       </td>
+                                       <td style="text-align:right;">
+                                           <p style="font-size:14px; font-family:'arial';">
+                                                <b>
+                                                    <t t-esc="'{:,}'.format(int(sparepart_rincian))"/>
+                                                </b>
+                                            </p>
+                                       </td>
+                                       <td style="text-align:right;">
+                                          <p style="font-size:14px; font-family:'arial';">
+                                                <b>
+                                                    <t t-esc="'{:,}'.format(int(total_rincian - sparepart_rincian))"/>
+                                                </b>
+                                            </p>
+
+                                       </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+                        </t>
+                    </page>
+                    </t>
+                </t>
+        </template>
+    </data>
+</odoo>
