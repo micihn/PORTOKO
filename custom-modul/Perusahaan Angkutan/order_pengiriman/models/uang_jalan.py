@@ -208,6 +208,11 @@ class UangJalan(models.Model):
         for record in self.balance_history:
             record.unlink()
 
+        # Cancel all journal entry
+        for record in self.env['account.move'].search([('ref', '=', str(self.uang_jalan_name))]):
+            record.button_draft()
+            record.button_cancel()
+
         self.can_use_all_balance = True
         self.state = 'to_submit'
 
@@ -346,6 +351,7 @@ class UangJalan(models.Model):
             self.state = 'cancel'
         else:
             account_settings = self.env['konfigurasi.account.uang.jalan'].search([('company_id', '=', self.company_id.id)])
+            account_settings_setoran = self.env['konfigurasi.account.setoran'].search([('company_id', '=', self.company_id.id)])
             account_uang_jalan = account_settings.account_uang_jalan
             journal_uang_jalan = account_settings.journal_uang_jalan
             account_kas = account_settings.account_kas
@@ -374,16 +380,16 @@ class UangJalan(models.Model):
                     message = "Uang jalan nomor " + str(self.uang_jalan_name) + " untuk pengiriman ini dibatalkan."
                     record.sudo().order_pengiriman.message_post(body=message)
 
-            # Batalkan journal entry pembuatan advanced pihut (Jika ada)
-            if self.state == 'paid':
-                for record in self.env['account.move'].search([('ref', '=', str(self.uang_jalan_name))]):
-                    record.button_draft()
-                    record.button_cancel()
+            # # Batalkan journal entry pembuatan advanced pihut (Jika ada)
+            # if self.state == 'paid' or self.state == 'closed':
+            #     for record in self.env['account.move'].search([('ref', '=', str(self.uang_jalan_name))]):
+            #         record.button_draft()
+            #         record.button_cancel()
 
             # Deakumulasi kas gantung kepada kendaraan
             self.kendaraan.kas_gantung_vehicle -= self.balance_uang_jalan
 
-            # Add Cancel Balance
+            # Membuat Pengeluaran untuk saldo yang sudah terpakai
             uang_jalan_terpakai = 0
             for history in self.balance_history:
                 if history.nominal_close < 0:
@@ -400,9 +406,9 @@ class UangJalan(models.Model):
                         (0, 0, {
                             'name': self.uang_jalan_name,
                             'date': self.create_date,
-                            'account_id': account_kas.id,
+                            'account_id': account_settings_setoran.account_biaya_ujt.id,
                             'company_id': self.company_id.id,
-                            'credit': self.balance_uang_jalan,
+                            'credit': uang_jalan_terpakai,
                         }),
 
                         (0, 0, {
@@ -410,13 +416,42 @@ class UangJalan(models.Model):
                             'date': self.create_date,
                             'account_id': account_uang_jalan.id,
                             'company_id': self.company_id.id,
-                            'debit': self.balance_uang_jalan,
+                            'debit': uang_jalan_terpakai,
                         }),
                     ],
                 })
 
                 journal_entry.action_post()
 
+                # Mengembalikan dana yang menjadi sisa ke dalam kas
+                journal_entry_kembalian_kas = self.env['account.move'].create({
+                    'company_id': self.company_id.id,
+                    'move_type': 'entry',
+                    'journal_id': journal_uang_jalan.id,
+                    'date': self.create_date,
+                    'ref': self.uang_jalan_name,
+                    'line_ids': [
+                        (0, 0, {
+                            'name': self.uang_jalan_name,
+                            'date': self.create_date,
+                            'account_id': account_uang_jalan.id,
+                            'company_id': self.company_id.id,
+                            'credit': self.balance_uang_jalan,
+                        }),
+
+                        (0, 0, {
+                            'name': self.uang_jalan_name,
+                            'date': self.create_date,
+                            'account_id': account_kas.id,
+                            'company_id': self.company_id.id,
+                            'debit': self.balance_uang_jalan,
+                        }),
+                    ],
+                })
+
+                journal_entry_kembalian_kas.action_post()
+
+            # Membuat history balance untuk uang yang dikembalikan ke kas
             self.env['uang.jalan.balance.history'].create({
                 'uang_jalan_id': self.id,
                 'company_id': self.company_id.id,
@@ -424,6 +459,8 @@ class UangJalan(models.Model):
                 'tanggal_pencatatan': fields.Date.today(),
                 'nominal_close': self.balance_uang_jalan * -1,
             })
+
+
 
             self.state = 'cancel'
 

@@ -50,7 +50,7 @@ class FleetPendapatan(models.TransientModel):
     def generate_report_pendapatan(self):
         kendaraan_list = []
         setoran_list = []
-        sparepart_rincian = 0
+        # sparepart_rincian = 0
         for record in self.order_setoran:
             if record.kendaraan.id not in kendaraan_list:
                 kendaraan_list.append(record.kendaraan.id)
@@ -74,7 +74,7 @@ class FleetPendapatan(models.TransientModel):
 
             for item in sparepart_service:
                 sparepart += sparepart_service.total_amount
-                sparepart_rincian += sparepart_service.total_amount
+                # sparepart_rincian += sparepart_service.total_amount
 
             for record in self.order_setoran:
                 if kendaraan == record.kendaraan.id:
@@ -114,46 +114,112 @@ class FleetPendapatan(models.TransientModel):
 
         if bool(data_sorted):
             if self.cetak_rincian:
-                rincian_list = []
-                for setor in self.order_setoran:
-                    rincian = {
-                        'tanggal': setor.tanggal_st.strftime('%d/%m/%Y'),
-                        'nomor_setoran': setor.kode_order_setoran,
-                        'hasil': setor.total_jumlah,
-                        'pengeluaran': setor.total_pengeluaran,
-                        'pembelian': setor.total_pembelian,
-                        'biaya_fee': setor.total_biaya_fee,
-                        'komisi': setor.komisi_kenek + setor.komisi_sopir,
-                        'jumlah': setor.total_jumlah - setor.total_pengeluaran - setor.total_pembelian - setor.total_biaya_fee - (setor.komisi_kenek + setor.komisi_sopir)
-                    }
+                kendaraan_rincian_list = []
+                plat_nomer = []
+                for record in self.order_setoran:
+                    if record.kendaraan.id not in kendaraan_rincian_list:
+                        kendaraan_rincian_list.append(record.kendaraan.id)
+                        plat_nomer.append(record.kendaraan.license_plate)
 
-                    rincian_list.append(rincian)
+                rincian_list = []
+                sparepart_list = []
+                for kendaraan_rincian in kendaraan_rincian_list:
+                    rincian_a = []
+                    sparepart_total = 0
+                    for setor in self.order_setoran:
+                        if kendaraan_rincian == setor.kendaraan.id:
+                            rincian = {
+                                'tanggal': setor.tanggal_st.strftime('%d/%m/%Y'),
+                                'nomor_setoran': setor.kode_order_setoran,
+                                'hasil': setor.total_jumlah,
+                                'pengeluaran': setor.total_pengeluaran,
+                                'pembelian': setor.total_pembelian,
+                                'biaya_fee': setor.total_biaya_fee,
+                                'komisi': setor.komisi_kenek + setor.komisi_sopir,
+                                'jumlah': setor.total_jumlah - setor.total_pengeluaran - setor.total_pembelian - setor.total_biaya_fee - (setor.komisi_kenek + setor.komisi_sopir),
+                                'plat_kendaraan': setor.kendaraan.license_plate,
+                            }
+
+                            if sparepart_total == 0:
+                                sparepart_service = self.env['fleet.vehicle.log.services'].search([
+                                    ('vehicle_id', '=', kendaraan_rincian),
+                                    ('date', '>=', self.tanggal_start),
+                                    ('date', '<=', self.tanggal_finish),
+                                    ('state_record', '=', 'selesai'),
+                                ])
+
+                                if bool(sparepart_service):
+                                    for item in sparepart_service:
+                                        sparepart_total += sparepart_service.total_amount
+                                else:
+                                    sparepart_total = 0
+
+                                # rincian['sparepart_rincian'] = sparepart_total
+                                sparepart_list.append(sparepart_total)
+
+                            rincian_a.append(rincian)
+
+                    rincian_list.append(rincian_a)
 
                 data_sorted['rincian'] = rincian_list
-                data_sorted['sparepart_rincian'] = sparepart_rincian
+                data_sorted['plat_nomer'] = plat_nomer
+                data_sorted['sparepart_list'] = sparepart_list
 
                 return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data_sorted)
             else:
                 return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data_sorted)
         else:
             if self.cetak_rincian:
-                rincian_list = []
-                for setor in self.order_setoran:
-                    rincian = {
-                        'tanggal': setor.tanggal_st.strftime('%d/%m/%Y'),
-                        'nomor_setoran': setor.kode_order_setoran,
-                        'hasil': setor.total_jumlah,
-                        'pengeluaran': setor.total_pengeluaran,
-                        'pembelian': setor.total_pembelian,
-                        'biaya_fee': setor.total_biaya_fee,
-                        'komisi': setor.komisi_kenek + setor.komisi_sopir,
-                        'jumlah': setor.total_jumlah - setor.total_pengeluaran - setor.total_pembelian - setor.total_biaya_fee - (setor.komisi_kenek + setor.komisi_sopir)
-                    }
+                kendaraan_rincian_list = []
+                plat_nomer = []
+                for record in self.order_setoran:
+                    if record.kendaraan.id not in kendaraan_rincian_list:
+                        kendaraan_rincian_list.append(record.kendaraan.id)
+                        plat_nomer.append(record.kendaraan.license_plate)
 
-                    rincian_list.append(rincian)
+                rincian_list = []
+                sparepart_list = []
+                for kendaraan_rincian in kendaraan_rincian_list:
+                    rincian_a = []
+                    sparepart_total = 0
+                    for setor in self.order_setoran:
+                        if kendaraan_rincian == setor.kendaraan.id:
+                            rincian = {
+                                'tanggal': setor.tanggal_st.strftime('%d/%m/%Y'),
+                                'nomor_setoran': setor.kode_order_setoran,
+                                'hasil': setor.total_jumlah,
+                                'pengeluaran': setor.total_pengeluaran,
+                                'pembelian': setor.total_pembelian,
+                                'biaya_fee': setor.total_biaya_fee,
+                                'komisi': setor.komisi_kenek + setor.komisi_sopir,
+                                'jumlah': setor.total_jumlah - setor.total_pengeluaran - setor.total_pembelian - setor.total_biaya_fee - (setor.komisi_kenek + setor.komisi_sopir),
+                                'plat_kendaraan': setor.kendaraan.license_plate,
+                            }
+
+                            if sparepart_total == 0:
+                                sparepart_service = self.env['fleet.vehicle.log.services'].search([
+                                    ('vehicle_id', '=', kendaraan_rincian),
+                                    ('date', '>=', self.tanggal_start),
+                                    ('date', '<=', self.tanggal_finish),
+                                    ('state_record', '=', 'selesai'),
+                                ])
+
+                                if bool(sparepart_service):
+                                    for item in sparepart_service:
+                                        sparepart_total += sparepart_service.total_amount
+                                else:
+                                    sparepart_total = 0
+
+                                # rincian['sparepart_rincian'] = sparepart_total
+                                sparepart_list.append(sparepart_total)
+
+                            rincian_a.append(rincian)
+
+                    rincian_list.append(rincian_a)
 
                 data['rincian'] = rincian_list
-                data['sparepart_rincian'] = sparepart_rincian
+                data['plat_nomer'] = plat_nomer
+                data['sparepart_list'] = sparepart_list
 
                 return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data)
             else:
