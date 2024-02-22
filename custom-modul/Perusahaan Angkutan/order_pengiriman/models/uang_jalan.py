@@ -208,6 +208,11 @@ class UangJalan(models.Model):
         for record in self.balance_history:
             record.unlink()
 
+        # Cancel all journal entry
+        for record in self.env['account.move'].search([('ref', '=', str(self.uang_jalan_name))]):
+            record.button_draft()
+            record.button_cancel()
+
         self.can_use_all_balance = True
         self.state = 'to_submit'
 

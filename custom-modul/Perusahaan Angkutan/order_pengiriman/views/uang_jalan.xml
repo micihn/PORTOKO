@@ -41,7 +41,7 @@
                     <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'validated', 'paid', 'closed', 'cancel'))]}"/>
                     <button name="paid" type="object" string="Submit Payment" class="btn-primary" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', 'closed', 'cancel'))]}"/>
                     <button name="close" type="object" string="Close Uang Jalan" class="btn-primary" attrs="{'invisible': ['|', ('balance_uang_jalan','=', 0), ('state', 'in', ('to_submit', 'submitted', 'validated', 'cancel'))]}"/>
-                    <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', 'closed'))]}"/>
+                    <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('to_submit', 'submitted', 'paid', 'closed'))]}" groups="order_pengiriman.group_order_pengiriman"/>
                     <button name="cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ('cancel'))]}"/>
                 </header>
 
