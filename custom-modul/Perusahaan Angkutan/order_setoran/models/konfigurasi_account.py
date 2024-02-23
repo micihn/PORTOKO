@@ -10,3 +10,4 @@ class KonfigurasiAccountSetoran(models.Model):
     account_kas = fields.Many2one('account.account', 'Account Cash/Bank')
     account_piutang = fields.Many2one('account.account', 'Account Piutang Uang Jalan')
     account_biaya_ujt = fields.Many2one('account.account', 'Account Biaya UJT')
+    journal_setoran = fields.Many2one('account.journal', 'Journal Setoran')
