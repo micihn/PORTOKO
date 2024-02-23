@@ -320,8 +320,24 @@ class AccountInvoicePayment(models.TransientModel):
                 if line.uang_jalan_name.order_disetor == line.uang_jalan_name.lines_count:
                     line.uang_jalan_name.state = 'closed'
 
-            # Deakumulasi kas gantung kepada kendaraan
-            setoran.kendaraan.kas_gantung_vehicle -= setoran.total_uang_jalan
+            # Block dibawah akan mengurangi saldo uang jalan gantung
+            for uj in setoran.list_uang_jalan.uang_jalan_name:
+                if uj.balance_uang_jalan > 0:
+
+                    # Deakumulasi kas gantung kepada kendaraan
+                    setoran.kendaraan.kas_gantung_vehicle -= uj.balance_uang_jalan
+
+                    self.env['uang.jalan.balance.history'].create({
+                        'uang_jalan_id': uj.id,
+                        'company_id': setoran.company_id.id,
+                        'keterangan': "Penutupan Uang Jalan karena telah disetor " + str(setoran.kode_order_setoran),
+                        'tanggal_pencatatan': fields.Date.today(),
+                        'nominal_close': uj.balance_uang_jalan * -1,
+                    })
+
+                    uj.state = 'closed'
+
+
 
             setoran.state = 'done'
 
