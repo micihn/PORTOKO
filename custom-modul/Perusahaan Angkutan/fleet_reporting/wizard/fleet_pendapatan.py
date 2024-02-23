@@ -161,12 +161,13 @@ class FleetPendapatan(models.TransientModel):
 
                     rincian_list.append(rincian_a)
 
-                data_sorted['rincian'] = rincian_list
+                data_sorted['rincian'] = rincian_list or False
                 data_sorted['plat_nomer'] = plat_nomer
                 data_sorted['sparepart_list'] = sparepart_list
 
                 return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data_sorted)
             else:
+                data_sorted['rincian'] = False
                 return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data_sorted)
         else:
             if self.cetak_rincian:
@@ -217,10 +218,11 @@ class FleetPendapatan(models.TransientModel):
 
                     rincian_list.append(rincian_a)
 
-                data['rincian'] = rincian_list
+                data['rincian'] = rincian_list or False
                 data['plat_nomer'] = plat_nomer
                 data['sparepart_list'] = sparepart_list
 
                 return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data)
             else:
+                data['rincian'] = False
                 return self.env.ref('fleet_reporting.report_fleet_pendapatan_action').report_action([], data=data)
