@@ -18,9 +18,9 @@ class OrderSetoran(models.Model):
     total_pembelian = fields.Float(compute='_compute_total_pembelian', digits=(6, 0))
     total_biaya_fee = fields.Float(compute='_compute_biaya_fee', digits=(6, 0))
     sisa = fields.Float(compute='_calculate_sisa', digits=(6, 0))
-    total_ongkos_calculated = fields.Float(compute='_compute_total_ongkos_calculated', digits=(6, 3))
-    komisi_sopir = fields.Float(compute='_compute_komisi_sopir', digits=(6, 3))
-    komisi_kenek = fields.Float(compute='_compute_komisi_kenek', digits=(6, 3))
+    total_ongkos_calculated = fields.Float(compute='_compute_total_ongkos_calculated', digits=(6, 0))
+    komisi_sopir = fields.Float(compute='_compute_komisi_sopir', digits=(6, 0))
+    komisi_kenek = fields.Float(compute='_compute_komisi_kenek', digits=(6, 0))
     active = fields.Boolean('Archive', default=True, tracking=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 

@@ -18,6 +18,7 @@
         <field name="arch" type="xml">
             <tree create="0" delete="0">
                 <field name="name" />
+                <field name="journal_setoran" string="Journal Setoran" optional="show"/>
                 <field name="account_kas" string="Account Cash/Bank" optional="show"/>
                 <field name="account_piutang" string="Account Piutang Uang Jalan" optional="show"/>
                 <field name="account_biaya_ujt" string="Account Biaya UJT" optional="show"/>
@@ -33,6 +34,7 @@
                 <sheet>
                     <group>
                         <group>
+                            <field name="journal_setoran" string="Journal Setoran" optional="show"/>
                             <field name="account_kas" string="Account Cash/Bank" optional="show"/>
                             <field name="account_piutang" string="Account Piutang Uang Jalan" optional="show"/>
                             <field name="account_biaya_ujt" string="Account Biaya UJT" optional="show"/>

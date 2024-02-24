@@ -4,3 +4,5 @@ access_order_setoran_fleet,access.order.setoran.fleet,order_setoran.model_order_
 
 access_service_fleet_report,access.service.fleet.report,fleet_reporting.model_service_fleet_report,,1,1,1,1
 access_fleet_configuration_service,access.fleet.configuration.service,fleet_reporting.model_fleet_configuration_service,fleet.fleet_group_manager,1,1,1,1
+
+access_product_service_line,access.product.service.line,fleet_reporting.model_product_service_line,fleet.fleet_group_manager,1,1,1,1

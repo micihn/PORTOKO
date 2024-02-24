@@ -64,6 +64,7 @@ class AccountInvoicePayment(models.TransientModel):
             account_kas = account_settings.account_kas
             account_piutang = account_settings.account_piutang
             account_biaya_ujt = account_settings.account_biaya_ujt
+            journal_setoran = account_settings.journal_setoran
 
             if bool(account_kas) == False:
                 raise ValidationError("Konfigurasi Account belum diisi! Lakukan konfigurasi di Order Setoran > Konfigurasi")
@@ -72,6 +73,9 @@ class AccountInvoicePayment(models.TransientModel):
                 raise ValidationError("Konfigurasi Account belum diisi! Lakukan konfigurasi di Order Setoran > Konfigurasi")
 
             if bool(account_biaya_ujt) == False:
+                raise ValidationError("Konfigurasi Account belum diisi! Lakukan konfigurasi di Order Setoran > Konfigurasi")
+
+            if bool(journal_setoran) == False:
                 raise ValidationError("Konfigurasi Account belum diisi! Lakukan konfigurasi di Order Setoran > Konfigurasi")
 
             # Write nomor surat jalan
@@ -184,6 +188,7 @@ class AccountInvoicePayment(models.TransientModel):
                 journal_entry_selisih = self.env['account.move'].create({
                     'company_id': setoran.company_id.id,
                     'move_type': 'entry',
+                    'journal_id': journal_setoran.id,
                     'date': setoran.create_date,
                     'ref': setoran.kode_order_setoran,
                     'line_ids': [
@@ -210,6 +215,7 @@ class AccountInvoicePayment(models.TransientModel):
                 journal_entry_total_pengeluaran = self.env['account.move'].create({
                     'company_id': setoran.company_id.id,
                     'move_type': 'entry',
+                    'journal_id': journal_setoran.id,
                     'date': setoran.create_date,
                     'ref': setoran.kode_order_setoran,
                     'line_ids': [
@@ -238,6 +244,7 @@ class AccountInvoicePayment(models.TransientModel):
                 journal_entry_selisih = self.env['account.move'].create({
                     'company_id': setoran.company_id.id,
                     'move_type': 'entry',
+                    'journal_id': journal_setoran.id,
                     'date': setoran.create_date,
                     'ref': setoran.kode_order_setoran,
                     'line_ids': [
@@ -265,6 +272,7 @@ class AccountInvoicePayment(models.TransientModel):
                     'company_id': setoran.company_id.id,
                     'move_type': 'entry',
                     'date': setoran.create_date,
+                    'journal_id': journal_setoran.id,
                     'ref': setoran.kode_order_setoran,
                     'line_ids': [
                         (0, 0, {
@@ -292,6 +300,7 @@ class AccountInvoicePayment(models.TransientModel):
                     'company_id': setoran.company_id.id,
                     'move_type': 'entry',
                     'date': setoran.create_date,
+                    'journal_id': journal_setoran.id,
                     'ref': setoran.kode_order_setoran,
                     'line_ids': [
                         (0, 0, {
@@ -320,8 +329,22 @@ class AccountInvoicePayment(models.TransientModel):
                 if line.uang_jalan_name.order_disetor == line.uang_jalan_name.lines_count:
                     line.uang_jalan_name.state = 'closed'
 
-            # Deakumulasi kas gantung kepada kendaraan
-            setoran.kendaraan.kas_gantung_vehicle -= setoran.total_uang_jalan
+            # Block dibawah akan mengurangi saldo uang jalan gantung
+            for uj in setoran.list_uang_jalan.uang_jalan_name:
+                if uj.balance_uang_jalan > 0:
+
+                    # Deakumulasi kas gantung kepada kendaraan
+                    setoran.kendaraan.kas_gantung_vehicle -= uj.balance_uang_jalan
+
+                    self.env['uang.jalan.balance.history'].create({
+                        'uang_jalan_id': uj.id,
+                        'company_id': setoran.company_id.id,
+                        'keterangan': "Penutupan Uang Jalan karena telah disetor " + str(setoran.kode_order_setoran),
+                        'tanggal_pencatatan': fields.Date.today(),
+                        'nominal_close': uj.balance_uang_jalan * -1,
+                    })
+
+                    uj.state = 'closed'
 
             setoran.state = 'done'
 
