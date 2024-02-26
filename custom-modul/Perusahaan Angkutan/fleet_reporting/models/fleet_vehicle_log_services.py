@@ -85,6 +85,7 @@ class FleetVehicleLogServiceProduct(models.Model):
                 'move_type': 'entry',
                 'date': self.date,
                 'ref': str(self.name) + str(" - " + self.description),
+                'journal_id': self.account_journal.id,
                 'line_ids': [
                     (0, 0, {
                         'name': self.name,
