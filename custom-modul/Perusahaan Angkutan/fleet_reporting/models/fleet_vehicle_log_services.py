@@ -32,19 +32,17 @@ class FleetVehicleLogServiceProduct(models.Model):
 
     list_sparepart = fields.One2many('product.service.line', 'service', copy=False)
 
-    @api.depends('amount', 'list_sparepart.total_cost')
+    @api.depends('list_sparepart.total_cost')
     def compute_amount(self):
-        if self.service_type_id.category == 'sparepart':
-            total_cost_product = 0
-            for rec in self:
-                for line in rec.list_sparepart:
+        for services in self:
+            if services.service_type_id.category == 'sparepart':
+                total_cost_product = 0
+                for line in services.list_sparepart:
                     total_cost_product += line.total_cost
+                services.amount = total_cost_product
 
-                rec.amount = total_cost_product
-
-        elif self.service_type_id.category == 'service':
-            for rec in self:
-                rec.amount = rec.total_amount
+            elif services.service_type_id.category == 'service':
+                services.amount = services.total_amount
 
     @api.onchange('service_type_id')
     def check_service_type_id_value(self):

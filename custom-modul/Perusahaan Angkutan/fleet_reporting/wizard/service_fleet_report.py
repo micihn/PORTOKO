@@ -31,20 +31,46 @@ class ServiceFleetReport(models.TransientModel):
     def generate_report(self):
         service_list_unsorted = []
         for record in self.services:
-            service_dictionary = {
-                'service_category': record.service_type_id.category,
-                'description': record.description,
-                'service_type_id': record.service_type_id.name,
-                'date': record.date.strftime('%d/%m/%Y'),
-                'default_code': record.product_id.default_code,
-                'name': record.product_id.name,
-                'qty': record.product_qty,
-                'amount': record.amount,
-                'total_amount': record.total_amount,
-            }
+            if record.service_type_id.category == 'service':
+                service_dictionary = {
+                    'service_category': record.service_type_id.category,
+                    'description': record.description,
+                    'service_type_id': record.service_type_id.name,
+                    'date': record.date.strftime('%d/%m/%Y'),
+                    'amount': record.amount,
+                    # 'default_code': record.product_id.default_code,
+                    # 'name': record.product_id.name,
+                    'qty': 1,
+                    'total_amount': record.total_amount,
+                }
+            elif record.service_type_id.category == 'sparepart':
+                service_dictionary = {
+                    'service_category': record.service_type_id.category,
+                    'description': record.description,
+                    'service_type_id': record.service_type_id.name,
+                    'date': record.date.strftime('%d/%m/%Y'),
+                }
+
+                items = []
+                for item in record.list_sparepart:
+                    item_dict = {
+                        'product_name': item.product_id.name,
+                        'product_qty': item.product_qty,
+                        'product_cost': item.cost,
+                        'product_total_cost': item.total_cost,
+                        'product_barcode': item.product_id.barcode,
+                    }
+
+                    # items.append(item.product_id.name)
+                    items.append(item_dict)
+
+                service_dictionary['items'] = items
+
             service_list_unsorted.append(service_dictionary)
 
         service_list = sorted(service_list_unsorted, key=lambda x: x['date'], reverse=True)
+
+        print(service_list)
 
         data = {'tanggal_start': self.tanggal_start.strftime('%d-%m-%Y'),
                 'tanggal_finish': self.tanggal_finish.strftime('%d-%m-%Y'),
