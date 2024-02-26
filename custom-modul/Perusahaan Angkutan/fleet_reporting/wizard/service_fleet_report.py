@@ -61,7 +61,6 @@ class ServiceFleetReport(models.TransientModel):
                         'product_barcode': item.product_id.barcode,
                     }
 
-                    # items.append(item.product_id.name)
                     items.append(item_dict)
 
                 service_dictionary['items'] = items
@@ -69,8 +68,6 @@ class ServiceFleetReport(models.TransientModel):
             service_list_unsorted.append(service_dictionary)
 
         service_list = sorted(service_list_unsorted, key=lambda x: x['date'], reverse=True)
-
-        print(service_list)
 
         data = {'tanggal_start': self.tanggal_start.strftime('%d-%m-%Y'),
                 'tanggal_finish': self.tanggal_finish.strftime('%d-%m-%Y'),
