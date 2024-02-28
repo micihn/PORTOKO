@@ -52,7 +52,7 @@
 
                     <div class="page default-font">
                         <div class="default-font-size bottom-spacing">
-                            Laporan Pemakaian Per-Truck
+                            Laporan Pemakaian Per-Kendaraan
                         </div>
 
                         <div class="default-font-size bottom-spacing-extra">
@@ -65,7 +65,7 @@
                         </div>
 
                         <div class="default-font-size bottom-spacing-extra">
-                            No. Truk :
+                            No. Kendaraan :
                             <t t-esc="license_plate"/>
                         </div>
 
@@ -84,30 +84,33 @@
                                 </tr>
                             </thead>
                             <tbody style="text-align:left">
-                                <tr t-foreach='services' t-as='service' class="default-tablefont-size">
+                                <tr t-foreach="services" t-as='service'>
                                     <t t-if="service['service_category'] == 'sparepart' ">
-                                        <td style="text-align:left;">
-                                            <t t-esc="service['service_type_id']"/>
-                                        </td>
-                                        <td style="text-align:left;">
-                                            <t t-esc="service['date']"/>
-                                        </td>
-                                        <td style="text-align:left;">
-                                            <t t-esc="service['default_code']"/>
-                                        </td>
-                                        <td style="text-align:left;">
-                                            <t t-esc="service['name']"/>
-                                        </td>
-                                        <td style="text-align:right;">
-                                            <t t-esc="service['qty']"/>
-                                        </td>
-                                        <td style="text-align:right;">
-                                            <t t-esc="'{:,}'.format(int(service['amount']))"/>
-                                        </td>
-                                        <td style="text-align:right;">
-                                            <t t-esc="'{:,}'.format(int(service['total_amount']))"/>
-                                            <t t-set="pengeluaran_sparepart" t-value="pengeluaran_sparepart + float(service['total_amount'])"/>
-                                        </td>
+                                        <tr t-foreach="service['items']" t-as='item' class="default-tablefont-size">
+                                            <td style="text-align:left;">
+                                                <t t-esc="service['service_type_id']"/>
+                                            </td>
+                                            <td style="text-align:left;">
+                                                <t t-esc="service['date']"/>
+                                            </td>
+                                            <td style="text-align:left;">
+                                                <t t-esc="item['product_barcode']"/>
+                                            </td>
+                                            <td style="text-align:left;">
+                                                <t t-esc="item['product_name']"/>
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <t t-esc="item['product_qty']"/>
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <t t-esc="item['product_cost']"/>
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <t t-esc="item['product_total_cost']"/>
+                                                <t t-set="pengeluaran_sparepart"
+                                                   t-value="pengeluaran_sparepart + int(item['product_total_cost'])"/>
+                                            </td>
+                                        </tr>
                                     </t>
                                 </tr>
                                 <tr class="default-tablefont-size" style="border-top: 1px solid #000;">
@@ -147,23 +150,43 @@
                                         </td>
                                         <td style="text-align:right;">
                                             <t t-esc="'{:,}'.format(int(service['total_amount']))"/>
-                                            <t t-set="pengeluaran_service" t-value="pengeluaran_service + float(service['total_amount'])"/>
+                                            <t t-set="pengeluaran_service"
+                                               t-value="pengeluaran_service + float(service['total_amount'])"/>
                                         </td>
                                     </t>
                                 </tr>
-                                <t t-if="service['service_category'] == 'service' ">
-                                    <tr class="default-tablefont-size " style="border-top: 1px solid #000;">
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>Total :</td>
-                                        <td style="text-align:right;">
-                                            <t t-esc="'{:,}'.format(int(pengeluaran_service))"/>
-                                        </td>
-                                    </tr>
-                                </t>
+                                <tr class="default-tablefont-size " style="border-top: 1px solid #000;">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>Total :</td>
+                                    <td style="text-align:right;">
+                                        <t t-esc="'{:,}'.format(int(pengeluaran_service))"/>
+                                    </td>
+                                </tr>
+
+                                <tr class="default-tablefont-size " style="border-top: 1px solid #000;">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <span>
+                                            <b>
+                                                Grand Total :
+                                            </b>
+
+                                        </span>
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <t t-esc="'{:,}'.format(int(pengeluaran_service + pengeluaran_sparepart))"/>
+                                    </td>
+                                </tr>
+
+
                             </tbody>
                         </table>
                     </div>
