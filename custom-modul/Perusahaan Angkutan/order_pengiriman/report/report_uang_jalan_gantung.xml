@@ -55,12 +55,21 @@
                             Laporan Uang Jalan Gantung
                         </div>
 
+                        <br />
+
                         <div class="default-font-size bottom-spacing-extra">
                             <t t-if="tanggal_start and tanggal_finish">
-                                Periode
+                                Periode :
                                 <t t-esc="tanggal_start"/>
                                 s/d
                                 <t t-esc="tanggal_finish"/>
+                            </t>
+
+                            <br />
+
+
+                            <t t-if="kendaraan">
+                                Kendaraan : <t t-esc="kendaraan" />
                             </t>
                         </div>
 
