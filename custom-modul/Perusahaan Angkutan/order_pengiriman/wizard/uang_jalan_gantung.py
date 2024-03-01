@@ -4,24 +4,40 @@ class UangJalanGantung(models.TransientModel):
     _name = 'uang.jalan.gantung'
     _description = 'Uang Jalan Gantung'
 
+    kendaraan = fields.Many2one('fleet.vehicle')
     tanggal_start = fields.Date()
     tanggal_finish = fields.Date()
     uang_jalan_tree = fields.Many2many('uang.jalan', 'uj_list')
 
-    @api.onchange('tanggal_start', 'tanggal_finish')
+    @api.onchange('tanggal_start', 'tanggal_finish', 'kendaraan')
     def _onchange_filters(self):
         if self.tanggal_start and self.tanggal_finish:
-            uang_jalan = self.env['uang.jalan'].search([
-                ('create_date', '>=', self.tanggal_start),
-                ('create_date', '<=', self.tanggal_finish),
-                ('balance_uang_jalan', '>', 0),
-            ])
+            if bool(self.kendaraan):
+                uang_jalan = self.env['uang.jalan'].search([
+                    ('create_date', '>=', self.tanggal_start),
+                    ('create_date', '<=', self.tanggal_finish),
+                    ('balance_uang_jalan', '>', 0),
+                    ('kendaraan', '=', self.kendaraan.id),
+                ])
 
-            if uang_jalan:
-                self.uang_jalan_tree = uang_jalan.ids
+                if uang_jalan:
+                    self.uang_jalan_tree = uang_jalan.ids
+                else:
+                    # Clear the services field if no records are found
+                    self.uang_jalan_tree = [(5, 0, 0)]
             else:
-                # Clear the services field if no records are found
-                self.uang_jalan_tree = [(5, 0, 0)]
+                uang_jalan = self.env['uang.jalan'].search([
+                    ('create_date', '>=', self.tanggal_start),
+                    ('create_date', '<=', self.tanggal_finish),
+                    ('balance_uang_jalan', '>', 0),
+                ])
+
+                if uang_jalan:
+                    self.uang_jalan_tree = uang_jalan.ids
+                else:
+                    # Clear the services field if no records are found
+                    self.uang_jalan_tree = [(5, 0, 0)]
+
         else:
             # Clear the services field if any of the required fields is not set
             self.uang_jalan_tree = [(5, 0, 0)]
@@ -42,6 +58,7 @@ class UangJalanGantung(models.TransientModel):
 
         data = {'tanggal_start': self.tanggal_start.strftime('%d-%m-%Y'),
                 'tanggal_finish': self.tanggal_finish.strftime('%d-%m-%Y'),
+                'kendaraan': self.kendaraan.name,
                 'uj_list': uj_list,
                 }
         return self.env.ref('order_pengiriman.report_uang_jalan_gantung_rep').report_action([], data=data)
