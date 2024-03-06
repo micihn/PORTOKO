@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <template id="report_stock_sparepart_queue">
+            <t t-call="web.html_container">
+                <page>
+                    <t t-call="web.internal_layout">
+                        <style type="text/css">
+                            .default-font {
+                            font-family: Lato, sans-serif;
+                            }
+
+                            .default-font-size{
+                            font-size:14px
+                            }
+
+                            .default-tablefont-size{
+                            font-size:13px
+                            }
+
+                            .bottom-spacing{
+                            margin-bottom: 4px;
+                            }
+
+                            .bottom-spacing-extra{
+                            margin-bottom: 12px;
+                            }
+
+                            .custom-table th {
+                            border-top: 1px solid #000; /* Adjust color and width as needed */
+                            border-bottom: 1px solid #000; /* Adjust color and width as needed */
+                            }
+
+                            .custom-table {
+                            --bs-table-bg: transparent;
+                            --bs-table-accent-bg: transparent;
+                            --bs-table-striped-color: #212529;
+                            --bs-table-striped-bg: rgba(0, 0, 0, 0.05);
+                            --bs-table-active-color: #212529;
+                            --bs-table-active-bg: rgba(0, 0, 0, 0.1);
+                            --bs-table-hover-color: #212529;
+                            --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
+                            width: 100%;
+                            color: #212529;
+                            vertical-align: middle;
+                            border-color: #ffffff;
+                            }
+
+                            .custom-table-sm > :not(caption) > * > * {
+                            padding: 0.4rem 0.4rem;
+                            }
+                        </style>
+
+                        <div class="default-font-size bottom-spacing" style="margin-bottom:20px">
+                            Laporan Stock Sparepart Per Tanggal : <t t-esc="tanggal" />
+                        </div>
+
+
+                            <table class="custom-table custom-table-sm">
+                                <thead style="ext-align:left" class="default-tablefont-size">
+                                    <tr>
+                                        <th style="text-align:left; width:40px">Kode Barang</th>
+                                        <th style="text-align:left; width:80px">Nama Barang</th>
+                                        <th style="text-align:right; width:80px">Harga</th>
+                                        <th style="text-align:right; width:80px">Stok</th>
+                                        <th style="text-align:right; width:80px">Nilai</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody >
+                                    <tr t-foreach='product_list' t-as='product' style="font-weight:bold" class="default-tablefont-size">
+                                        <td style="text-align:left;">
+                                            <t t-esc="product['product_code']"/>
+                                        </td>
+                                        <td style="text-align:left;">
+                                            <t t-esc="product['product_name']"/>
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="product['product_price']"/>
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="product['product_qty']"/>
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-esc="product['product_value']"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+<!--                                <tbody class="default-tablefont-size">-->
+<!--                                    <tr>-->
+<!--                                        <td style="text-align:center; border-top: 1px solid black;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right; border-top: 1px solid black;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right; border-top: 1px solid black;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right; border-top: 1px solid black;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right; border-top: 1px solid black;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right; border-top: 1px solid black;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right; border-top: 1px solid black;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right; border-top: 1px solid black;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right; border-top: 1px solid black;">-->
+<!--                                            <t t-esc="'{:,}'.format(int(total_rincian))"/>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+
+<!--                                    <tr>-->
+<!--                                        <td style="text-align:center;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right; ">-->
+<!--                                            &lt;!&ndash;                                           <t t-esc="'{:,}'.format(int(total_sparepart_rincian))"/>&ndash;&gt;-->
+<!--                                            <t t-esc="'{:,}'.format(int(sparepart_list[kendaraan_counter]))"/>-->
+<!--                                            <t t-set="total_sparepart_rincian"-->
+<!--                                               t-value="total_sparepart_rincian + int(sparepart_list[kendaraan_counter])"/>-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+
+<!--                                    <tr>-->
+<!--                                        <td style="text-align:center; ">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right; border-top: 1px solid black;">-->
+<!--                                        </td>-->
+<!--                                        <td style="text-align:right; border-top: 1px solid black;">-->
+<!--                                            <t t-esc="'{:,}'.format(int(total_rincian - int(sparepart_list[kendaraan_counter])))"/>-->
+<!--                                            <t t-set="grand_total_rincian"-->
+<!--                                               t-value="grand_total_rincian + (int(total_rincian) - int(sparepart_list[kendaraan_counter]))"/>-->
+
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                </tbody><br/>-->
+
+<!--                                <t t-if="len(plat_nomer) == footer_counter">-->
+<!--                                    <tbody class="default-tablefont-size">-->
+<!--                                        <tr>-->
+<!--                                            <th style="text-align:left; width:40px">-->
+<!--                                                <p style="font-size:14px; font-family:'arial';">-->
+<!--                                                    <b>-->
+<!--                                                        GRAND TOTAL :-->
+<!--                                                    </b>-->
+<!--                                                </p>-->
+<!--                                            </th>-->
+
+<!--                                            <th style="text-align:center; width:80px"></th>-->
+
+<!--                                            <th style="text-align:right; width:50px">-->
+<!--                                                <p style="font-size:14px; font-family:'arial';">-->
+<!--                                                    <b>-->
+<!--                                                        <t t-esc="'{:,}'.format(int(total_hasil_rincian))"/>-->
+<!--                                                    </b>-->
+<!--                                                </p>-->
+<!--                                            </th>-->
+
+<!--                                            <th style="text-align:right; width:50px">-->
+<!--                                                <p style="font-size:14px; font-family:'arial';">-->
+<!--                                                    <b>-->
+<!--                                                        <t t-esc="'{:,}'.format(int(total_pengeluaran_rincian))"/>-->
+<!--                                                    </b>-->
+<!--                                                </p>-->
+<!--                                            </th>-->
+
+<!--                                            <th style="text-align:right; width:50px">-->
+<!--                                                <p style="font-size:14px; font-family:'arial';">-->
+<!--                                                    <b>-->
+<!--                                                        <t t-esc="'{:,}'.format(int(total_pembelian_rincian))"/>-->
+<!--                                                    </b>-->
+<!--                                                </p>-->
+<!--                                            </th>-->
+
+<!--                                            <th style="text-align:right; width:50px">-->
+<!--                                                <p style="font-size:14px; font-family:'arial';">-->
+<!--                                                    <b>-->
+<!--                                                        <t t-esc="'{:,}'.format(int(total_biaya_fee_rincian))"/>-->
+<!--                                                    </b>-->
+<!--                                                </p>-->
+<!--                                            </th>-->
+<!--                                            <th style="text-align:right; width:50px">-->
+<!--                                                <p style="font-size:14px; font-family:'arial';">-->
+<!--                                                    <b>-->
+<!--                                                        <t t-esc="'{:,}'.format(int(total_komisi_rincian))"/>-->
+<!--                                                    </b>-->
+<!--                                                </p>-->
+<!--                                            </th>-->
+<!--                                            <th style="text-align:right; width:50px">-->
+<!--                                                <p style="font-size:14px; font-family:'arial';">-->
+<!--                                                    <b>-->
+<!--                                                        <t t-esc="'{:,}'.format(int(total_sparepart_rincian))"/>-->
+<!--                                                    </b>-->
+<!--                                                </p>-->
+<!--                                            </th>-->
+<!--                                            <th style="text-align:right; width:60px">-->
+<!--                                                <p style="font-size:14px; font-family:'arial';">-->
+<!--                                                    <b>-->
+<!--                                                        <t t-esc="'{:,}'.format(int(grand_total_rincian))"/>-->
+<!--                                                    </b>-->
+<!--                                                </p>-->
+<!--                                            </th>-->
+<!--                                        </tr>-->
+<!--                                    </tbody>-->
+<!--                                </t>-->
+
+                            </table>
+                        </t>
+            </page>
+            </t>
+        </template>
+    </data>
+</odoo>
