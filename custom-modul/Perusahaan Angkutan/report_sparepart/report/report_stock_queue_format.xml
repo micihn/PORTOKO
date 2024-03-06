@@ -52,7 +52,7 @@
                         </style>
 
                         <div class="default-font-size bottom-spacing" style="margin-bottom:20px">
-                            Laporan Stock Sparepart Per Tanggal : <t t-esc="tanggal" />
+                            Laporan Stock Sparepart Per Tanggal : <t t-esc="date" />
                         </div>
 
 

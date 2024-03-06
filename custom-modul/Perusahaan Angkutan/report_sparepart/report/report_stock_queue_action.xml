@@ -16,9 +16,9 @@
         <field name="dpi">90</field>
     </record>
 
-    <record id="report_fleet_pendapatan_action" model="ir.actions.report">
-        <field name="name">Pendapatan</field>
-        <field name="model">order.setoran</field>
+    <record id="report_stock_sparepart_action" model="ir.actions.report">
+        <field name="name">Report Sparepart</field>
+        <field name="model">report.stock.sparepart</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">report_sparepart.report_stock_sparepart_queue</field>
         <field name="paperformat_id" ref="report_sparepart.paperformat_stock_queue"/>
