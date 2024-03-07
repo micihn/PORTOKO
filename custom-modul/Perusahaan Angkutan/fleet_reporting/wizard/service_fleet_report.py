@@ -58,7 +58,7 @@ class ServiceFleetReport(models.TransientModel):
                         'product_qty': item.product_qty,
                         'product_cost': item.cost,
                         'product_total_cost': item.total_cost,
-                        'product_barcode': item.product_id.barcode,
+                        'product_barcode': item.product_id.default_code,
                     }
 
                     items.append(item_dict)

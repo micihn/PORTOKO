@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_stock_sparepart"
+      groups="stock.group_stock_user"
+      sequence="1"
+      name="Laporan Cetak Stok"
+      action="action_stock_sparepart"
+      parent="stock.menu_warehouse_report">
+    </menuitem>
+</odoo>
