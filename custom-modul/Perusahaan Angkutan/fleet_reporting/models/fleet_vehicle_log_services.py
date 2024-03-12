@@ -108,6 +108,11 @@ class FleetVehicleLogServiceProduct(models.Model):
             self.state_record = 'selesai'
 
         else:
+            # Check list product
+            for line in self.list_sparepart:
+                if line.product_qty == 0:
+                    raise ValidationError('Qty Produk ' + str(line.product_id.name) + " berisi 0")
+
             picking = self.env['stock.picking'].create({
                 'location_id': fleet_settings.operation_type.default_location_src_id.id,
                 'location_dest_id': fleet_settings.operation_type.default_location_dest_id.id,
