@@ -71,5 +71,29 @@ class FleetMove(models.Model):
     harga_satuan = fields.Float('Harga Satuan', digits=(6, 0))
     harga_total = fields.Float('Harga Total', digits=(6, 0))
 
+class StockBackorderFleet(models.TransientModel):
+    _inherit = 'stock.backorder.confirmation'
+
+    def process_cancel_backorder(self):
+        res = super(StockBackorderFleet, self).process_cancel_backorder()
+
+        if self.pick_ids.fleet_layer == 1:
+            service_id = self.env['fleet.vehicle.log.services'].search([('name', '=',self.pick_ids.origin)])
+
+            product_name = []
+            for line in self.pick_ids.move_ids_without_package:
+                if line.product_uom_qty != line.quantity_done:
+                    service_line = self.env['product.service.line'].search([('product_id', '=', line.product_id.id), ('service','=',service_id.id)])
+                    service_line.product_qty = line.quantity_done
+                    product_name.append(line.product_id.name)
+
+            message = "Log report quantity Updated\n"
+            for name in product_name:
+                message += f"- {name}\n"
+
+            service_id.message_post(body=message)
+
+        return res
+
 
 
