@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_return_product_service" model="ir.actions.act_window">
+        <field name="name">Return Product</field>
+        <field name="res_model">return.product.service</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="return_product_service_view" model="ir.ui.view">
+        <field name="name">return.product.service.form</field>
+        <field name="model">return.product.service</field>
+        <field name="arch" type="xml">
+            <form string="Return Product">
+                    <field name="product_line" nolabel="1">
+                            <tree editable="top" create="0" delete="0">
+                                <field name="product_id" options="{'no_create': True, 'no_open': True}" force_save="1"/>
+                                <field name="product_qty" string="Return Qty"/>
+                                <field name="maximum_qty" string="Service Qty"/>
+                            </tree>
+                    </field>
+                <footer>
+                    <button name="process_return" string="Return" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+
+</odoo>

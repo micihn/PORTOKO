@@ -103,10 +103,10 @@
                                                 <t t-esc="item['product_qty']"/>
                                             </td>
                                             <td style="text-align:right;">
-                                                <t t-esc="item['product_cost']"/>
+                                                <t t-esc="'{:,}'.format(int(item['product_cost']))"/>
                                             </td>
                                             <td style="text-align:right;">
-                                                <t t-esc="item['product_total_cost']"/>
+                                                <t t-esc="'{:,}'.format(int(item['product_total_cost']))"/>
                                                 <t t-set="pengeluaran_sparepart"
                                                    t-value="pengeluaran_sparepart + int(item['product_total_cost'])"/>
                                             </td>

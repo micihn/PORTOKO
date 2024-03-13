@@ -53,15 +53,16 @@ class ServiceFleetReport(models.TransientModel):
 
                 items = []
                 for item in record.list_sparepart:
-                    item_dict = {
-                        'product_name': item.product_id.name,
-                        'product_qty': item.product_qty,
-                        'product_cost': item.cost,
-                        'product_total_cost': item.total_cost,
-                        'product_barcode': item.product_id.default_code,
-                    }
+                    if item.product_qty != 0:
+                        item_dict = {
+                            'product_name': item.product_id.name,
+                            'product_qty': item.product_qty,
+                            'product_cost': item.cost,
+                            'product_total_cost': item.total_cost,
+                            'product_barcode': item.product_id.default_code,
+                        }
 
-                    items.append(item_dict)
+                        items.append(item_dict)
 
                 service_dictionary['items'] = items
 

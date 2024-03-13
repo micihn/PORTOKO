@@ -32,6 +32,14 @@ class FleetVehicleLogServiceProduct(models.Model):
 
     list_sparepart = fields.One2many('product.service.line', 'service', copy=False)
 
+    def retun_product(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'return.product.service',
+            'view_mode': 'form',
+            'target': 'new',
+        }
+
     @api.depends('list_sparepart.total_cost')
     def compute_amount(self):
         for services in self:
@@ -57,22 +65,12 @@ class FleetVehicleLogServiceProduct(models.Model):
         elif self.service_type_id.category == 'sparepart':
             self.is_service = False
             self.initial = False
-            # self.product_qty = 1
-            # self.amount = self.product_id.product_tmpl_id.standard_price
             self.total_amount = 0
 
         elif self.service_type_id.category == 'contract':
             self.is_service = False
             self.initial = False
-            # self.product_qty = 1
-            # self.amount = 0
             self.total_amount = 0
-            # self.product_id = None
-
-    # @api.onchange('product_qty', 'amount', 'product_id')
-    # def _compute_total_amount(self):
-    #     for record in self:
-    #         record.total_amount = record.product_qty * record.amount
 
     def validate(self):
         fleet_settings = self.env['fleet.configuration.service'].search([('company_id', '=', self.company_id.id)])
@@ -108,10 +106,20 @@ class FleetVehicleLogServiceProduct(models.Model):
             self.state_record = 'selesai'
 
         else:
-            # Check list product
+            # Check list product 0 Qty
             for line in self.list_sparepart:
                 if line.product_qty == 0:
                     raise ValidationError('Qty Produk ' + str(line.product_id.name) + " berisi 0")
+
+            # Check duplicate product
+            # Check duplicate product
+            spareparts = [line.product_id.id for line in self.list_sparepart]
+            duplicates = list(filter(lambda x: spareparts.count(x) > 1, set(spareparts)))
+
+            if duplicates:
+                raise ValidationError("Terdapat produk sparepart duplikat dalam list")
+
+
 
             picking = self.env['stock.picking'].create({
                 'location_id': fleet_settings.operation_type.default_location_src_id.id,
