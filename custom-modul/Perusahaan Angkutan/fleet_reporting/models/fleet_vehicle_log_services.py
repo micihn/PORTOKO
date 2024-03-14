@@ -119,8 +119,6 @@ class FleetVehicleLogServiceProduct(models.Model):
             if duplicates:
                 raise ValidationError("Terdapat produk sparepart duplikat dalam list")
 
-
-
             picking = self.env['stock.picking'].create({
                 'location_id': fleet_settings.operation_type.default_location_src_id.id,
                 'location_dest_id': fleet_settings.operation_type.default_location_dest_id.id,
@@ -128,6 +126,7 @@ class FleetVehicleLogServiceProduct(models.Model):
                 'origin': self.name,
                 'is_permintaan_barang': True,
             })
+
             for line in self.list_sparepart:
                 stock_move = self.env['stock.move'].create({
                     'name': self.name + str(' - ' + self.description),
@@ -152,6 +151,8 @@ class FleetVehicleLogServiceProduct(models.Model):
             for rec in related_picking:
                 rec.fleet_layer = 2
                 rec.fleet_service_id = self.id
+
+            line.product_return_limit = line.product_qty
 
             self.state_record = 'diminta'
 
@@ -181,6 +182,7 @@ class ProductLine(models.Model):
     service = fields.Many2one('fleet.vehicle.log.services', invisible=True)
     product_id = fields.Many2one('product.product', copy=False)
     product_qty = fields.Float()
+    product_return_limit = fields.Float()
     cost = fields.Float()
     total_cost = fields.Float(compute='_compute_total_cost', store=True, copy=False, default=0)
 

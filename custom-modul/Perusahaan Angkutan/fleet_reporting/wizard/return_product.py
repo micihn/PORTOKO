@@ -1,6 +1,6 @@
 from odoo import api, fields, models
 from datetime import datetime
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 class ReturnProduct(models.TransientModel):
     _name = 'return.product.service'
@@ -10,6 +10,10 @@ class ReturnProduct(models.TransientModel):
 
     def process_return(self):
         services = self.env['fleet.vehicle.log.services'].browse(self._context.get('active_ids', []))
+
+        for line in self.product_line:
+            if line.product_qty > line.product_return_limit:
+                raise UserError("Anda memasukkan jumlah Qty melebihi batas Limit Qty Return. " + str(line.product_id.name) + " memiliki limit return sebanyak " + str(line.product_return_limit))
 
         returned_product = []
         for line in self.product_line:
@@ -42,6 +46,11 @@ class ReturnProduct(models.TransientModel):
             })
 
         return_service.state_record = 'selesai'
+
+        # Mengurangi maximum return limit untuk barang yang direturn
+        for product in returned_product:
+            product_line = self.env['product.service.line'].search([('service', '=', services.id), ('product_id', '=', product['product_id'])])
+            product_line.product_return_limit = product_line.product_return_limit - product['product_qty']
 
         # Membuat Picking Return & Create
         picking_values = {
@@ -91,6 +100,7 @@ class ReturnProduct(models.TransientModel):
                 'product_id': record.product_id.id,
                 'product_qty': 0,
                 'maximum_qty': record.product_qty,
+                'product_return_limit': record.product_return_limit,
             }))
 
         default_vals['product_line'] = list_barang
@@ -103,6 +113,7 @@ class ReturnProductLine(models.TransientModel):
     product_id = fields.Many2one('product.product', string="Product", required=True, readonly=True, domain="[('id', '=', product_id)]")
     product_qty = fields.Float("Quantity", required=True)
     maximum_qty = fields.Float("Maximum Qty", readonly=True)
+    product_return_limit = fields.Float("Product Return Limit", readonly=True)
     wizard_id = fields.Many2one('return.product.service', string="Wizard")
     move_id = fields.Many2one('stock.move', "Move")
 

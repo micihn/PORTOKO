@@ -16,8 +16,9 @@
                     <field name="product_line" nolabel="1">
                             <tree editable="top" create="0" delete="0">
                                 <field name="product_id" options="{'no_create': True, 'no_open': True}" force_save="1"/>
-                                <field name="product_qty" string="Return Qty"/>
-                                <field name="maximum_qty" string="Service Qty"/>
+                                <field name="product_qty" string="Return Qty" force_save="1"/>
+                                <field name="product_return_limit" string="Maximum Return Limit" force_save="1" invisible="1"/>
+                                <field name="maximum_qty" string="Service Qty" force_save="1"/>
                             </tree>
                     </field>
                 <footer>
