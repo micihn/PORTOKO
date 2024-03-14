@@ -82,12 +82,13 @@ class StockBackorderFleet(models.TransientModel):
 
             product_name = []
             for line in self.pick_ids.move_ids_without_package:
-                if line.product_uom_qty != line.quantity_done:
+
+                if line.product_uom_qty == line.quantity_done and line.state == 'done':
                     service_line = self.env['product.service.line'].search([('product_id', '=', line.product_id.id), ('service','=',service_id.id)])
                     service_line.product_qty = line.quantity_done
                     product_name.append(line.product_id.name)
 
-            message = "Log report quantity Updated\n"
+            message = "Log report quantity Updated \n"
             for name in product_name:
                 message += f"- {name}\n"
 

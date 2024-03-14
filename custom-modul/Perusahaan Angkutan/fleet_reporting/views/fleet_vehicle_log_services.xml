@@ -19,7 +19,7 @@
             <field name="arch" type="xml">
 
                 <header>
-                    <button type="action" name="%(fleet_reporting.action_return_product_service)d" string="Return" attrs="{'invisible': [('state_record', 'not in', ('selesai'))]}"/>
+                    <button type="object" name="return_product" string="Return" attrs="{'invisible': [('state_record', 'not in', ('selesai'))]}"/>
                     <button class="btn-primary" type="object" name="validate" string="Validate" attrs="{'invisible': [('state_record', 'not in', ('draft'))]}"/>
                     <button type="object" name="cancel" string="Cancel" attrs="{'invisible': [('state_record', 'in', ('batal', 'selesai'))]}"/>
                 </header>
