@@ -12,6 +12,11 @@ class FleetVehicleLogServiceProduct(models.Model):
         result = super(FleetVehicleLogServiceProduct, self).create(vals)
         return result
 
+    def return_product(self):
+        action = self.env.ref('fleet_reporting.action_return_product_service').read()[0]
+        action['views'] = [(self.env.ref('fleet_reporting.return_product_service_view').id, 'form')]
+        return action
+
     name = fields.Char(readonly=True, required=True, copy=False, default='New')
     # product_id = fields.Many2one('product.product', copy=False)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
@@ -32,13 +37,6 @@ class FleetVehicleLogServiceProduct(models.Model):
 
     list_sparepart = fields.One2many('product.service.line', 'service', copy=False)
 
-    def retun_product(self):
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'return.product.service',
-            'view_mode': 'form',
-            'target': 'new',
-        }
 
     @api.depends('list_sparepart.total_cost')
     def compute_amount(self):
