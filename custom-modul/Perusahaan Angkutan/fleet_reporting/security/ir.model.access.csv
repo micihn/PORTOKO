@@ -6,3 +6,8 @@ access_service_fleet_report,access.service.fleet.report,fleet_reporting.model_se
 access_fleet_configuration_service,access.fleet.configuration.service,fleet_reporting.model_fleet_configuration_service,fleet.fleet_group_manager,1,1,1,1
 
 access_product_service_line,access.product.service.line,fleet_reporting.model_product_service_line,fleet.fleet_group_manager,1,1,1,1
+
+access_return_product_service,access.product.return.service,fleet_reporting.model_return_product_service,,1,1,1,1
+
+access_return_product_service_line,access.return.product.service.line,fleet_reporting.model_return_product_service_line,,1,1,1,1
+

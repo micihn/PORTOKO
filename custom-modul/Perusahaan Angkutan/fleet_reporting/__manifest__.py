@@ -24,6 +24,7 @@
         'views/stock_picking.xml',
         'wizard/service_fleet_report.xml',
         'wizard/fleet_pendapatan.xml',
+        'wizard/return_product.xml',
         'report/report_fleet_pendapatan.xml',
         'report/report_fleet_pendapatan_action.xml',
         'report/report_service_fleet.xml',
