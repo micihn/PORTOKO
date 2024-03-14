@@ -22,9 +22,28 @@ class ReturnProduct(models.TransientModel):
 
                 returned_product.append(returned_product_dict)
 
-                product_in_line = self.env['product.service.line'].search([('service','=',services.id), ('product_id', '=', line.product_id.id)])
-                product_in_line.product_qty = product_in_line.product_qty - line.product_qty
+        # Membuat Service List khusus barang yang di return
+        return_service = self.env['fleet.vehicle.log.services'].create({
+            'description': str(services.name) + " - Return",
+            'date': fields.Date.today(),
+            'service_type_id': services.service_type_id.id,
+            'vehicle_id': services.vehicle_id.id,
+            'purchaser_id': services.purchaser_id.id,
+            'is_service': False,
+            'initial': False,
+        })
 
+        for product in returned_product:
+            self.env['product.service.line'].create({
+                'service': return_service.id,
+                'product_id': product['product_id'],
+                'product_qty': product['product_qty'] * -1,
+                'cost': self.env['product.product'].search([('id','=',product['product_id'])]).standard_price,
+            })
+
+        return_service.state_record = 'selesai'
+
+        # Membuat Picking Return & Create
         picking_values = {
             'origin': services.name + str(" - Return"),
             'location_id': self.env['stock.location'].search([('name', '=', 'Internal Consumption')]).id,
@@ -33,6 +52,7 @@ class ReturnProduct(models.TransientModel):
         }
         picking = self.env['stock.picking'].create(picking_values)
 
+        # Membuat picking line
         for product in returned_product:
             move_values = {
                 'name': product['product_name'],
@@ -48,6 +68,16 @@ class ReturnProduct(models.TransientModel):
 
         picking.action_confirm()
         picking.button_validate()
+
+        # Get the action for fleet.vehicle.log.services form view
+        action = self.env.ref('fleet.fleet_vehicle_log_services_action').read()[0]
+
+        # Set the context to open the form view for the newly created return_service
+        action['views'] = [(self.env.ref('fleet.fleet_vehicle_log_services_view_form').id, 'form')]
+        action['res_id'] = return_service.id
+
+        # Return the action
+        return action
 
     @api.model
     def default_get(self, active_ids):
