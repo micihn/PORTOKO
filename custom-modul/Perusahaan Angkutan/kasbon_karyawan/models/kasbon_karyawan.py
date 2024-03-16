@@ -53,6 +53,7 @@ class KasbonKaryawan(models.Model):
         'lended': [('readonly', True)],
         'returned': [('readonly', True)],
     })
+
     journal_entry_hutang = fields.Many2many('account.move', string='Journal Entry Hutang', readonly=True, relation='kasbon_karyawan_journal_entry_hutang_rel')
     journal_entry_pelunasan_hutang = fields.Many2many('account.move', string='Journal Entry Pelunasan', readonly=True, relation='kasbon_karyawan_journal_entry_pelunasan_hutang_rel')
 
@@ -81,6 +82,7 @@ class KasbonKaryawan(models.Model):
             'move_type': 'entry',
             'date': self.tanggal,
             'ref': str(self.name) + str(" - Hutang Karyawan " + self.nama_karyawan.name),
+            'journal_id': self.akun_kas.id,
             'line_ids': [
                 (0, 0, {
                     'name': self.name,
