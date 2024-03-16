@@ -1,13 +1,35 @@
 from odoo import api, fields, models
+from datetime import datetime
 
 class UangJalanGantung(models.TransientModel):
     _name = 'uang.jalan.gantung'
     _description = 'Uang Jalan Gantung'
 
+    cari_semua_kendaraan = fields.Boolean()
+    cari_seluruh_uang_gantung = fields.Boolean()
     kendaraan = fields.Many2one('fleet.vehicle')
     tanggal_start = fields.Date()
     tanggal_finish = fields.Date()
     uang_jalan_tree = fields.Many2many('uang.jalan', 'uj_list')
+
+    @api.onchange('cari_semua_kendaraan')
+    def reset_kendaraan(self):
+        for rec in self:
+            if bool(rec.cari_semua_kendaraan):
+                rec.kendaraan = rec.cari_semua_kendaraan
+            else:
+                rec.kendaraan = False
+
+
+    @api.onchange('cari_seluruh_uang_gantung')
+    def reset_tanggal(self):
+        for rec in self:
+            if rec.cari_seluruh_uang_gantung == True:
+                rec.tanggal_start = fields.Date.from_string('2000-01-01')
+                rec.tanggal_finish = fields.Date.from_string(datetime.today().strftime('%Y-%m-%d'))
+            else:
+                rec.tanggal_start = False
+                rec.tanggal_finish = False
 
     @api.onchange('tanggal_start', 'tanggal_finish', 'kendaraan')
     def _onchange_filters(self):
@@ -25,7 +47,7 @@ class UangJalanGantung(models.TransientModel):
                 else:
                     # Clear the services field if no records are found
                     self.uang_jalan_tree = [(5, 0, 0)]
-            else:
+            elif bool(self.kendaraan) == False:
                 uang_jalan = self.env['uang.jalan'].search([
                     ('create_date', '>=', self.tanggal_start),
                     ('create_date', '<=', self.tanggal_finish),

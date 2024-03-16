@@ -7,9 +7,11 @@
         <field name="arch" type="xml">
             <form string="Uang Jalan Gantung">
                 <group>
-                    <field name="kendaraan"/>
-                    <field name="tanggal_start"/>
-                    <field name="tanggal_finish"/>
+                    <field name="cari_semua_kendaraan" attrs="{'invisible': [('cari_seluruh_uang_gantung', '=', True)]}" string="Tampilkan Seluruh Kendaraan"/>
+                    <field name="cari_seluruh_uang_gantung" attrs="{'invisible': [('cari_semua_kendaraan', '=', True)]}" string="Tampilkan Uang Gantung Keseluruhan"/>
+                    <field name="kendaraan" attrs="{'invisible': ['|', ('cari_semua_kendaraan', '=', True), ('cari_seluruh_uang_gantung', '=', True)]}"/>
+                    <field name="tanggal_start" attrs="{'invisible': [('cari_seluruh_uang_gantung', '=', True)]}"/>
+                    <field name="tanggal_finish" attrs="{'invisible': [('cari_seluruh_uang_gantung', '=', True)]}"/>
                     <field name="uang_jalan_tree" invisible="0"/>
                 </group>
                 <footer>
