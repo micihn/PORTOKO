@@ -23,26 +23,27 @@ class OrderSetoran(models.Model):
     komisi_kenek = fields.Float(compute='_compute_komisi_kenek', digits=(6, 0))
     active = fields.Boolean('Archive', default=True, tracking=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+    fetch_order_automatic = fields.Boolean()
 
-    kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', tracking=True, required=True, states={
+    kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', tracking=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     })
 
-    sopir = fields.Many2one('hr.employee', 'Sopir', tracking=True, required=True, states={
+    sopir = fields.Many2one('hr.employee', 'Sopir', tracking=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     })
 
-    kenek = fields.Many2one('hr.employee', 'Kenek', tracking=True, required=True, states={
+    kenek = fields.Many2one('hr.employee', 'Kenek', tracking=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     })
 
-    tanggal_st = fields.Date('Tanggal ST', tracking=True, required=True, states={
+    tanggal_st = fields.Date('Tanggal ST', tracking=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
@@ -330,30 +331,31 @@ class OrderSetoran(models.Model):
             else:
                 record.total_pengeluaran = 0
 
-    @api.model
-    def create(self, vals):
-        ####################### AUTO ASSIGN RECORD NAME ##############################
+    def ambil_order_pengiriman(self):
+        if bool(self.kendaraan) == False:
+            raise ValidationError('Kendaraan Belum Diisi!')
 
-        if vals.get('kode_order_setoran', 'New') == 'New':
-            vals['kode_order_setoran'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('order.setoran.sequence') or 'New'
-        result = super(OrderSetoran, self).create(vals)
+        if bool(self.sopir) == False:
+            raise ValidationError('Sopir Belum Diisi!')
+
+        if bool(self.kenek) == False:
+            raise ValidationError('Sopir Belum Diisi!')
+
+        self.fetch_order_automatic = True
 
         # list utama untuk membuat record pada tiap notebook
         detail_order = []
         list_uang_jalan = []
         list_pembelian = []
         list_biaya_fee = []
+        record_uang_jalan = [] # List untuk menghindari double input pada setoran
 
-        # List ini untuk menghindari double input pada setoran
-        record_uang_jalan = []
-
-        ############################## Membuat Dictionary-List Detail Order ###########################
-
-        for record in self.env['order.pengiriman'].search([('kendaraan', '=', vals['kendaraan']), ('sopir','=', vals['sopir']), ('kenek','=', vals['kenek']), ('state', '=', 'selesai'), ('company_id', '=', int(self.env.company))]):
-            # Meng-assign nomor setoran ke dalam order pengiriman meskipun statusnya masih draft
+        for record in self.env['order.pengiriman'].search([('kendaraan', '=', self.kendaraan.id), ('sopir','=', self.sopir.id), ('kenek','=', self.kenek.id), ('state', '=', 'selesai'), ('company_id', '=', int(self.env.company))]):
             # Untuk membantu proses perubahan atau update biaya fee (jika ada)
-            record.nomor_setoran = result.kode_order_setoran
+            record.nomor_setoran = self.kode_order_setoran
 
+            # Fase 1 : Membuat Dictionary List
+            # Membuat Dictionary-List Detail Order
             detail_order_dict = {
                 'order_pengiriman': record.id,
                 'create_date': record.create_date,
@@ -364,8 +366,7 @@ class OrderSetoran(models.Model):
             }
             detail_order.append(detail_order_dict)
 
-        ############################## Membuat Dictionary-List Uang Jalan ###########################
-
+            # Membuat Dictionary-List Uang Jalan
             for uang_jalan in record.uang_jalan:
                 if uang_jalan.id not in record_uang_jalan:
                     list_uang_jalan_dict = {
@@ -377,8 +378,7 @@ class OrderSetoran(models.Model):
                     list_uang_jalan.append(list_uang_jalan_dict)
                     record_uang_jalan.append(int(uang_jalan.id))
 
-        ############################## Membuat Dictionary-List Pembelian ###########################
-
+            # Membuat Dictionary-List Pembelian
             if record.biaya_pembelian:
                 for item in record.biaya_pembelian:
                     detail_list_pembelian_dict = {
@@ -391,8 +391,7 @@ class OrderSetoran(models.Model):
 
                     list_pembelian.append(detail_list_pembelian_dict)
 
-        ############################## Membuat Dictionary-List Fee ################################
-
+            # Membuat Dictionary-List Fee
             if record.biaya_fee:
                 for item in record.biaya_fee:
                     detail_list_biaya_fee_dict = {
@@ -403,305 +402,514 @@ class OrderSetoran(models.Model):
 
                     list_biaya_fee.append(detail_list_biaya_fee_dict)
 
-        ############################## Mengeksekusi Create Record ################################
+            # Fase 2 : Mengeksekusi Create Record
+            # Membuat detail order
+            for item in detail_order:
+                self.env['detail.order'].create([{
+                    'company_id': self.env.company.id,
+                    'order_setoran': self.id,
+                    'order_pengiriman': item['order_pengiriman'],
+                    'tanggal_order': item['create_date'],
+                    'jenis_order': item['jenis_order'],
+                    'customer': item['customer_id'],
+                    'plant': item['plant'],
+                    'jumlah': item['total_ongkos'],
+                }])
 
-        # Membuat detail order
-        for item in detail_order:
-            self.env['detail.order'].create([{
-                'company_id': self.env.company.id,
-                'order_setoran': result.id,
-                'order_pengiriman': item['order_pengiriman'],
-                'tanggal_order': item['create_date'],
-                'jenis_order': item['jenis_order'],
-                'customer': item['customer_id'],
-                'plant': item['plant'],
-                'jumlah': item['total_ongkos'],
-            }])
+            # Membuat detail list uang jalan
+            for item in list_uang_jalan:
+                self.env['detail.list.uang.jalan'].create([{
+                    'company_id': self.env.company.id,
+                    'order_setoran': self.id,
+                    'tanggal': item['tanggal'],
+                    'uang_jalan_name': item['uang_jalan_name'],
+                    'total': item['total'],
+                    'keterangan': item['keterangan'],
+                }])
 
-        # Membuat detail list uang jalan
-        for item in list_uang_jalan:
-            self.env['detail.list.uang.jalan'].create([{
-                'company_id': self.env.company.id,
-                'order_setoran': result.id,
-                'tanggal': item['tanggal'],
-                'uang_jalan_name': item['uang_jalan_name'],
-                'total': item['total'],
-                'keterangan': item['keterangan'],
-            }])
+            # Membuat list pembelian
+            for item in list_pembelian:
+                self.env['detail.list.pembelian'].create([{
+                    'company_id': self.env.company.id,
+                    'order_setoran': self.id,
+                    'order_pengiriman': item['order_pengiriman'],
+                    'supplier': item['supplier'],
+                    'nama_barang': item['nama_barang'],
+                    'ukuran': item['ukuran'],
+                    'nominal': item['nominal'],
+                }])
 
-        # Membuat list pembelian
-        for item in list_pembelian:
-            self.env['detail.list.pembelian'].create([{
-                'company_id': self.env.company.id,
-                'order_setoran': result.id,
-                'order_pengiriman': item['order_pengiriman'],
-                'supplier': item['supplier'],
-                'nama_barang': item['nama_barang'],
-                'ukuran': item['ukuran'],
-                'nominal': item['nominal'],
-            }])
-
-        # Membuat list biaya fee
-        for item in list_biaya_fee:
-            self.env['detail.biaya.fee'].create([{
-                'company_id': self.env.company.id,
-                'order_setoran': result.id,
-                'order_pengiriman': item['order_pengiriman'],
-                'fee_contact': item['fee_contact'],
-                'nominal': item['nominal'],
-            }])
-
-        order_pengiriman_model = self.env['order.pengiriman'].search([
-            ('kendaraan', '=', vals.get('kendaraan', self.kendaraan.id)),
-            ('sopir', '=', vals.get('sopir', self.sopir.id)),
-            ('kenek', '=', vals.get('kenek', self.kenek.id)),
-            ('state', '=', 'selesai'),
-            ('company_id', '=', int(self.env.company.id))
-        ])
-
-        if not order_pengiriman_model:
-            self.env.user.notify_warning(message='Order pengiriman dengan kriteria kendaraan, sopir, dan kenek yang Anda pilih tidak ditemukan. Pastikan Order Pengiriman ada dan berstatus "Selesai".', sticky=True, title='Setoran ' + str(vals.get('kode_order_setoran')) + ' : Detail Order Tidak Ditemukan')
-        else:
-            pass
-
-        return result
-
-    def write(self, vals):
-        if 'kendaraan' in vals or 'sopir' in vals or 'kenek' in vals:
-
-            ############################## Rewrite Dictionary-List Detail Order ###########################
-
-            for record in self.detail_order:
-                record.order_pengiriman.nomor_surat_jalan = None
-                record.unlink()
-
-            for record in self.list_uang_jalan:
-                record.unlink()
-
-            for record in self.list_pembelian:
-                record.unlink()
-
-            for record in self.biaya_fee:
-                record.unlink()
-
-            # list utama untuk membuat record pada tiap notebook
-            detail_order = []
-            list_uang_jalan = []
-            list_pembelian = []
-            list_biaya_fee = []
-
-            # List ini untuk menghindari double input pada setoran
-            record_uang_jalan = []
+            # Membuat list biaya fee
+            for item in list_biaya_fee:
+                self.env['detail.biaya.fee'].create([{
+                    'company_id': self.env.company.id,
+                    'order_setoran': self.id,
+                    'order_pengiriman': item['order_pengiriman'],
+                    'fee_contact': item['fee_contact'],
+                    'nominal': item['nominal'],
+                }])
 
             order_pengiriman_model = self.env['order.pengiriman'].search([
-                ('kendaraan', '=', vals.get('kendaraan', self.kendaraan.id)),
-                ('sopir', '=', vals.get('sopir', self.sopir.id)),
-                ('kenek', '=', vals.get('kenek', self.kenek.id)),
+                ('kendaraan', '=', self.kendaraan.id),
+                ('sopir', '=', self.sopir.id),
+                ('kenek', '=', self.kenek.id),
                 ('state', '=', 'selesai'),
                 ('company_id', '=', int(self.env.company.id))
             ])
 
             if not order_pengiriman_model:
                 self.env.user.notify_warning(
-                    message='Order pengiriman dengan kriteria kendaraan, sopir, dan kenek yang Anda pilih tidak ditemukan. Pastikan Order Pengiriman ada dan berstatus "Selesai".', sticky=True, title='Setoran ' + str(self.kode_order_setoran) + ' : Detail Order Tidak Ditemukan')
+                    message='Order pengiriman dengan kriteria kendaraan, sopir, dan kenek yang Anda pilih tidak ditemukan. Pastikan Order Pengiriman ada dan berstatus "Selesai".',
+                    sticky=True,
+                    title='Setoran ' + str(self.kode_order_setoran) + ' : Detail Order Tidak Ditemukan')
             else:
                 pass
 
-            for record in order_pengiriman_model:
-                detail_order_dict = {
-                    'order_pengiriman': record.id,
-                    'create_date': record.create_date,
-                    'jenis_order': record.jenis_order,
-                    'customer_id': record.customer.id,
-                    'plant': record.plant.id if record.plant else None,
-                    'total_ongkos': record.total_ongkos_do or record.total_ongkos_reguler
-                }
-                detail_order.append(detail_order_dict)
+    @api.model
+    def create(self, vals):
+        # Auto Assign record name
+        if vals.get('kode_order_setoran', 'New') == 'New':
+            vals['kode_order_setoran'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('order.setoran.sequence') or 'New'
+        result = super(OrderSetoran, self).create(vals)
 
-            ############################## Rewrite Dictionary-List List Uang Jalan ###########################
-
-                for uang_jalan in record.uang_jalan:
-                    if uang_jalan.id not in record_uang_jalan:
-                        list_uang_jalan_dict = {
-                            'tanggal': uang_jalan.create_date,
-                            'uang_jalan_name': uang_jalan.id,
-                            'total': uang_jalan.total,
-                            'keterangan': uang_jalan.keterangan,
-                        }
-                        list_uang_jalan.append(list_uang_jalan_dict)
-                        record_uang_jalan.append(int(uang_jalan.id))
-
-            ############################## Rewrite Dictionary-List List Pembelian ###########################
-
-                if record.biaya_pembelian:
-                    for item in record.biaya_pembelian:
-                        detail_list_pembelian_dict = {
-                            'order_pengiriman': record.id,
-                            'supplier': item.supplier.id,
-                            'nama_barang': item.nama_barang,
-                            'ukuran': item.ukuran,
-                            'nominal': item.nominal,
-                        }
-
-                        list_pembelian.append(detail_list_pembelian_dict)
-
-            ############################## Rewrite Dictionary-List Biaya Fee ###########################
-
-                # membuat list pembelian
-                if record.biaya_fee:
-                    for item in record.biaya_fee:
-                        detail_list_biaya_fee_dict = {
-                            'order_pengiriman': record.id,
-                            'fee_contact': item.fee_contact.id,
-                            'nominal': item.nominal,
-                        }
-                        list_biaya_fee.append(detail_list_biaya_fee_dict)
-
-            ############################## Mengeksekusi WriteRecord ################################
-
-            for record in detail_order:
-                self.env['detail.order'].create([{
+        setoran = self.env['order.setoran'].search([('id', '=', result.id)])
+        for order in setoran.detail_order:
+            for uang_jalan in order.order_pengiriman.uang_jalan:
+                setoran.list_uang_jalan.create({
                     'company_id': self.env.company.id,
-                    'order_setoran': self.id,
-                    'order_pengiriman': record['order_pengiriman'],
-                    'tanggal_order': record['create_date'],
-                    'jenis_order': record['jenis_order'],
-                    'customer': record['customer_id'],
-                    'plant': record['plant'],
-                    'jumlah': record['total_ongkos'],
-                }])
-
-            for record in list_uang_jalan:
-                self.env['detail.list.uang.jalan'].create([{
-                    'company_id': self.env.company.id,
-                    'order_setoran': self.id,
-                    'tanggal': record['tanggal'],
-                    'uang_jalan_name': record['uang_jalan_name'],
-                    'total': record['total'],
-                    'keterangan': record['keterangan'],
-            }])
-
-            for record in list_pembelian:
-                self.env['detail.list.pembelian'].create([{
-                    'company_id': self.env.company.id,
-                    'order_setoran': self.id,
-                    'order_pengiriman': record['order_pengiriman'],
-                    'supplier': record['supplier'],
-                    'nama_barang': record['nama_barang'],
-                    'ukuran': record['ukuran'],
-                    'nominal': record['nominal'],
-                }])
-
-            for record in list_biaya_fee:
-                self.env['detail.biaya.fee'].create([{
-                    'company_id': self.env.company.id,
-                    'order_setoran': self.id,
-                    'order_pengiriman': record['order_pengiriman'],
-                    'fee_contact': record['fee_contact'],
-                    'nominal': record['nominal'],
-                }])
-
-        res = super(OrderSetoran, self).write(vals)
-
-        # Cek apakah ada penambahan atau perubahan biaya_fee
-        if 'biaya_fee' in vals:
-            biaya_fee_list_before_updated = []
-            # Rewriting Biaya Fee di dalam order setoran
-            for record in self.biaya_fee:
-                biaya_fee_before_update_dict = {
-                    'order_setoran': self.id,
-                    'order_pengiriman': record.order_pengiriman.id,
-                    'fee_contact': record.fee_contact.id,
-                    'nominal': record.nominal,
-                }
-
-                biaya_fee_list_before_updated.append(biaya_fee_before_update_dict)
-
-                record.unlink()
-
-            for item in biaya_fee_list_before_updated:
-                self.env['detail.biaya.fee'].create({
-                    'company_id': self.env.company.id,
-                    'order_setoran': self.id,
-                    'order_pengiriman': item['order_pengiriman'],
-                    'fee_contact': item['fee_contact'],
-                    'nominal': item['nominal'],
+                    'order_pengiriman': order.order_pengiriman.id,
+                    'order_setoran': result.id,
+                    'tanggal': uang_jalan.create_date,
+                    'uang_jalan_name': uang_jalan.id,
+                    'total': uang_jalan.total,
+                    'keterangan': uang_jalan.keterangan,
                 })
 
-            # Rewriting Biaya Fee di order pengiriman
-            biaya_fee_order_pengiriman = []
-            for item in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_fee:
-                fee_dict = {
-                    'order_pengiriman': item.order_pengiriman.id,
-                    'fee_contact': item.fee_contact.id,
-                    'nominal': item.nominal,
-                }
-
-                biaya_fee_order_pengiriman.append(fee_dict)
-
-            for record in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_fee:
-                record.unlink()
-
-            for item in biaya_fee_list_before_updated:
-                self.env['biaya.fee'].create({
-                    'company_id': self.env.company.id,
-                    'order_pengiriman': item['order_pengiriman'],
-                    'fee_contact': item['fee_contact'],
-                    'nominal': item['nominal'],
+            for pembelian in order.order_pengiriman.biaya_pembelian:
+                setoran.list_pembelian.create({
+                    'order_pengiriman': order.order_pengiriman.id,
+                    'order_setoran': result.id,
+                    'supplier': pembelian.supplier.id,
+                    'nama_barang': pembelian.nama_barang,
+                    'ukuran': pembelian.ukuran,
+                    'nominal': pembelian.nominal,
                 })
 
-        # Cek apakah ada penambahan atau perubahan List Pembelian
-        if 'list_pembelian' in vals:
-            list_pembelian_before_updated = []
-            # Rewriting List Pembelian di dalam order setoran
-            for record in self.list_pembelian:
-                list_pembelian_before_update_dict = {
-                    'order_setoran': self.id,
-                    'order_pengiriman': record.order_pengiriman.id,
-                    'supplier': record.supplier.id,
-                    'nama_barang': record.nama_barang,
-                    'nominal': record.nominal,
-                }
-
-                list_pembelian_before_updated.append(list_pembelian_before_update_dict)
-
-                record.unlink()
-
-            for item in list_pembelian_before_updated:
-                self.env['detail.list.pembelian'].create({
-                    'company_id': self.env.company.id,
-                    'order_setoran': self.id,
-                    'order_pengiriman': item['order_pengiriman'],
-                    'supplier': item['supplier'],
-                    'nama_barang': item['nama_barang'],
-                    'nominal': item['nominal'],
+            for biaya_fee in order.order_pengiriman.biaya_fee:
+                setoran.biaya_fee.create({
+                    'order_pengiriman': order.order_pengiriman.id,
+                    'order_setoran': result.id,
+                    'fee_contact': biaya_fee.fee_contact.id,
+                    'nominal': biaya_fee.nominal,
                 })
 
-            # Rewriting Biaya Fee di order pengiriman
-            list_pembelian_order_pengiriman = []
-            for item in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_pembelian:
-                list_pembelian_dict = {
-                    'order_pengiriman': item.order_pengiriman.id,
-                    'supplier': item.supplier.id,
-                    'nama_barang': item.nama_barang,
-                    'nominal': item.nominal,
-                }
+        ### START
+        # # list utama untuk membuat record pada tiap notebook
+        # detail_order = []
+        # list_uang_jalan = []
+        # list_pembelian = []
+        # list_biaya_fee = []
+        #
+        #
+        # record_uang_jalan = []
+        #
+        # ############################## Membuat Dictionary-List Detail Order ###########################
+        #
+        # for record in self.env['order.pengiriman'].search([('kendaraan', '=', vals['kendaraan']), ('sopir','=', vals['sopir']), ('kenek','=', vals['kenek']), ('state', '=', 'selesai'), ('company_id', '=', int(self.env.company))]):
+        #     # Meng-assign nomor setoran ke dalam order pengiriman meskipun statusnya masih draft
+        #     # Untuk membantu proses perubahan atau update biaya fee (jika ada)
+        #     record.nomor_setoran = result.kode_order_setoran
+        #
+        #     detail_order_dict = {
+        #         'order_pengiriman': record.id,
+        #         'create_date': record.create_date,
+        #         'jenis_order': record.jenis_order,
+        #         'customer_id': record.customer.id,
+        #         'plant': record.plant.id if record.plant else None,
+        #         'total_ongkos': record.total_ongkos_do or record.total_ongkos_reguler
+        #     }
+        #     detail_order.append(detail_order_dict)
+        #
+        # ############################## Membuat Dictionary-List Uang Jalan ###########################
+        #
+        #     for uang_jalan in record.uang_jalan:
+        #         if uang_jalan.id not in record_uang_jalan:
+        #             list_uang_jalan_dict = {
+        #                 'tanggal': uang_jalan.create_date,
+        #                 'uang_jalan_name': uang_jalan.id,
+        #                 'total': uang_jalan.total,
+        #                 'keterangan': uang_jalan.keterangan,
+        #             }
+        #             list_uang_jalan.append(list_uang_jalan_dict)
+        #             record_uang_jalan.append(int(uang_jalan.id))
+        #
+        # ############################## Membuat Dictionary-List Pembelian ###########################
+        #
+        #     if record.biaya_pembelian:
+        #         for item in record.biaya_pembelian:
+        #             detail_list_pembelian_dict = {
+        #                 'order_pengiriman': item.order_pengiriman.id,
+        #                 'supplier': item.supplier.id,
+        #                 'nama_barang': item.nama_barang,
+        #                 'ukuran': item.ukuran,
+        #                 'nominal': item.nominal,
+        #             }
+        #
+        #             list_pembelian.append(detail_list_pembelian_dict)
+        #
+        # ############################## Membuat Dictionary-List Fee ################################
+        #
+        #     if record.biaya_fee:
+        #         for item in record.biaya_fee:
+        #             detail_list_biaya_fee_dict = {
+        #                 'order_pengiriman': item.order_pengiriman.id,
+        #                 'fee_contact': item.fee_contact.id,
+        #                 'nominal': item.nominal,
+        #             }
+        #
+        #             list_biaya_fee.append(detail_list_biaya_fee_dict)
+        #
+        # ############################## Mengeksekusi Create Record ################################
+        #
+        # # Membuat detail order
+        # for item in detail_order:
+        #     self.env['detail.order'].create([{
+        #         'company_id': self.env.company.id,
+        #         'order_setoran': result.id,
+        #         'order_pengiriman': item['order_pengiriman'],
+        #         'tanggal_order': item['create_date'],
+        #         'jenis_order': item['jenis_order'],
+        #         'customer': item['customer_id'],
+        #         'plant': item['plant'],
+        #         'jumlah': item['total_ongkos'],
+        #     }])
+        #
+        # # Membuat detail list uang jalan
+        # for item in list_uang_jalan:
+        #     self.env['detail.list.uang.jalan'].create([{
+        #         'company_id': self.env.company.id,
+        #         'order_setoran': result.id,
+        #         'tanggal': item['tanggal'],
+        #         'uang_jalan_name': item['uang_jalan_name'],
+        #         'total': item['total'],
+        #         'keterangan': item['keterangan'],
+        #     }])
+        #
+        # # Membuat list pembelian
+        # for item in list_pembelian:
+        #     self.env['detail.list.pembelian'].create([{
+        #         'company_id': self.env.company.id,
+        #         'order_setoran': result.id,
+        #         'order_pengiriman': item['order_pengiriman'],
+        #         'supplier': item['supplier'],
+        #         'nama_barang': item['nama_barang'],
+        #         'ukuran': item['ukuran'],
+        #         'nominal': item['nominal'],
+        #     }])
+        #
+        # # Membuat list biaya fee
+        # for item in list_biaya_fee:
+        #     self.env['detail.biaya.fee'].create([{
+        #         'company_id': self.env.company.id,
+        #         'order_setoran': result.id,
+        #         'order_pengiriman': item['order_pengiriman'],
+        #         'fee_contact': item['fee_contact'],
+        #         'nominal': item['nominal'],
+        #     }])
+        #
+        # order_pengiriman_model = self.env['order.pengiriman'].search([
+        #     ('kendaraan', '=', vals.get('kendaraan', self.kendaraan.id)),
+        #     ('sopir', '=', vals.get('sopir', self.sopir.id)),
+        #     ('kenek', '=', vals.get('kenek', self.kenek.id)),
+        #     ('state', '=', 'selesai'),
+        #     ('company_id', '=', int(self.env.company.id))
+        # ])
+        #
+        # if not order_pengiriman_model:
+        #     self.env.user.notify_warning(message='Order pengiriman dengan kriteria kendaraan, sopir, dan kenek yang Anda pilih tidak ditemukan. Pastikan Order Pengiriman ada dan berstatus "Selesai".', sticky=True, title='Setoran ' + str(vals.get('kode_order_setoran')) + ' : Detail Order Tidak Ditemukan')
+        # else:
+        #     pass
 
-                list_pembelian_order_pengiriman.append(list_pembelian_dict)
+        return result
 
-            for record in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_pembelian:
-                record.unlink()
+    def write(self, vals):
+        result = super(OrderSetoran, self).write(vals)
 
-            for item in list_pembelian_before_updated:
-                self.env['biaya.pembelian'].create({
-                    'company_id': self.env.company.id,
-                    'order_pengiriman': item['order_pengiriman'],
-                    'supplier': item['supplier'],
-                    'nama_barang': item['nama_barang'],
-                    'nominal': item['nominal'],
-                })
+        if 'detail_order' in vals:
+            for uang_jalan in self.list_uang_jalan:
+                uang_jalan.unlink()
 
-        return res
+            for pembelian in self.list_pembelian:
+                pembelian.unlink()
+
+            for biaya_fee in self.biaya_fee:
+                biaya_fee.unlink()
+
+            for order in self.detail_order:
+                for uang_jalan in order.order_pengiriman.uang_jalan:
+                    self.list_uang_jalan.create({
+                        'company_id': self.env.company.id,
+                        'order_pengiriman': order.order_pengiriman.id,
+                        'order_setoran': self.id,
+                        'tanggal': uang_jalan.create_date,
+                        'uang_jalan_name': uang_jalan.id,
+                        'total': uang_jalan.total,
+                        'keterangan': uang_jalan.keterangan,
+                    })
+
+                for pembelian in order.order_pengiriman.biaya_pembelian:
+                    self.list_pembelian.create({
+                        'order_pengiriman': order.order_pengiriman.id,
+                        'order_setoran': self.id,
+                        'supplier': pembelian.supplier.id,
+                        'nama_barang': pembelian.nama_barang,
+                        'ukuran': pembelian.ukuran,
+                        'nominal': pembelian.nominal,
+                    })
+
+                for biaya_fee in order.order_pengiriman.biaya_fee:
+                    self.biaya_fee.create({
+                        'order_pengiriman': order.order_pengiriman.id,
+                        'order_setoran': self.id,
+                        'fee_contact': biaya_fee.fee_contact.id,
+                        'nominal': biaya_fee.nominal,
+                    })
+
+        # if 'kendaraan' in vals or 'sopir' in vals or 'kenek' in vals:
+        #
+        #     ############################## Rewrite Dictionary-List Detail Order ###########################
+        #
+        #     for record in self.detail_order:
+        #         record.order_pengiriman.nomor_surat_jalan = None
+        #         record.unlink()
+        #
+        #     for record in self.list_uang_jalan:
+        #         record.unlink()
+        #
+        #     for record in self.list_pembelian:
+        #         record.unlink()
+        #
+        #     for record in self.biaya_fee:
+        #         record.unlink()
+        #
+        #     # list utama untuk membuat record pada tiap notebook
+        #     detail_order = []
+        #     list_uang_jalan = []
+        #     list_pembelian = []
+        #     list_biaya_fee = []
+        #
+        #     # List ini untuk menghindari double input pada setoran
+        #     record_uang_jalan = []
+        #
+        #     order_pengiriman_model = self.env['order.pengiriman'].search([
+        #         ('kendaraan', '=', vals.get('kendaraan', self.kendaraan.id)),
+        #         ('sopir', '=', vals.get('sopir', self.sopir.id)),
+        #         ('kenek', '=', vals.get('kenek', self.kenek.id)),
+        #         ('state', '=', 'selesai'),
+        #         ('company_id', '=', int(self.env.company.id))
+        #     ])
+        #
+        #     if not order_pengiriman_model:
+        #         self.env.user.notify_warning(
+        #             message='Order pengiriman dengan kriteria kendaraan, sopir, dan kenek yang Anda pilih tidak ditemukan. Pastikan Order Pengiriman ada dan berstatus "Selesai".', sticky=True, title='Setoran ' + str(self.kode_order_setoran) + ' : Detail Order Tidak Ditemukan')
+        #     else:
+        #         pass
+        #
+        #     for record in order_pengiriman_model:
+        #         detail_order_dict = {
+        #             'order_pengiriman': record.id,
+        #             'create_date': record.create_date,
+        #             'jenis_order': record.jenis_order,
+        #             'customer_id': record.customer.id,
+        #             'plant': record.plant.id if record.plant else None,
+        #             'total_ongkos': record.total_ongkos_do or record.total_ongkos_reguler
+        #         }
+        #         detail_order.append(detail_order_dict)
+        #
+        #     ############################## Rewrite Dictionary-List List Uang Jalan ###########################
+        #
+        #         for uang_jalan in record.uang_jalan:
+        #             if uang_jalan.id not in record_uang_jalan:
+        #                 list_uang_jalan_dict = {
+        #                     'tanggal': uang_jalan.create_date,
+        #                     'uang_jalan_name': uang_jalan.id,
+        #                     'total': uang_jalan.total,
+        #                     'keterangan': uang_jalan.keterangan,
+        #                 }
+        #                 list_uang_jalan.append(list_uang_jalan_dict)
+        #                 record_uang_jalan.append(int(uang_jalan.id))
+        #
+        #     ############################## Rewrite Dictionary-List List Pembelian ###########################
+        #
+        #         if record.biaya_pembelian:
+        #             for item in record.biaya_pembelian:
+        #                 detail_list_pembelian_dict = {
+        #                     'order_pengiriman': record.id,
+        #                     'supplier': item.supplier.id,
+        #                     'nama_barang': item.nama_barang,
+        #                     'ukuran': item.ukuran,
+        #                     'nominal': item.nominal,
+        #                 }
+        #
+        #                 list_pembelian.append(detail_list_pembelian_dict)
+        #
+        #     ############################## Rewrite Dictionary-List Biaya Fee ###########################
+        #
+        #         # membuat list pembelian
+        #         if record.biaya_fee:
+        #             for item in record.biaya_fee:
+        #                 detail_list_biaya_fee_dict = {
+        #                     'order_pengiriman': record.id,
+        #                     'fee_contact': item.fee_contact.id,
+        #                     'nominal': item.nominal,
+        #                 }
+        #                 list_biaya_fee.append(detail_list_biaya_fee_dict)
+        #
+        #     ############################## Mengeksekusi WriteRecord ################################
+        #
+        #     for record in detail_order:
+        #         self.env['detail.order'].create([{
+        #             'company_id': self.env.company.id,
+        #             'order_setoran': self.id,
+        #             'order_pengiriman': record['order_pengiriman'],
+        #             'tanggal_order': record['create_date'],
+        #             'jenis_order': record['jenis_order'],
+        #             'customer': record['customer_id'],
+        #             'plant': record['plant'],
+        #             'jumlah': record['total_ongkos'],
+        #         }])
+        #
+        #     for record in list_uang_jalan:
+        #         self.env['detail.list.uang.jalan'].create([{
+        #             'company_id': self.env.company.id,
+        #             'order_setoran': self.id,
+        #             'tanggal': record['tanggal'],
+        #             'uang_jalan_name': record['uang_jalan_name'],
+        #             'total': record['total'],
+        #             'keterangan': record['keterangan'],
+        #     }])
+        #
+        #     for record in list_pembelian:
+        #         self.env['detail.list.pembelian'].create([{
+        #             'company_id': self.env.company.id,
+        #             'order_setoran': self.id,
+        #             'order_pengiriman': record['order_pengiriman'],
+        #             'supplier': record['supplier'],
+        #             'nama_barang': record['nama_barang'],
+        #             'ukuran': record['ukuran'],
+        #             'nominal': record['nominal'],
+        #         }])
+        #
+        #     for record in list_biaya_fee:
+        #         self.env['detail.biaya.fee'].create([{
+        #             'company_id': self.env.company.id,
+        #             'order_setoran': self.id,
+        #             'order_pengiriman': record['order_pengiriman'],
+        #             'fee_contact': record['fee_contact'],
+        #             'nominal': record['nominal'],
+        #         }])
+
+        # res = super(OrderSetoran, self).write(vals)
+
+        # # Cek apakah ada penambahan atau perubahan biaya_fee
+        # if 'biaya_fee' in vals:
+        #     biaya_fee_list_before_updated = []
+        #     # Rewriting Biaya Fee di dalam order setoran
+        #     for record in self.biaya_fee:
+        #         biaya_fee_before_update_dict = {
+        #             'order_setoran': self.id,
+        #             'order_pengiriman': record.order_pengiriman.id,
+        #             'fee_contact': record.fee_contact.id,
+        #             'nominal': record.nominal,
+        #         }
+        #
+        #         biaya_fee_list_before_updated.append(biaya_fee_before_update_dict)
+        #
+        #         record.unlink()
+        #
+        #     for item in biaya_fee_list_before_updated:
+        #         self.env['detail.biaya.fee'].create({
+        #             'company_id': self.env.company.id,
+        #             'order_setoran': self.id,
+        #             'order_pengiriman': item['order_pengiriman'],
+        #             'fee_contact': item['fee_contact'],
+        #             'nominal': item['nominal'],
+        #         })
+        #
+        #     # Rewriting Biaya Fee di order pengiriman
+        #     biaya_fee_order_pengiriman = []
+        #     for item in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_fee:
+        #         fee_dict = {
+        #             'order_pengiriman': item.order_pengiriman.id,
+        #             'fee_contact': item.fee_contact.id,
+        #             'nominal': item.nominal,
+        #         }
+        #
+        #         biaya_fee_order_pengiriman.append(fee_dict)
+        #
+        #     for record in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_fee:
+        #         record.unlink()
+        #
+        #     for item in biaya_fee_list_before_updated:
+        #         self.env['biaya.fee'].create({
+        #             'company_id': self.env.company.id,
+        #             'order_pengiriman': item['order_pengiriman'],
+        #             'fee_contact': item['fee_contact'],
+        #             'nominal': item['nominal'],
+        #         })
+        #
+        # # Cek apakah ada penambahan atau perubahan List Pembelian
+        # if 'list_pembelian' in vals:
+        #     list_pembelian_before_updated = []
+        #     # Rewriting List Pembelian di dalam order setoran
+        #     for record in self.list_pembelian:
+        #         list_pembelian_before_update_dict = {
+        #             'order_setoran': self.id,
+        #             'order_pengiriman': record.order_pengiriman.id,
+        #             'supplier': record.supplier.id,
+        #             'nama_barang': record.nama_barang,
+        #             'nominal': record.nominal,
+        #         }
+        #
+        #         list_pembelian_before_updated.append(list_pembelian_before_update_dict)
+        #
+        #         record.unlink()
+        #
+        #     for item in list_pembelian_before_updated:
+        #         self.env['detail.list.pembelian'].create({
+        #             'company_id': self.env.company.id,
+        #             'order_setoran': self.id,
+        #             'order_pengiriman': item['order_pengiriman'],
+        #             'supplier': item['supplier'],
+        #             'nama_barang': item['nama_barang'],
+        #             'nominal': item['nominal'],
+        #         })
+        #
+        #     # Rewriting Biaya Fee di order pengiriman
+        #     list_pembelian_order_pengiriman = []
+        #     for item in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_pembelian:
+        #         list_pembelian_dict = {
+        #             'order_pengiriman': item.order_pengiriman.id,
+        #             'supplier': item.supplier.id,
+        #             'nama_barang': item.nama_barang,
+        #             'nominal': item.nominal,
+        #         }
+        #
+        #         list_pembelian_order_pengiriman.append(list_pembelian_dict)
+        #
+        #     for record in self.env['order.pengiriman'].search([('nomor_setoran', '=', self.kode_order_setoran)]).biaya_pembelian:
+        #         record.unlink()
+        #
+        #     for item in list_pembelian_before_updated:
+        #         self.env['biaya.pembelian'].create({
+        #             'company_id': self.env.company.id,
+        #             'order_pengiriman': item['order_pengiriman'],
+        #             'supplier': item['supplier'],
+        #             'nama_barang': item['nama_barang'],
+        #             'nominal': item['nominal'],
+        #         })
+
+        return result
 
 class DetailOrder(models.Model):
     _name = 'detail.order'
@@ -728,11 +936,22 @@ class DetailOrder(models.Model):
             if record.bayar_dimuka > record.jumlah:
                 raise ValidationError('Nominal bayar dimuka lebih besar daripada nominal yang ditagihkan (' +(record.order_pengiriman.order_pengiriman_name) + ').' )
 
+    @api.onchange('order_pengiriman')
+    def onchange_order_pengiriman(self):
+        for order in self.order_pengiriman:
+            self.company_id = self.env.company.id
+            self.tanggal_order = order.create_date
+            self.jenis_order = order.jenis_order
+            self.customer = order.customer.id
+            self.plant = order.plant
+            self.jumlah = order.total_ongkos
+
 class ListUangJalan(models.Model):
     _name = 'detail.list.uang.jalan'
     _description = 'List Uang Jalan'
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+    order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
     order_setoran = fields.Many2one('order.setoran', invisible=True)
     tanggal = fields.Date('Tanggal')
     uang_jalan_name = fields.Many2one('uang.jalan', 'No Uang Jalan')
