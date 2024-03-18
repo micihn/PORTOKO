@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <form string="Print Stock Sparepart">
                 <group>
-                    <field name="date"/>
+                    <field name="date" string="Tanggal"/>
                 </group>
                 <footer>
                     <button name="generate_report_sparepart" string="Print" type="object" class="btn-primary" data-hotkey="q"/>

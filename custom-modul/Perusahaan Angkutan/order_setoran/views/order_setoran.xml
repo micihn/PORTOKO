@@ -35,6 +35,7 @@
                 <header>
                     <field name="state" widget="statusbar" statusbar_visible="draft, done"/>
                     <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('cancel', 'done'))]}"/>
+                    <button name="ambil_order_pengiriman" type="object" string="Ambil Order Setoran" attrs="{'invisible': ['|', ('fetch_order_automatic', '=', True), ('state', 'in', ('cancel', 'done'))]}"/>
                     <button name="cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ('draft', 'cancel'))]}"/>
                     <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('draft', 'done'))]}"/>
                 </header>
@@ -78,6 +79,7 @@
                             <field name="kendaraan"/>
                             <field name="sopir"/>
                             <field name="kenek"/>
+                            <field name="fetch_order_automatic" invisible="1"/>
                         </group>
 
                         <group>
@@ -89,13 +91,13 @@
                     <notebook>
                         <page string="Detail Order">
                             <field name="detail_order">
-                                <tree editable="bottom" create="0" delete="0">
-                                    <field name="order_pengiriman" optional="show" force_save="True" readonly="True"/>
+                                <tree editable="bottom">
+                                    <field name="order_pengiriman" optional="show" force_save="True" />
                                     <field name="tanggal_order" optional="show" force_save="True" readonly="True"/>
                                     <field name="jenis_order" optional="show" force_save="True" readonly="True"/>
                                     <field name="customer" optional="show" force_save="True" readonly="True"/>
                                     <field name="plant" optional="show" force_save="True" readonly="True"/>
-                                    <field name="nomor_surat_jalan" optional="show"/>
+                                    <field name="nomor_surat_jalan" optional="show" />
                                     <field name="tanggal_surat_jalan" optional="show"/>
                                     <field name="jumlah" optional="show" force_save="True" readonly="True"/>
                                     <field name="bayar_dimuka" optional="show"/>
@@ -223,7 +225,7 @@
 
                         <page string="List Uang Jalan">
                             <field name="list_uang_jalan" force_save="1" readonly="1">
-                                <tree editable="bottom" create="0" delete="0">
+                                <tree editable="bottom" >
                                     <field name="tanggal" optional="show"/>
                                     <field name="uang_jalan_name" optional="show"/>
                                     <field name="keterangan" optional="show"/>
@@ -243,7 +245,7 @@
                         </page>
 
                         <page string="List Pembelian">
-                            <field name="list_pembelian" force_save="1" >
+                            <field name="list_pembelian" force_save="1" readonly="1">
                                 <tree editable="bottom" >
                                     <field name="order_pengiriman" optional="show"/>
                                     <field name="supplier" optional="show"/>
@@ -265,8 +267,8 @@
 
                         </page>
 
-                        <page string="Biaya Fee">
-                            <field name="biaya_fee" force_save="1" >
+                        <page string="Biaya Fee" >
+                            <field name="biaya_fee" force_save="1" readonly="1">
                                 <tree editable="bottom" >
                                     <field name="order_pengiriman" optional="show"/>
                                     <field name="fee_contact" optional="show"/>
