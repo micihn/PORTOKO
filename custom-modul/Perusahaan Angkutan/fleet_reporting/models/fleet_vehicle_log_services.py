@@ -118,6 +118,7 @@ class FleetVehicleLogServiceProduct(models.Model):
                 raise ValidationError("Terdapat produk sparepart duplikat dalam list")
 
             picking = self.env['stock.picking'].create({
+                'partner_id': self.purchaser_id.id,
                 'location_id': fleet_settings.operation_type.default_location_src_id.id,
                 'location_dest_id': fleet_settings.operation_type.default_location_dest_id.id,
                 'picking_type_id': fleet_settings.operation_type.id,
