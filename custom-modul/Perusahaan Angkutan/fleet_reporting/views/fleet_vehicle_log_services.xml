@@ -161,15 +161,18 @@
                         }
                     </attribute>
                 </xpath>
+            </field>
+        </record>
 
-
-
-
-
-
-
-
-
+        <record id="fleet_vehicle_log_services_product_search" model="ir.ui.view">
+            <field name="name">fleet.vehicle.log.services.product.search</field>
+            <field name="model">fleet.vehicle.log.services</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" string="Name"/>
+                    <field name="vehicle_id" string="Kendaraan"/>
+                    <field name="purchaser_id" string="Driver"/>
+                </search>
             </field>
         </record>
     </data>

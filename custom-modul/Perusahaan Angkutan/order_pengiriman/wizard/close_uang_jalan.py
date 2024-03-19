@@ -13,25 +13,99 @@ class CloseUangJalan(models.TransientModel):
 
     def close_uang_jalan(self):
         for record in self.env['uang.jalan'].browse(self._context.get('active_ids', [])):
-            order_ids = []
-            for order_pengiriman in record.uang_jalan_line.order_pengiriman:
-                order_ids.append(order_pengiriman.id)
+            if self.nominal_close < 0 :
+                raise ValidationError("Nominal Close uang jalan tidak boleh kurang dari 0 Rupiah")
 
-            if self.specific_order_pengiriman == True and self.order_pengiriman.id not in order_ids:
-                raise ValidationError('Order Pengiriman Terpilih tidak merupakan bagian dari Surat Jalan')
+            if self.nominal_close > 0:
+                order_ids = []
+                for order_pengiriman in record.uang_jalan_line.order_pengiriman:
+                    order_ids.append(order_pengiriman.id)
 
-            if record.balance_uang_jalan < self.nominal_close:
+                if self.specific_order_pengiriman == True and self.order_pengiriman.id not in order_ids:
+                    raise ValidationError('Order Pengiriman Terpilih tidak merupakan bagian dari Surat Jalan')
+
+                if record.balance_uang_jalan < self.nominal_close:
+                    account_settings = self.env['konfigurasi.account.uang.jalan'].search([('company_id', '=', record.company_id.id)])
+                    account_uang_jalan = account_settings.account_uang_jalan
+                    journal_uang_jalan = account_settings.journal_uang_jalan
+                    account_kas = account_settings.account_kas
+
+                    self.env['uang.jalan.balance.history'].create({
+                        'uang_jalan_id': record.id,
+                        'company_id': record.company_id.id,
+                        'keterangan': "Penggunaan Saldo Uang Jalan Di luar nominal yang diberikan",
+                        'tanggal_pencatatan': self.tanggal_penggunaan,
+                        'nominal_close': self.nominal_close * -1,
+                    })
+
+                    journal_entry = self.env['account.move'].create({
+                        'company_id': record.company_id.id,
+                        'move_type': 'entry',
+                        'journal_id': journal_uang_jalan.id,
+                        'date': record.create_date,
+                        'ref': record.uang_jalan_name,
+                        'line_ids': [
+                            (0, 0, {
+                                'name': record.uang_jalan_name,
+                                'date': record.create_date,
+                                'account_id': account_kas.id,
+                                'company_id': record.company_id.id,
+                                'credit': self.nominal_close,
+                            }),
+
+                            (0, 0, {
+                                'name': record.uang_jalan_name,
+                                'date': record.create_date,
+                                'account_id': account_uang_jalan.id,
+                                'company_id': record.company_id.id,
+                                'debit': self.nominal_close,
+                            }),
+                        ],
+                    })
+
+                    journal_entry.action_post()
+
+                    record.kendaraan.kas_gantung_vehicle -= self.nominal_close
+
+                    record.state = 'closed'
+
+                else:
+                    if self.specific_order_pengiriman:
+                        self.env['uang.jalan.balance.history'].create({
+                            'uang_jalan_id': record.id,
+                            'company_id': record.company_id.id,
+                            'keterangan': "Penggunaan Saldo Uang Jalan Untuk " + str(self.order_pengiriman.order_pengiriman_name),
+                            'tanggal_pencatatan': self.tanggal_penggunaan,
+                            'nominal_close': self.nominal_close * -1,
+                        })
+                    else:
+                        self.env['uang.jalan.balance.history'].create({
+                            'uang_jalan_id': record.id,
+                            'company_id': record.company_id.id,
+                            'keterangan': "Penggunaan Saldo Uang Jalan Untuk Seluruh Order Pengiriman",
+                            'tanggal_pencatatan': self.tanggal_penggunaan,
+                            'nominal_close': self.nominal_close * -1,
+                        })
+
+                    record.can_use_all_balance = False
+
+                    record.kendaraan.kas_gantung_vehicle -= self.nominal_close
+
+                    record.state = 'closed'
+
+            elif self.nominal_close == 0:
                 account_settings = self.env['konfigurasi.account.uang.jalan'].search([('company_id', '=', record.company_id.id)])
                 account_uang_jalan = account_settings.account_uang_jalan
                 journal_uang_jalan = account_settings.journal_uang_jalan
                 account_kas = account_settings.account_kas
+                balance_uang_jalan = record.balance_uang_jalan
 
                 self.env['uang.jalan.balance.history'].create({
                     'uang_jalan_id': record.id,
                     'company_id': record.company_id.id,
-                    'keterangan': "Penggunaan Saldo Uang Jalan Di luar nominal yang diberikan",
+                    'keterangan': "Saldo uang jalan dikembalikan",
                     'tanggal_pencatatan': self.tanggal_penggunaan,
-                    'nominal_close': self.nominal_close * -1,
+                    'nominal_close': balance_uang_jalan * -1,
                 })
 
                 journal_entry = self.env['account.move'].create({
@@ -43,49 +117,26 @@ class CloseUangJalan(models.TransientModel):
                     'line_ids': [
                         (0, 0, {
                             'name': record.uang_jalan_name,
-                            'date': record.create_date,
-                            'account_id': account_kas.id,
+                            'date': self.tanggal_penggunaan,
+                            'account_id': account_uang_jalan.id,
                             'company_id': record.company_id.id,
-                            'credit': self.nominal_close,
+                            'credit': balance_uang_jalan,
                         }),
 
                         (0, 0, {
                             'name': record.uang_jalan_name,
-                            'date': record.create_date,
-                            'account_id': account_uang_jalan.id,
+                            'date': self.tanggal_penggunaan,
+                            'account_id': account_kas.id,
                             'company_id': record.company_id.id,
-                            'debit': self.nominal_close,
+                            'debit': balance_uang_jalan,
                         }),
                     ],
                 })
 
                 journal_entry.action_post()
 
-                record.kendaraan.kas_gantung_vehicle -= self.nominal_close
+                record.kendaraan.kas_gantung_vehicle -= balance_uang_jalan
 
                 record.state = 'closed'
 
-            else:
-                if self.specific_order_pengiriman:
-                    self.env['uang.jalan.balance.history'].create({
-                        'uang_jalan_id': record.id,
-                        'company_id': record.company_id.id,
-                        'keterangan': "Penggunaan Saldo Uang Jalan Untuk " + str(self.order_pengiriman.order_pengiriman_name),
-                        'tanggal_pencatatan': self.tanggal_penggunaan,
-                        'nominal_close': self.nominal_close * -1,
-                    })
-                else:
-                    self.env['uang.jalan.balance.history'].create({
-                        'uang_jalan_id': record.id,
-                        'company_id': record.company_id.id,
-                        'keterangan': "Penggunaan Saldo Uang Jalan Untuk Seluruh Order Pengiriman",
-                        'tanggal_pencatatan': self.tanggal_penggunaan,
-                        'nominal_close': self.nominal_close * -1,
-                    })
-
-                record.can_use_all_balance = False
-
-                record.kendaraan.kas_gantung_vehicle -= self.nominal_close
-
-                record.state = 'closed'
 

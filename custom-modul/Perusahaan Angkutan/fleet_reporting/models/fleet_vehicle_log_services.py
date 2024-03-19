@@ -8,7 +8,12 @@ class FleetVehicleLogServiceProduct(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('name', 'New') == 'New':
-            vals['name'] = self.env['ir.sequence'].next_by_code('service.sequence') or 'New'
+            service_type = self.env['fleet.service.type'].search([('id','=',vals['service_type_id'])])
+            if service_type.category == 'service':
+                vals['name'] = self.env['ir.sequence'].next_by_code('service.sequence') or 'New'
+            elif service_type.category == 'sparepart':
+                vals['name'] = self.env['ir.sequence'].next_by_code('permintaan.barang.sequence') or 'New'
+
         result = super(FleetVehicleLogServiceProduct, self).create(vals)
         return result
 
@@ -18,9 +23,7 @@ class FleetVehicleLogServiceProduct(models.Model):
         return action
 
     name = fields.Char(readonly=True, required=True, copy=False, default='New')
-    # product_id = fields.Many2one('product.product', copy=False)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
-    # product_qty = fields.Float('Quantity', copy=False, default=1)
     total_amount = fields.Monetary(readonly=False, store=True, copy=False, default=0)
     is_service = fields.Boolean()
     amount = fields.Monetary(copy=False, readonly=True, compute="compute_amount", default=0)
@@ -143,13 +146,15 @@ class FleetVehicleLogServiceProduct(models.Model):
                 stock_move._action_confirm()
                 stock_move._action_assign()
 
-            picking.fleet_layer = 1
             picking.fleet_service_id = self.id
 
-            related_picking = self.env['stock.picking'].search([('origin', '=', picking.name)])
-            for rec in related_picking:
-                rec.fleet_layer = 2
-                rec.fleet_service_id = self.id
+            # picking.fleet_layer = 1
+            # picking.fleet_service_id = self.id
+            #
+            # related_picking = self.env['stock.picking'].search([('origin', '=', picking.name)])
+            # for rec in related_picking:
+            #     rec.fleet_layer = 2
+            #     rec.fleet_service_id = self.id
 
             line.product_return_limit = line.product_qty
 
