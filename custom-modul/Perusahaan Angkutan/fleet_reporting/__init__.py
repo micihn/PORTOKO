@@ -11,7 +11,17 @@ def post_init_hook(cr, registry):
 
         sequence_data = [
             {
-                'name' : 'Service Sequence - ',
+                'name' : 'Permintaan Barang Sequence - ',
+                'code': 'permintaan.barang.sequence',
+                'implementation': 'standard',
+                'prefix': 'PB/%(day)s/%(month)s/%(year)s/',
+                'padding': 3,
+                'number_increment': 1,
+                'number_next_actual': 1,
+            },
+
+            {
+                'name': 'Service Sequence - ',
                 'code': 'service.sequence',
                 'implementation': 'standard',
                 'prefix': 'SE/%(day)s/%(month)s/%(year)s/',

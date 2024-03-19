@@ -56,7 +56,7 @@ class ReturnProduct(models.TransientModel):
         picking_values = {
             'origin': services.name + str(" - Return"),
             'location_id': self.env['stock.location'].search([('name', '=', 'Internal Consumption')]).id,
-            'location_dest_id': self.env['stock.picking.type'].search([('name', '=', 'Permintaan Barang')]).default_location_src_id.id,
+            'location_dest_id': self.env['stock.picking.type'].search([('name', '=', 'Keluar Barang')]).default_location_src_id.id,
             'picking_type_id': self.env['stock.picking.type'].search([('name', '=', 'Keluar Barang')]).id,
         }
         picking = self.env['stock.picking'].create(picking_values)
