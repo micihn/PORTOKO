@@ -43,7 +43,7 @@ class OrderSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    tanggal_st = fields.Date('Tanggal ST', tracking=True, states={
+    tanggal_st = fields.Date('Tanggal ST', tracking=True, required=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
@@ -202,6 +202,16 @@ class OrderSetoran(models.Model):
         return super(OrderSetoran, self).unlink()
 
     def validate(self):
+
+        # Cek Kendaraan
+        if bool(self.kendaraan) == False:
+            raise ValidationError('Kendaraan Belum Terisi!')
+
+        if bool(self.sopir) == False:
+            raise ValidationError('Sopir Belum Terisi!')
+
+        if bool(self.kenek) == False:
+            raise ValidationError('Kenek Belum Terisi!')
 
         # Cek Detail Order
         if bool(self.detail_order) == False:
