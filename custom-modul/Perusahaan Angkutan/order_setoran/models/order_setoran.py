@@ -473,19 +473,9 @@ class OrderSetoran(models.Model):
         result = super(OrderSetoran, self).create(vals)
 
         setoran = self.env['order.setoran'].search([('id', '=', result.id)])
+        list_uang_jalan = []
         for order in setoran.detail_order:
-            list_uang_jalan = []
-            for uang_jalan in order.order_pengiriman.uang_jalan:
-                setoran.list_uang_jalan.create({
-                    'company_id': self.env.company.id,
-                    'order_pengiriman': order.order_pengiriman.id,
-                    'order_setoran': result.id,
-                    'tanggal': uang_jalan.create_date,
-                    'uang_jalan_name': uang_jalan.id,
-                    'total': uang_jalan.total,
-                    'keterangan': uang_jalan.keterangan,
-                })
-
+            # Buat Pembelian
             for pembelian in order.order_pengiriman.biaya_pembelian:
                 setoran.list_pembelian.create({
                     'order_pengiriman': order.order_pengiriman.id,
@@ -496,6 +486,7 @@ class OrderSetoran(models.Model):
                     'nominal': pembelian.nominal,
                 })
 
+            # Buat Biaya Fee
             for biaya_fee in order.order_pengiriman.biaya_fee:
                 setoran.biaya_fee.create({
                     'order_pengiriman': order.order_pengiriman.id,
@@ -503,6 +494,40 @@ class OrderSetoran(models.Model):
                     'fee_contact': biaya_fee.fee_contact.id,
                     'nominal': biaya_fee.nominal,
                 })
+
+            # Appending Uang Jalan
+            for uang_jalan in order.order_pengiriman.uang_jalan:
+                list_uang_jalan.append({
+                    'tanggal_uang_jalan': uang_jalan.create_date,
+                    'uang_jalan_id': uang_jalan.id,
+                    'total': uang_jalan.total,
+                    'keterangan': uang_jalan.keterangan,
+                    'order_id': order.order_pengiriman.id,
+                })
+
+        # Remove duplicate uang jalan
+        unique_list = []
+        seen_ids = set()
+        for item in list_uang_jalan:
+            uang_jalan_id = item['uang_jalan_id']
+            if uang_jalan_id not in seen_ids:
+                unique_list.append(item)
+                seen_ids.add(uang_jalan_id)
+
+        print(unique_list)
+
+        # Buat Uang Jalan
+        for uj in unique_list:
+            self.list_uang_jalan.create({
+                'company_id': self.env.company.id,
+                'order_setoran': setoran.id,
+                'order_pengiriman': uj['order_id'],
+                'tanggal': uj['tanggal_uang_jalan'],
+                'uang_jalan_name': uj['uang_jalan_id'],
+                'total': uj['total'],
+                'keterangan': uj['keterangan'],
+            })
+
 
         ### START
         # # list utama untuk membuat record pada tiap notebook
