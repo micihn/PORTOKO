@@ -474,6 +474,7 @@ class OrderSetoran(models.Model):
 
         setoran = self.env['order.setoran'].search([('id', '=', result.id)])
         for order in setoran.detail_order:
+            list_uang_jalan = []
             for uang_jalan in order.order_pengiriman.uang_jalan:
                 setoran.list_uang_jalan.create({
                     'company_id': self.env.company.id,
@@ -633,7 +634,7 @@ class OrderSetoran(models.Model):
         return result
 
     def write(self, vals):
-        result = super(OrderSetoran, self).write(vals)
+        res = super(OrderSetoran, self).write(vals)
 
         if 'detail_order' in vals:
             for uang_jalan in self.list_uang_jalan:
@@ -645,18 +646,9 @@ class OrderSetoran(models.Model):
             for biaya_fee in self.biaya_fee:
                 biaya_fee.unlink()
 
+            list_uang_jalan = []
             for order in self.detail_order:
-                for uang_jalan in order.order_pengiriman.uang_jalan:
-                    self.list_uang_jalan.create({
-                        'company_id': self.env.company.id,
-                        'order_pengiriman': order.order_pengiriman.id,
-                        'order_setoran': self.id,
-                        'tanggal': uang_jalan.create_date,
-                        'uang_jalan_name': uang_jalan.id,
-                        'total': uang_jalan.total,
-                        'keterangan': uang_jalan.keterangan,
-                    })
-
+                # Buat Pembelian
                 for pembelian in order.order_pengiriman.biaya_pembelian:
                     self.list_pembelian.create({
                         'order_pengiriman': order.order_pengiriman.id,
@@ -667,6 +659,7 @@ class OrderSetoran(models.Model):
                         'nominal': pembelian.nominal,
                     })
 
+                # Buat Biaya Fee
                 for biaya_fee in order.order_pengiriman.biaya_fee:
                     self.biaya_fee.create({
                         'order_pengiriman': order.order_pengiriman.id,
@@ -674,6 +667,60 @@ class OrderSetoran(models.Model):
                         'fee_contact': biaya_fee.fee_contact.id,
                         'nominal': biaya_fee.nominal,
                     })
+
+                # Appending Uang Jalan
+                for uang_jalan in order.order_pengiriman.uang_jalan:
+                    list_uang_jalan.append({
+                        'tanggal_uang_jalan': uang_jalan.create_date,
+                        'uang_jalan_id': uang_jalan.id,
+                        'total': uang_jalan.total,
+                        'keterangan': uang_jalan.keterangan,
+                        'order_id': order.order_pengiriman.id,
+                    })
+
+            # Remove duplicate uang jalan
+            unique_list = []
+            seen_ids = set()
+            for item in list_uang_jalan:
+                uang_jalan_id = item['uang_jalan_id']
+                if uang_jalan_id not in seen_ids:
+                    unique_list.append(item)
+                    seen_ids.add(uang_jalan_id)
+
+            # Buat Uang Jalan
+            for item in unique_list:
+                self.list_uang_jalan.create({
+                    'company_id': self.env.company.id,
+                    'order_pengiriman': item['order_id'],
+                    'order_setoran': self.id,
+                    'tanggal': item['tanggal_uang_jalan'],
+                    'uang_jalan_name': item['uang_jalan_id'],
+                    'total': item['total'],
+                    'keterangan': item['keterangan'],
+                })
+
+                # for uang_jalan in order.order_pengiriman.uang_jalan:
+                #     list_uang_jalan.append({
+                #         'tanggal_uang_jalan': uang_jalan.create_date,
+                #         'uang_jalan_id': uang_jalan.id,
+                #         'total': uang_jalan.total,
+                #         'keterangan': uang_jalan.keterangan,
+                #     })
+                #
+                # print(list_uang_jalan)
+                #
+                # if bool(list_uang_jalan):
+                #     for record in list_uang_jalan:
+                #         self.list_uang_jalan.create({
+                #             'company_id': self.env.company.id,
+                #             'order_pengiriman': order.order_pengiriman.id,
+                #             'order_setoran': self.id,
+                #
+                #             'tanggal': record['tanggal_uang_jalan'],
+                #             'uang_jalan_name': record['uang_jalan_id'],
+                #             'total': record['total'],
+                #             'keterangan': record['keterangan'],
+                #         })
 
         # if 'kendaraan' in vals or 'sopir' in vals or 'kenek' in vals:
         #
@@ -909,7 +956,7 @@ class OrderSetoran(models.Model):
         #             'nominal': item['nominal'],
         #         })
 
-        return result
+        return res
 
 class DetailOrder(models.Model):
     _name = 'detail.order'

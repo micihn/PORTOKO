@@ -228,6 +228,7 @@
                                 <tree editable="bottom" >
                                     <field name="tanggal" optional="show"/>
                                     <field name="uang_jalan_name" optional="show"/>
+                                    <field name="order_pengiriman" optional="show"/>
                                     <field name="keterangan" optional="show"/>
                                     <field name="total" optional="show"/>
                                 </tree>
