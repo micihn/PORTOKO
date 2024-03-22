@@ -124,7 +124,7 @@ class AccountInvoicePayment(models.TransientModel):
 
             # Membuat Vendor Bill (List Pembelian)
             if setoran.total_pembelian > 0:
-                for bill in setoran.list_pembelian.order_pengiriman:
+                for bill in setoran.relatable_list_pembelian.order_pengiriman:
                     for purchase in bill.biaya_pembelian:
                         self.env['account.move'].sudo().create({
                             'company_id': self.env.company.id,
@@ -146,8 +146,8 @@ class AccountInvoicePayment(models.TransientModel):
                         })
 
             tanggal_uang_jalan = []
-            for rec in setoran.list_uang_jalan:
-                tanggal_uang_jalan.append(rec.tanggal)
+            for rec in setoran.relatable_uang_jalan:
+                tanggal_uang_jalan.append(rec.create_date)
 
             formatted_dates = [date.strftime('%d/%m/%Y') for date in tanggal_uang_jalan]
             formatted_dates_str = ', '.join(formatted_dates)
@@ -323,28 +323,29 @@ class AccountInvoicePayment(models.TransientModel):
                 journal_entry_total_pengeluaran.action_post()
 
             # This will close uang jalan
-            for line in setoran.list_uang_jalan:
-                line.uang_jalan_name.order_disetor += 1
+            for line in setoran.detail_order:
+                for uang_jalan in line.order_pengiriman.uang_jalan:
+                    uang_jalan.order_disetor += 1
 
-                if line.uang_jalan_name.order_disetor == line.uang_jalan_name.lines_count:
-                    line.uang_jalan_name.state = 'closed'
+                    if uang_jalan.order_disetor == uang_jalan.lines_count:
+                        uang_jalan.state = 'closed'
 
             # Block dibawah akan mengurangi saldo uang jalan gantung
-            for uj in setoran.list_uang_jalan.uang_jalan_name:
-                if uj.balance_uang_jalan > 0:
+            for line in setoran.detail_order:
+                for uang_jalan in line.order_pengiriman.uang_jalan:
+                    if uang_jalan.balance_uang_jalan > 0:
+                        # Deakumulasi kas gantung kepada kendaraan
+                        setoran.kendaraan.kas_gantung_vehicle -= uang_jalan.balance_uang_jalan
 
-                    # Deakumulasi kas gantung kepada kendaraan
-                    setoran.kendaraan.kas_gantung_vehicle -= uj.balance_uang_jalan
+                        self.env['uang.jalan.balance.history'].create({
+                            'uang_jalan_id': uang_jalan.id,
+                            'company_id': setoran.company_id.id,
+                            'keterangan': "Penutupan Uang Jalan karena telah disetor " + str(setoran.kode_order_setoran),
+                            'tanggal_pencatatan': fields.Date.today(),
+                            'nominal_close': uang_jalan.balance_uang_jalan * -1,
+                        })
 
-                    self.env['uang.jalan.balance.history'].create({
-                        'uang_jalan_id': uj.id,
-                        'company_id': setoran.company_id.id,
-                        'keterangan': "Penutupan Uang Jalan karena telah disetor " + str(setoran.kode_order_setoran),
-                        'tanggal_pencatatan': fields.Date.today(),
-                        'nominal_close': uj.balance_uang_jalan * -1,
-                    })
-
-                    uj.state = 'closed'
+                        uang_jalan.state = 'closed'
 
             setoran.state = 'done'
 

@@ -177,13 +177,6 @@
                                         <field name="keterangan_komisi_kenek" />
                                     </div>
                                 </div>
-
-
-
-
-
-
-
                             </div>
 
 
@@ -224,14 +217,25 @@
                         </page>
 
                         <page string="List Uang Jalan">
-                            <field name="list_uang_jalan" force_save="1" readonly="1">
-                                <tree editable="bottom" >
-                                    <field name="tanggal" optional="show"/>
+
+                            <field name="relatable_uang_jalan" optional="show" force_save="True" readonly="True">
+                                <tree>
                                     <field name="uang_jalan_name" optional="show"/>
                                     <field name="keterangan" optional="show"/>
+                                    <field name="create_date" optional="show"/>
                                     <field name="total" optional="show"/>
                                 </tree>
                             </field>
+
+<!--                            <field name="list_uang_jalan" force_save="1" readonly="1">-->
+<!--                                <tree editable="bottom" >-->
+<!--                                    <field name="tanggal" optional="show"/>-->
+<!--                                    <field name="uang_jalan_name" optional="show"/>-->
+<!--                                    <field name="order_pengiriman" optional="show"/>-->
+<!--                                    <field name="keterangan" optional="show"/>-->
+<!--                                    <field name="total" optional="show"/>-->
+<!--                                </tree>-->
+<!--                            </field>-->
 
                             <div class="oe_right" style="display: inline-block; margin-right: 0px;">
                                 <!-- Total Jalan -->
@@ -245,14 +249,24 @@
                         </page>
 
                         <page string="List Pembelian">
-                            <field name="list_pembelian" force_save="1" readonly="1">
-                                <tree editable="bottom" >
+                            <field name="relatable_list_pembelian" optional="show" force_save="True" readonly="True">
+                                <tree>
                                     <field name="order_pengiriman" optional="show"/>
                                     <field name="supplier" optional="show"/>
                                     <field name="nama_barang" optional="show"/>
+                                    <field name="ukuran" optional="show"/>
                                     <field name="nominal" optional="show"/>
                                 </tree>
                             </field>
+
+<!--                            <field name="list_pembelian" force_save="1" readonly="1">-->
+<!--                                <tree editable="bottom" >-->
+<!--                                    <field name="order_pengiriman" optional="show"/>-->
+<!--                                    <field name="supplier" optional="show"/>-->
+<!--                                    <field name="nama_barang" optional="show"/>-->
+<!--                                    <field name="nominal" optional="show"/>-->
+<!--                                </tree>-->
+<!--                            </field>-->
 
 
                             <div class="oe_right" style="display: inline-block; margin-right: 0px;">
@@ -268,13 +282,21 @@
                         </page>
 
                         <page string="Biaya Fee" >
-                            <field name="biaya_fee" force_save="1" readonly="1">
-                                <tree editable="bottom" >
+                             <field name="relatable_biaya_fee" optional="show" force_save="True" readonly="True">
+                                <tree>
                                     <field name="order_pengiriman" optional="show"/>
                                     <field name="fee_contact" optional="show"/>
                                     <field name="nominal" optional="show"/>
                                 </tree>
                             </field>
+
+<!--                            <field name="biaya_fee" force_save="1" readonly="1">-->
+<!--                                <tree editable="bottom" >-->
+<!--                                    <field name="order_pengiriman" optional="show"/>-->
+<!--                                    <field name="fee_contact" optional="show"/>-->
+<!--                                    <field name="nominal" optional="show"/>-->
+<!--                                </tree>-->
+<!--                            </field>-->
 
                             <div class="oe_right" style="display: inline-block; margin-right: 0px;">
                                 <!-- Total Jalan -->
