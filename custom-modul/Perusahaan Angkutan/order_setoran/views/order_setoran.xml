@@ -35,8 +35,7 @@
                 <header>
                     <field name="state" widget="statusbar" statusbar_visible="draft, done"/>
                     <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('cancel', 'done'))]}"/>
-                    <button name="ambil_order_pengiriman" type="object" string="Ambil Order Setoran" />
-<!--                    <button name="ambil_order_pengiriman" type="object" string="Ambil Order Setoran" attrs="{'invisible': ['|', ('fetch_order_automatic', '=', True), ('state', 'in', ('cancel', 'done'))]}"/>-->
+                    <button name="ambil_order_pengiriman" type="object" string="Ambil Order Setoran" attrs="{'invisible': ['|', ('fetch_order_automatic', '=', True), ('state', 'in', ('cancel', 'done'))]}"/>
                     <button name="cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ('draft', 'cancel'))]}"/>
                     <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('draft', 'done'))]}"/>
                 </header>
