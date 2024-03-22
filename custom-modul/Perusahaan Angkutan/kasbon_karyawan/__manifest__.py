@@ -18,6 +18,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/kasbon_karyawan.xml',
+        'views/hr_employee.xml',
         'wizard/pelunasan_kasbon_karyawan.xml',
         'views/menu.xml',
     ],

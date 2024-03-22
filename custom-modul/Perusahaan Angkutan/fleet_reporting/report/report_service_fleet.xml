@@ -72,7 +72,7 @@
                         <t t-set="pengeluaran_sparepart" t-value="0"/>
                         <t t-set="pengeluaran_service" t-value="0"/>
                         <table class="custom-table custom-table-sm">
-                            <thead style="ext-align:left" class="default-tablefont-size">
+                            <thead style="text-align:left" class="default-tablefont-size">
                                 <tr>
                                     <th style="text-align:left;">Kelompok</th>
                                     <th style="text-align:left;">Tanggal</th>
@@ -83,6 +83,7 @@
                                     <th style="text-align:right;">Jumlah</th>
                                 </tr>
                             </thead>
+
                             <tbody style="text-align:left">
                                 <tr t-foreach="services" t-as='service'>
                                     <t t-if="service['service_category'] == 'sparepart' ">

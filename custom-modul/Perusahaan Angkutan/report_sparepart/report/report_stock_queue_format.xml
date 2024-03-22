@@ -57,6 +57,9 @@
 
 
                             <table class="custom-table custom-table-sm">
+                                <t t-set="total_stock" t-value="0" />
+                                <t t-set="total_value" t-value="0" />
+
                                 <thead style="ext-align:left" class="default-tablefont-size">
                                     <tr>
                                         <th style="text-align:left; width:40px">Kode Barang</th>
@@ -67,7 +70,7 @@
                                     </tr>
                                 </thead>
 
-                                <tbody >
+                                <tbody style="text-align:left">
                                     <tr t-foreach='product_list' t-as='product' style="font-weight:bold" class="default-tablefont-size">
                                         <td style="text-align:left;">
                                             <t t-esc="product['product_code']"/>
@@ -76,13 +79,42 @@
                                             <t t-esc="product['product_name']"/>
                                         </td>
                                         <td style="text-align:right;">
-                                            <t t-esc="product['product_price']"/>
+<!--                                            <t t-esc="'{:,}'.format(int(product['product_price']))"/>-->
+                                            <t t-esc="'{:,.2f}'.format(float(product['product_price']))"/>
                                         </td>
                                         <td style="text-align:right;">
-                                            <t t-esc="product['product_qty']"/>
+<!--                                            <t t-esc="product['product_qty']"/>-->
+                                             <t t-esc="'{:,.2f}'.format(float(product['product_qty']))"/>
+                                            <t t-set="total_stock" t-value="total_stock + float(product['product_qty'])" />
                                         </td>
                                         <td style="text-align:right;">
-                                            <t t-esc="product['product_value']"/>
+<!--                                            <t t-esc="'{:,}'.format(int(product['product_value']))"/>-->
+                                            <t t-esc="'{:,.2f}'.format(float(product['product_value']))"/>
+                                            <t t-set="total_value" t-value="total_value + float(product['product_value'])" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tbody style="text-align:left" class="default-tablefont-size">
+                                    <tr class="default-tablefont-size" style="border-top: 1px solid #000;">
+                                        <td></td>
+                                        <td></td>
+                                        <td style="text-align:right;">
+                                           <span>
+                                                <b>
+                                                    TOTAL
+                                                </b>
+                                            </span>
+                                        </td>
+
+                                        <td style="text-align:right;">
+<!--                                            <t t-esc="'{:,}'.format(int(total_stock))"/>-->
+                                            <t t-esc="'{:,.2f}'.format(float(total_stock))"/>
+                                        </td>
+
+                                        <td style="text-align:right;">
+<!--                                            <t t-esc="'{:,}'.format(int(total_value))"/>-->
+                                            <t t-esc="'{:,.2f}'.format(float(total_value))"/>
                                         </td>
                                     </tr>
                                 </tbody>

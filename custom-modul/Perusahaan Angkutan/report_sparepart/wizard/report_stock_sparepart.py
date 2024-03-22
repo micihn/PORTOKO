@@ -13,22 +13,22 @@ class ReportStockSparepart(models.TransientModel):
         product_list = []
         for product in products:
             product_qty = float(product.with_context({'to_date': self.date}).qty_available)
-            product_value = 0.00
-            product_valuations = self.env['stock.valuation.layer'].search([
-                ('product_id', '=', product.id),
-                ('create_date', '<=', self.date)
-            ])
-
-            for product_valuation in product_valuations:
-                product_value += product_valuation.value
+            # product_value = 0.00
+            # product_valuations = self.env['stock.valuation.layer'].search([
+            #     ('product_id', '=', product.id),
+            #     ('create_date', '<=', self.date)
+            # ])
+            #
+            # for product_valuation in product_valuations:
+            #     product_value += product_valuation.value
 
             if product_qty > 0:
                 product_dict = {
                     'product_code': product.default_code,
                     'product_name': product.name,
-                    'product_price': float(product.list_price),
+                    'product_price': float(product.standard_price),
                     'product_qty': product_qty,
-                    'product_value': float(product_value),
+                    'product_value': float(product_qty) * float(product.standard_price),
                 }
                 product_list.append(product_dict)
 

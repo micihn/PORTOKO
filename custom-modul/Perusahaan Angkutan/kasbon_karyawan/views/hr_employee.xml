@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="hr_employee_kasbon_form_view">
+            <field name="name">hr.employee.kasbon.form.view</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='bank_account_id']" position="before">
+                    <field name="hutang_karyawan" force_save="1" readonly="1" groups="kasbon_karyawan.group_kasbon_karyawan"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

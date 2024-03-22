@@ -16,16 +16,18 @@ class KasbonKaryawan(models.Model):
 
     active = fields.Boolean('Archive', default=True, tracking=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
-    nama_karyawan = fields.Many2one('res.partner', 'Nama Karyawan', states={
+    nama_karyawan = fields.Many2one('hr.employee', 'Nama Karyawan', states={
         'draft': [('readonly', False)],
         'lended': [('readonly', True)],
         'returned': [('readonly', True)],
     })
+
     rekening_karyawan = fields.Many2one('res.partner.bank', 'Rekening', states={
         'draft': [('readonly', False)],
         'lended': [('readonly', True)],
         'returned': [('readonly', True)],
     })
+
     nominal_pinjam = fields.Float('Nominal Pinjam', digits=(6, 0), states={
         'draft': [('readonly', False)],
         'lended': [('readonly', True)],
@@ -71,10 +73,14 @@ class KasbonKaryawan(models.Model):
 
     @api.onchange('nama_karyawan')
     def onchange_nama_karyawan(self):
+        self.rekening_karyawan = self.nama_karyawan.bank_account_id.id
+
         if self.nama_karyawan:
             return {'domain': {'rekening_karyawan': [('partner_id', '=', self.nama_karyawan.id)]}}
         else:
             return {'domain': {'rekening_karyawan': []}}
+
+
 
     def proses_hutang(self):
         journal_entry_hutang = self.env['account.move'].sudo().create({
@@ -108,6 +114,8 @@ class KasbonKaryawan(models.Model):
         # journal_entry_hutang_list = []
         # for rec in self.journal_entry_hutang:
         #     journal_entry_hutang_list.append((6, 0, [rec.id]))
+
+        self.nama_karyawan.hutang_karyawan = self.nama_karyawan.hutang_karyawan + self.nominal_pinjam
 
         self.nominal_sisa = self.nominal_pinjam
 

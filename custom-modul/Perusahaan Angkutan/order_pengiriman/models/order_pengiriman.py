@@ -158,11 +158,12 @@ class OrderPengiriman(models.Model):
         'sudah_setor': [('readonly', True)],
     })
 
-    uang_jalan = fields.Many2many('uang.jalan', string='No. Uang Jalan', readonly=False, store=True, copy=False, domain=[('state', 'in', ['paid', 'closed'])], states={
+    uang_jalan = fields.Many2many('uang.jalan', string='No. Uang Jalan', store=True, copy=False, domain=[('state', 'in', ['paid', 'closed'])], states={
         'order_baru': [('readonly', False)],
         'dalam_perjalanan': [('readonly', False)],
         'selesai': [('readonly', True)],
         'sudah_setor': [('readonly', True)],
+        'batal': [('readonly', True)],
     })
 
     nomor_setoran = fields.Char('Nomor Setoran')
@@ -308,6 +309,7 @@ class OrderPengiriman(models.Model):
                     if vals['uang_jalan'][0][2]:
                         uang_jalan = self.env['uang.jalan'].search([('id', '=', int(vals['uang_jalan'][0][2]))])
 
+                # Mengassign Order pengiriman dengan data uang jalan
                 if vals['uang_jalan'][0][2] != 0:
                     vals['sopir'] = None
                     vals['kenek'] = None

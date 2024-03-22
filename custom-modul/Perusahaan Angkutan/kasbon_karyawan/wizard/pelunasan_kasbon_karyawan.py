@@ -49,6 +49,8 @@ class PelunasanKasbonKaryawan(models.TransientModel):
 
             kasbon_karyawan.nominal_sisa = kasbon_karyawan.nominal_sisa - self.jumlah_pengembalian
 
+            kasbon_karyawan.nama_karyawan.hutang_karyawan = kasbon_karyawan.nama_karyawan.hutang_karyawan - self.jumlah_pengembalian
+
             if kasbon_karyawan.nominal_sisa == 0:
                 kasbon_karyawan.state = 'returned'
             else:
