@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="faktur_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs"
+               t-as="doc"> <!-- This will ensure report be able to be printed from multiple invoices -->
+
+                <div style="display: inline-block; vertical-align: top; margin-right:70px">
+                    <table style="border-collapse: collapse; border: 1px solid black;">
+                        <tbody>
+                            <tr>
+                                <td style="padding-top: 5px; padding-left: 5px;">
+                                    <strong>
+                                        <span>
+                                            CV. PILLAR GRESINDO
+                                        </span>
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 5px; padding-right: 5px;">
+                                    <span style="font-size:12px">
+                                        JL. NAGARAWANGI KALER RT.001 RW.007 CIHIDEUNG
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-bottom: 5px; padding-left: 5px;">
+                                    <span style="font-size:12px">
+                                        0265331916
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div style="display: inline-block; vertical-align: top; margin-right:70px">
+                    <span style="font-size:18px">
+                        <strong>
+                            FAKTUR
+                        </strong>
+                    </span>
+                </div>
+
+                <div style="display: inline-block; vertical-align: top; margin-right: 10px">
+                    <span style="font-size:12px">
+                        Customer :
+                    </span>
+                </div>
+
+                <div style="display: inline-block; vertical-align: top; ">
+                    <span style="font-size:12px">
+                        <t t-esc="doc.partner_id.name"/>
+                        <br/>
+                        <t t-esc="doc.partner_id.street"/>,
+                        <t t-esc="doc.partner_id.street2"/>
+                        <br/>
+                        <t t-esc="doc.partner_id.country_id.name"/>
+                    </span>
+                </div>
+
+                <br />
+
+                <div style="display: inline-block; margin-right: 10px;">
+                    <span style="font-size:12px; margin-top:5px;">
+                        No Faktur :
+                        <t t-esc="doc.name"/>
+                    </span>
+                </div>
+
+                <div style="display: inline-block; margin-right: 280px;">
+                    <span style="font-size:12px; margin-top:5px;">
+                        No. DO : DO03-0305
+                    </span>
+                </div>
+
+                <div style="display: inline-block;margin-right: 5px;">
+                    <span style="font-size:12px; margin-top:5px;">
+                        Tanggal : <t t-esc="doc.invoice_date"/>
+                    </span>
+                </div>
+
+                <div style="display: inline-block;">
+                    <span style="font-size:12px; margin-top:5px;">
+                        Tanggal Jt Tempo : <t t-esc="doc.invoice_date_due"/>
+                    </span>
+                </div>
+
+
+                <!--                <table style="width: 100%;">-->
+                <!--                    <tbody>-->
+                <!--                        <tr>-->
+                <!--                            <td colspan="6">CV. PILLAR GRESINDO</td>-->
+                <!--                            <td>FAKTUR</td>-->
+                <!--                            <td>Customer</td>-->
+                <!--                            <td>Teh Anisa</td>-->
+                <!--                            <td></td>-->
+                <!--                            <td>1/1</td>-->
+                <!--                        </tr>-->
+                <!--                        <tr>-->
+                <!--                            <td colspan="6">JL. NAGARAWANGI KALER RT.001 RW.007 CIHIDEUNG</td>-->
+                <!--                            <td></td>-->
+                <!--                            <td></td>-->
+                <!--                            <td>Garut</td>-->
+                <!--                            <td></td>-->
+                <!--                            <td></td>-->
+                <!--                        </tr>-->
+                <!--                        <tr>-->
+                <!--                            <td colspan="6">0265331916</td>-->
+                <!--                            <td></td>-->
+                <!--                            <td></td>-->
+                <!--                            <td></td>-->
+                <!--                            <td></td>-->
+                <!--                            <td></td>-->
+                <!--                        </tr>-->
+                <!--                        <tr>-->
+                <!--                            <td>No Faktur :</td>-->
+                <!--                            <td>J2403-0305</td>-->
+                <!--                            <td></td>-->
+                <!--                            <td>No DO</td>-->
+                <!--                            <td>DO03-0305</td>-->
+                <!--                            <td></td>-->
+                <!--                            <td></td>-->
+                <!--                            <td>Tanggal</td>-->
+                <!--                            <td>19/03/2024</td>-->
+                <!--                            <td>Tanggal Jt Tempo</td>-->
+                <!--                            <td>19/03/2024</td>-->
+                <!--                        </tr>-->
+                <!--                    </tbody>-->
+                <!--                </table>-->
+
+
+                <!-- DivTable.com -->
+
+
+                <!--                <p style="page-break-after:always;"/> &lt;!&ndash; This will ensure every multiple invoice selected will print to each own page &ndash;&gt;-->
+                <!--                <t t-call="jafza_invoice.jafza_invoice_header"/> &lt;!&ndash; Calling custom header, declared from the bottom in this file &ndash;&gt;-->
+                <!--                <div class="page">-->
+
+                <!--                    <h3>-->
+                <!--                        <center>-->
+                <!--                            <span style="text-decoration: underline; font-weight: bold; font-family: 'arial'">INVOICE</span>-->
+                <!--                        </center>-->
+                <!--                    </h3>-->
+
+                <!--                    <table border="1" style="border-collapse: collapse; width: 100%">-->
+                <!--                        <tr>-->
+                <!--                            <td style=" width: 50%;" colspan="3" rowspan="2">-->
+                <!--                                <p style="font-size:12px; font-family:'arial';color: red;padding-left:10;padding-top:10"><b>Shipper : </b></p>-->
+                <!--                                <p style="font-size:12px;font-family:'arial';padding-left:10;padding-bottom:10">-->
+                <!--                                    <b>-->
+                <!--                                        <t t-esc="doc.company_id.name"/><br/>-->
+                <!--                                        <t t-esc="doc.company_id.street2"/><br/>-->
+                <!--                                        <t t-esc="doc.company_id.city"/><br/>-->
+                <!--                                        <t t-esc="doc.company_id.country_id.name"/><br/>-->
+                <!--                                        <b>VAT : </b> <t t-esc="doc.company_id.vat"/>-->
+                <!--                                    </b>-->
+                <!--                                </p>-->
+                <!--                            </td>-->
+
+                <!--                            <td colspan="6" style=" width: 50%;">-->
+                <!--                                <p style="font-size:12px;font-family:'arial';padding-left:10;padding-top:10;color:red"><b>Invoice No &amp; Date :</b></p>-->
+
+                <!--                                <p style="font-size:12px;font-family:'arial'; margin: 0; display: inline; float: left; padding-left:10; margin-bottom: 00px;">-->
+                <!--                                    <b>-->
+                <!--                                        <t t-esc="doc.name"/>-->
+
+                <!--                                        <t t-foreach="request.env['stock.picking'].search([('origin', 'like', doc.invoice_origin), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'done')], limit=1)" t-as="obj">-->
+                <!--                                            <b><span t-field="obj.date_done" style="padding-left: 210px;" t-options="{'format': 'dd-MM-YY'}"/></b>-->
+                <!--                                        </t>-->
+
+                <!--                                    </b>-->
+                <!--                                </p>-->
+                <!--                            </td>-->
+                <!--                        </tr>-->
+
+                <!--                        <tr>-->
+                <!--                            <td colspan="6"/>-->
+                <!--                        </tr>-->
+
+                <!--                        <tr>-->
+                <!--                            <td colspan="3">-->
+                <!--                                <p style="font-size:12px; font-family:'arial';color: red;padding-left:10;padding-top:10"><b>Consignee : </b></p>-->
+                <!--                                <p style="font-size:12px;font-family:'arial';padding-left:10;padding-bottom:10">-->
+                <!--                                    <b>-->
+                <!--                                        <t t-esc="doc.partner_id.name"/><br/>-->
+                <!--                                        <t t-esc="doc.partner_id.street"/><br/>-->
+                <!--                                        <t t-if="doc.partner_id.street2">-->
+                <!--                                            <t t-esc="doc.partner_id.street2"/><br/>-->
+                <!--                                        </t>-->
+                <!--                                        <t t-esc="doc.partner_id.city"/><br/>-->
+                <!--                                        <t t-esc="doc.partner_id.country_id.name"/><br/>-->
+                <!--                                    </b>-->
+                <!--                                </p>-->
+                <!--                            </td>-->
+
+                <!--                            <td rowspan="2" colspan="6"/>-->
+                <!--                        </tr>-->
+                <!--                        <tr>-->
+                <!--                            <td colspan="2">-->
+                <!--                                <p style="font-size:12px;font-family:'arial'; padding-left:10;">-->
+                <!--                                    <b> Mode of shipment :</b>-->
+                <!--                                </p>-->
+                <!--                            </td>-->
+                <!--                            <td>-->
+                <!--                                <p style="font-size:12px;font-family:'arial'; padding-left:10;">-->
+                <!--                                    <b> Place of Receipt</b>-->
+                <!--                                </p>-->
+                <!--                            </td>-->
+                <!--                        </tr>-->
+                <!--                        <tr>-->
+                <!--                            <td colspan="2"/>-->
+                <!--                            <td/>-->
+                <!--                            <td colspan="6">-->
+                <!--                                <center>-->
+                <!--                                    <p style="font-size:12px; font-family:'arial';color: red; vertical-align:middle"><b>INCOTERMS : </b></p>-->
+                <!--                                </center>-->
+                <!--                            </td>-->
+                <!--                        </tr>-->
+                <!--                        <tr>-->
+                <!--                            <td colspan="2" rowspan="2" width="40">-->
+                <!--                                <p style="font-size:12px; font-family:'arial';padding-left:10;padding-bottom:20;padding-top:3"><b>Vessel/Flight No.</b></p>-->
+                <!--                            </td>-->
+                <!--                            <td>-->
+                <!--                                <p style="font-size:12px;font-family:'arial'; padding-left:10;">-->
+                <!--                                    <b>Port of Loading</b>-->
+                <!--                                </p>-->
+                <!--                            </td>-->
+                <!--                            <td colspan="6" rowspan="3">-->
+                <!--                                <center>-->
+                <!--                                    <p style="font-size:12px;font-family:'arial'; margin-bottom: 2px; padding-left:10; padding-top:10;"><b>DAP, JEBEL ALI, Incoterms 2010</b></p>-->
+                <!--                                </center>-->
+                <!--                            </td>-->
+                <!--                        </tr>-->
+                <!--                            <tr>-->
+                <!--                                <td>-->
+                <!--                                    <p style="font-size:12px;font-family:'arial'; padding-left:10; padding-top:2">-->
+                <!--                                        <b>RA08-FC03</b>-->
+                <!--                                    </p>-->
+                <!--                                </td>-->
+                <!--                            </tr>-->
+                <!--                        <tr>-->
+                <!--                            <td colspan="2" width="30">-->
+                <!--                                <p style="font-size:12px; font-family:'arial';padding-left:10;padding-bottom:20;padding-top:5"><b>Port of Discharge </b></p>-->
+                <!--                            </td>-->
+                <!--                            <td>-->
+                <!--                                <p style="font-size:12px;font-family:'arial'; margin-bottom: 2px; padding-left:10; padding-top:5;"><b>Final Destination</b></p>-->
+                <!--                                <p style="font-size:12px;font-family:'arial'; margin-top: 0; padding-left:10; padding-bottom:10;"><b><t t-esc="doc.partner_id.name"/></b></p>-->
+                <!--                            </td>-->
+                <!--                        </tr>-->
+
+                <!--                            <tr>-->
+                <!--                                <th width="5%"><p style="font-size:9px;font-family:'arial';color:red"><b>SR.#</b></p></th>-->
+                <!--                                <th width="10.3%"><p style="font-size:9px;font-family:'arial';color:red"><b>PRODUCT CODE</b></p></th>-->
+                <!--                                <th width="36%"><p style="font-size:9px;font-family:'arial';color:red"><b>PRODUCT NAME</b></p></th>-->
+                <!--                                <th width="7.3%"><p style="font-size:9px;font-family:'arial';color:red"><b>COO</b></p></th>-->
+                <!--                                <th width="9%"><p style="font-size:9px;font-family:'arial';color:red"><b>H.S. CODE</b></p></th>-->
+                <!--                                <th width="7%"><p style="font-size:9px;font-family:'arial';color:red"><b>GROSS<BR/>WEIGHT</b></p></th>-->
+                <!--                                <th width="7%"><p style="font-size:9px;font-family:'arial';color:red"><b>NO OF<br/>PCS</b></p></th>-->
+                <!--                                <th width="10%"><p style="font-size:9px;font-family:'arial';color:red"><b>UNIT<br/>PRICE</b></p></th>-->
+                <!--                                <th width="21%"><p style="font-size:9px;font-family:'arial';color:red"><b>VALUE</b></p></th>-->
+                <!--                            </tr>-->
+
+                <!--                            <t t-set="total_weight" t-value="0"/> &lt;!&ndash; Initial value set for total_weight &ndash;&gt;-->
+                <!--                        <t t-set="total_quantity" t-value="0"/> &lt;!&ndash; Initial value set for total_quantity &ndash;&gt;-->
+                <!--                        <t t-set="total_value" t-value="0"/> &lt;!&ndash; Initial value set for total_quantity &ndash;&gt;-->
+                <!--                        <t t-foreach="doc.invoice_line_ids" t-as="line">-->
+                <!--                            <t t-set="total_weight" t-value="total_weight + line.weight"/>-->
+                <!--                            <t t-set="total_quantity" t-value="total_quantity + line.quantity"/>-->
+                <!--                            <t t-set="total_value" t-value="total_value + line.price_subtotal"/>-->
+                <!--                        <tbody>-->
+                <!--                            <tr>-->
+                <!--                                <td>-->
+                <!--                                    <center>-->
+                <!--                                        <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="str(line_index + 1) + '0'"/>-->
+                <!--                                    </center>-->
+                <!--                                </td>-->
+                <!--                                <td>-->
+                <!--                                    <center>-->
+                <!--                                        <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.product_id.default_code"/>-->
+                <!--                                    </center>-->
+                <!--                                </td>-->
+                <!--                                <td>-->
+                <!--                                    <span style="color: #000000;font-family:'arial';padding-left:10;padding-right:10; font-size: 10px" t-esc="line.product_id.name"/>-->
+                <!--                                </td>-->
+                <!--                                <td>-->
+                <!--                                    <center>-->
+                <!--                                        <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.product_id.product_template_variant_value_ids.name"/>-->
+                <!--                                    </center>-->
+                <!--                                </td>-->
+                <!--                                <td>-->
+                <!--                                    <center>-->
+                <!--                                        <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.product_id.hs_code"/>-->
+                <!--                                    </center>-->
+                <!--                                </td>-->
+                <!--                                <td style="text-align: right">-->
+                <!--                                    <span style="color: #000000;font-family:'arial';padding-right:3; font-size: 10px" t-esc="'%.2f'% line.weight"/>-->
+                <!--                                </td>-->
+                <!--                                <td style="text-align: right">-->
+                <!--                                    <span style="color: #000000;font-family:'arial';padding-right:3; font-size: 10px" t-esc="int(line.quantity)"/>-->
+                <!--                                </td>-->
+                <!--                                <td style="text-align: right">-->
+                <!--                                    <span style="color: #000000;font-family:'arial'; font-size: 10px; padding-left:3; display: inline; float: left;" t-esc="doc.currency_id.name"/>-->
+                <!--                                    <span style="color: #000000;font-family:'arial';padding-right:3; font-size: 10px" t-esc="'{0:,.4f}'.format(line.price_unit)"/>-->
+                <!--                                </td>-->
+                <!--                                <td style="text-align: right">-->
+                <!--                                    <span style="color: #000000;font-family:'arial';padding-right:3; font-size: 10px" t-esc="'{0:,.2f}'.format(line.price_subtotal)"/>-->
+                <!--                                </td>-->
+                <!--                            </tr>-->
+                <!--                        </tbody>-->
+                <!--                        </t>-->
+                <!--                        <tfoot>-->
+                <!--                            <tr>-->
+                <!--                              &lt;!&ndash; Empty line for spacing between items and total &ndash;&gt;-->
+                <!--                              <td style="padding: 10px"/>-->
+                <!--                              <td style="padding: 10px"/>-->
+                <!--                              <td style="padding: 10px"/>-->
+                <!--                              <td style="padding: 10px"/>-->
+                <!--                              <td style="padding: 10px"/>-->
+                <!--                              <td style="padding: 10px"/>-->
+                <!--                              <td style="padding: 10px"/>-->
+                <!--                              <td style="padding: 10px"/>-->
+                <!--                              <td style="padding: 10px"/>-->
+
+
+                <!--                            </tr>-->
+                <!--                            <tr >-->
+                <!--                            <td style="width: 36px; height: 23px; text-align: right" colspan="2"><b><span style="color: #000000;font-family:'arial';padding-right:3; font-size: 10px">Total : </span></b></td>-->
+                <!--                            <td style="width: 15px; height: 23px;"/>-->
+                <!--                            <td style="width: 15px; height: 23px;"/>-->
+                <!--                            <td style="width: 15px; height: 23px;"/>-->
+                <!--                                <td style="width: 15px; height: 23px; text-align: right"><b><span style="color: #000000;font-family:'arial';padding-right:3; font-size: 10px" t-esc="'%.2f'% total_weight"/></b></td>-->
+                <!--                            <td style="width: 14px; height: 23px; text-align: right"><b><span style="color: #000000;font-family:'arial';padding-right:3; font-size: 10px" t-esc="int(total_quantity)"/></b></td>-->
+                <!--                            <td style="width: 15px; height: 23px;"/>-->
+                <!--                            <td style="width: 15px; height: 23px; text-align: right"><b><span style="color: #000000;font-family:'arial';padding-right:3; font-size: 10px" t-esc="'{0:,.2f}'.format(total_value)"/></b></td>-->
+                <!--                            </tr>-->
+                <!--                            <tr>-->
+                <!--                                <td colspan="9" style="text-align: right">-->
+                <!--                                    <p style="font-size: 10px; margin: 0; display: inline-block;font-family:'arial'; padding-right: 80px; padding-bottom: 100px; color: red;">-->
+                <!--                                        <b>For <t t-esc="doc.company_id.name"/></b>-->
+                <!--                                        </p>-->
+                <!--                                        <p style="font-size: 10px;font-family:'arial'; margin: 0; display: inline-block; padding-right: 40px; padding-bottom: 60px; color: red;">-->
+                <!--                                            <b>Authorized signatory</b>-->
+                <!--                                    </p>-->
+                <!--                                </td>-->
+                <!--                            </tr>-->
+                <!--                        </tfoot>-->
+                <!--                    </table>-->
+                <!--                    -->
+                <!--                </div>-->
+            </t>
+        </t>
+    </template>
+
+    <!--    &lt;!&ndash; This is the custom header declaration &ndash;&gt;-->
+    <!--    <template id="jafza_invoice_header">-->
+    <!--        <div class="header">-->
+    <!--            &lt;!&ndash; This should pull the logo from the web but we use mounted logo from /static in this module instead &ndash;&gt;-->
+    <!--            &lt;!&ndash; <img class="img" src='/web/binary/company_logo' style="max-height: 45px;"/>&ndash;&gt;-->
+    <!--            <img class="img" src="/report_delivery_slip/static/src/logo.png" style="max-height: 70px; margin-top:40px"/>-->
+    <!--            <img class="img" src="/report_delivery_slip/static/src/iso.png" style="max-height: 70px; margin-top:40px"/>-->
+    <!--        </div>-->
+    <!--    </template>-->
+</odoo>
