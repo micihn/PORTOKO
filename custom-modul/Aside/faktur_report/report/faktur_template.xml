@@ -88,6 +88,12 @@
                 <t t-esc="doc.invoice_date_due"/>
             </span>
         </div>
+
+        <!-- Pages -->
+        <span class="page"/>
+                of
+                <span class="topage"/>
+                Page(s)
     </template>
 
     <template id="faktur_template_footer">
@@ -100,146 +106,114 @@
     <template id="faktur_template">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc"> <!-- This will ensure report be able to be printed from multiple invoices -->
+                 <div class="page">
+                    <!-- Call Header -->
+                    <t t-call="faktur_report.faktur_template_header"/>
 
-                <!-- Call Header -->
-                <t t-call="faktur_report.faktur_template_header"/>
+                    <!-- Define Body -->
+                    <table width="100%" style="margin-top:10px; border-collapse: collapse; border: 1px solid black;">
+                        <thead>
+                            <th style="border-collapse: collapse; border: 1px solid black;">No</th>
+                            <th style="border-collapse: collapse; border: 1px solid black;">Nama Barang</th>
+                            <th style="border-collapse: collapse; border: 1px solid black;">G</th>
+                            <th style="border-collapse: collapse; border: 1px solid black;">Qty</th>
+                            <th style="border-collapse: collapse; border: 1px solid black;">Satuan</th>
+                            <th style="border-collapse: collapse; border: 1px solid black;">Harga</th>
+                            <th style="border-collapse: collapse; border: 1px solid black;">Disc %</th>
+                            <th style="border-collapse: collapse; border: 1px solid black;">Jumlah</th>
+                        </thead>
 
-                <!-- Define Body -->
-                <table width="100%" style="margin-top:10px; border-collapse: collapse; border: 1px solid black;">
-                    <thead>
-                        <th style="border-collapse: collapse; border: 1px solid black;">No</th>
-                        <th style="border-collapse: collapse; border: 1px solid black;">Nama Barang</th>
-                        <th style="border-collapse: collapse; border: 1px solid black;">G</th>
-                        <th style="border-collapse: collapse; border: 1px solid black;">Qty</th>
-                        <th style="border-collapse: collapse; border: 1px solid black;">Satuan</th>
-                        <th style="border-collapse: collapse; border: 1px solid black;">Harga</th>
-                        <th style="border-collapse: collapse; border: 1px solid black;">Disc %</th>
-                        <th style="border-collapse: collapse; border: 1px solid black;">Jumlah</th>
-                    </thead>
-
-                    <t t-foreach="doc.invoice_line_ids" t-as="line">
-                        <tbody >
-                            <tr>
+                        <t t-set="line_count" t-value="1"/>
+                        <t t-foreach="doc.invoice_line_ids" t-as="line">
+                            <tbody>
                                 <td style="border-collapse: collapse; border-right: 1px solid black;">
                                     <center>
-                                        <span style="color: #000000;font-family:'arial'; font-size: 10px"
-                                              t-esc="str(line_index + 1)"/>
+                                        <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="str(line_index + 1)"/>
                                     </center>
                                 </td>
 
                                 <td style="border-collapse: collapse; border-right: 1px solid black;">
-                                    <span style="color: #000000;font-family:'arial'; font-size: 10px; padding-left:10px"
-                                          t-esc="line.product_id.name"/>
+                                    <span style="color: #000000;font-family:'arial'; font-size: 10px; padding-left:10px" t-esc="line.product_id.name"/>
                                 </td>
+
                                 <td style="border-collapse: collapse; border-right: 1px solid black;">
                                     <center>
                                         G1
                                     </center>
                                 </td>
+
                                 <td style="border-collapse: collapse; border-right: 1px solid black;">
                                     <center>
-                                        <span style="color: #000000;font-family:'arial'; font-size: 10px"
-                                              t-esc="int(line.quantity)"/>
+                                        <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="int(line.quantity)"/>
                                     </center>
                                 </td>
+
                                 <td style="border-collapse: collapse; border-right: 1px solid black;">
                                     <center>
-                                        <span style="color: #000000;font-family:'arial'; font-size: 10px"
-                                              t-esc="line.product_uom_id.name"/>
+                                        <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.product_uom_id.name"/>
                                     </center>
                                 </td>
+
                                 <td style="border-collapse: collapse; border-right: 1px solid black; text-align:right;">
                                     <span style="color: #000000;font-family:'arial'; font-size: 10px; padding-right:10px" t-esc="line.price_unit"/>
                                 </td>
+
                                 <td style="border-collapse: collapse; border-right: 1px solid black;">
                                     <center>
                                         <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.discount"/>
                                     </center>
                                 </td>
+
                                 <td style="border-collapse: collapse; border-right: 1px solid black; text-align:right; padding-right: 10px;">
                                     <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.price_subtotal"/>
                                 </td>
+                            </tbody>
+                        </t>
+
+                        <tfoot style="border-collapse: collapse; border-top: 1px solid black;">
+                            <tr>
+                                <td rowspan="5" colspan="4" style="font-size: 10px; text-align: left; vertical-align: top; padding-left:10px">Memo</td>
+                                <td style="border-collapse: collapse; font-size: 10px; border-left: 1px solid black; padding-left:10px">Sub Total</td>
+                                <td>:</td>
+                                <td></td>
+                                <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
                             </tr>
-                        </tbody>
-                    </t>
 
-                    <tfoot style="border-collapse: collapse; border-top: 1px solid black;">
-                        <tr>
-                            <td rowspan="5" colspan="4" style="font-size: 10px; text-align: left; vertical-align: top; padding-left:10px">Memo</td>
-                            <td style="border-collapse: collapse; font-size: 10px; border-left: 1px solid black; padding-left:10px">Sub Total</td>
-                            <td>:</td>
-                            <td></td>
-                            <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
-                        </tr>
+                            <tr>
+                                <td style="padding-left:10px; font-size: 10px; ">Grand Total</td>
+                                <td>:</td>
+                                <td></td>
+                                <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
+                            </tr>
 
-                        <tr>
-                            <td style="padding-left:10px; font-size: 10px; ">Grand Total</td>
-                            <td>:</td>
-                            <td></td>
-                            <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
-                        </tr>
+                            <tr>
+                                <td style="padding-left:10px; font-size: 10px; ">Disc</td>
+                                <td>:</td>
+                                <td style="font-size: 10px; ">0 %</td>
+                                <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
+                            </tr>
 
-                        <tr>
-                            <td style="padding-left:10px; font-size: 10px; ">Disc</td>
-                            <td>:</td>
-                            <td style="font-size: 10px; ">0 %</td>
-                            <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
-                        </tr>
+                            <tr>
+                                <td style="padding-left:10px; font-size: 10px; ">DP</td>
+                                <td>:</td>
+                                <td></td>
+                                <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
+                            </tr>
 
-                        <tr>
-                            <td style="padding-left:10px; font-size: 10px; ">DP</td>
-                            <td>:</td>
-                            <td></td>
-                            <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
-                        </tr>
+                            <tr>
+                                <td style="padding-left:10px; font-size: 10px; ">Sisa</td>
+                                <td>:</td>
+                                <td></td>
+                                <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
+                            </tr>
+                        </tfoot>
 
-                        <tr>
-                            <td style="padding-left:10px; font-size: 10px; ">Sisa</td>
-                            <td>:</td>
-                            <td></td>
-                            <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
-                        </tr>
 
-<!--                        <tr>-->
-<!--                            <td colspan="4" rowspan="5">Memo</td>-->
-<!--                            <td>Subtotal</td>-->
-<!--                            <td>:</td>-->
-<!--                            <td></td>-->
-<!--                            <td>5300000</td>-->
-<!--                        </tr>-->
-<!--                        <tr>-->
-<!--                            <td>Grand Total</td>-->
-<!--                            <td>:</td>-->
-<!--                            <td></td>-->
-<!--                            <td>5300000</td>-->
-<!--                        </tr>-->
-<!--                        <tr>-->
-<!--                            <td>Disc</td>-->
-<!--                            <td>:</td>-->
-<!--                            <td>0%</td>-->
-<!--                            <td>0</td>-->
-<!--                        </tr>-->
-<!--                        <tr>-->
-<!--                            <td>DP</td>-->
-<!--                            <td>:</td>-->
-<!--                            <td></td>-->
-<!--                            <td>3000000</td>-->
-<!--                        </tr>-->
-<!--                        <tr>-->
-<!--                            <td>Sisa</td>-->
-<!--                            <td>:</td>-->
-<!--                            <td></td>-->
-<!--                            <td>-->
-<!--                                <span style="color: #000000; font-family:'arial'; font-size: 10px; text-align:'right'">-->
-<!--                                    2300000-->
-<!--                                </span>-->
-<!--                            </td>-->
-<!--                        </tr>-->
-        </tfoot>
                 </table>
 
-                <!-- Call Footer -->
-                <t t-call="faktur_report.faktur_template_footer" />
+                    <!-- Call Footer -->
+                    <t t-call="faktur_report.faktur_template_footer" />
+                </div>
             </t>
         </t>
     </template>
