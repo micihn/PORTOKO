@@ -2,220 +2,214 @@
 <odoo>
     <!-- Header Definition -->
     <template id="faktur_template_header">
-        <!-- Company Box -->
-        <div style="display: inline-block; vertical-align: top; margin-right:70px">
-            <table style="border-collapse: collapse; border: 1px solid black;">
-                <tbody>
-                    <tr>
-                        <td style="padding-top: 5px; padding-left: 5px;">
-                            <strong>
-                                <span>
-                                    CV. PILLAR GRESINDO
+            <!-- Company Box -->
+            <div style="display: inline-block; vertical-align: top; margin-right:70px">
+                <table style="border-collapse: collapse; border: 1px solid black;">
+                    <tbody>
+                        <tr>
+                            <td style="padding-top: 5px; padding-left: 5px;">
+                                <strong>
+                                    <span>
+                                        CV. PILLAR GRESINDO
+                                    </span>
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-left: 5px; padding-right: 5px;">
+                                <span style="font-size:12px">
+                                    JL. NAGARAWANGI KALER RT.001 RW.007 CIHIDEUNG
                                 </span>
-                            </strong>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding-left: 5px; padding-right: 5px;">
-                            <span style="font-size:12px">
-                                JL. NAGARAWANGI KALER RT.001 RW.007 CIHIDEUNG
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding-bottom: 5px; padding-left: 5px;">
-                            <span style="font-size:12px">
-                                0265331916
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-bottom: 5px; padding-left: 5px;">
+                                <span style="font-size:12px">
+                                    0265331916
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <!-- Doc Title -->
-        <div style="display: inline-block; vertical-align: top; margin-right:70px">
-            <span style="font-size:18px">
-                <strong>
-                    FAKTUR
-                </strong>
-            </span>
-        </div>
+            <!-- Doc Title -->
+            <div style="display: inline-block; vertical-align: top; margin-right:70px">
+                <span style="font-size:18px">
+                    <strong>
+                        FAKTUR
+                    </strong>
+                </span>
+            </div>
 
-        <!-- Customer -->
-        <div style="display: inline-block; vertical-align: top; margin-right: 10px">
-            <span style="font-size:12px">
-                Customer :
-            </span>
-        </div>
+            <!-- Customer -->
+            <div style="display: inline-block; vertical-align: top; margin-right: 10px">
+                <span style="font-size:12px">
+                    Customer :
+                </span>
+            </div>
 
-        <div style="display: inline-block; vertical-align: top; ">
-            <span style="font-size:12px">
-                <t t-esc="doc.partner_id.name"/>
-                <br/>
-                <t t-esc="doc.partner_id.street"/>,
-                <t t-esc="doc.partner_id.street2"/>
-                <br/>
-                <t t-esc="doc.partner_id.country_id.name"/>
-            </span>
-        </div>
-        <br/>
+            <div style="display: inline-block; vertical-align: top; ">
+                <span style="font-size:12px">
+                    <t t-esc="doc.partner_id.name"/>
+                    <br/>
+                    <t t-esc="doc.partner_id.street"/>,
+                    <t t-esc="doc.partner_id.street2"/>
+                    <br/>
+                    <t t-esc="doc.partner_id.country_id.name"/>
+                </span>
+            </div>
+            <br/>
 
-        <!-- No Faktur -->
-        <div style="display: inline-block; margin-right: 10px;">
-            <span style="font-size:12px; margin-top:10px;">
-                No Faktur :
-                <t t-esc="doc.name"/>
-            </span>
-        </div>
+            <!-- No Faktur -->
+            <div style="display: inline-block; margin-right: 10px;">
+                <span style="font-size:12px; margin-top:10px;">
+                    No Faktur :
+                    <t t-esc="doc.name"/>
+                </span>
+            </div>
 
-        <div style="display: inline-block; margin-right: 280px;">
-            <span style="font-size:12px; margin-top:5px;">
-                No. DO : DO03-0305
-            </span>
-        </div>
+            <div style="display: inline-block; margin-right: 280px;">
+                <span style="font-size:12px; margin-top:5px;">
+                    No. DO : DO03-0305
+                </span>
+            </div>
 
-        <div style="display: inline-block;margin-right: 5px;">
-            <span style="font-size:12px; margin-top:5px;">
-                Tanggal :
-                <t t-esc="doc.invoice_date"/>
-            </span>
-        </div>
+            <div style="display: inline-block;margin-right: 5px;">
+                <span style="font-size:12px; margin-top:5px;">
+                    Tanggal :
+                    <t t-esc="doc.invoice_date"/>
+                </span>
+            </div>
 
-        <div style="display: inline-block;">
-            <span style="font-size:12px; margin-top:5px;">
-                Tanggal Jt Tempo :
-                <t t-esc="doc.invoice_date_due"/>
-            </span>
-        </div>
+            <div style="display: inline-block;">
+                <span style="font-size:12px; margin-top:5px;">
+                    Tanggal Jt Tempo :
+                    <t t-esc="doc.invoice_date_due"/>
+                </span>
+            </div>
 
-        <!-- Pages -->
-        <span class="page"/>
-                of
-                <span class="topage"/>
-                Page(s)
-    </template>
-
-    <template id="faktur_template_footer">
-        <table width="100%">
-
-        </table>
     </template>
 
     <!-- Body and template definition -->
     <template id="faktur_template">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc"> <!-- This will ensure report be able to be printed from multiple invoices -->
-                 <div class="page">
+                    <div style="page-break-after:always;" />
                     <!-- Call Header -->
                     <t t-call="faktur_report.faktur_template_header"/>
 
-                    <!-- Define Body -->
-                    <table width="100%" style="margin-top:10px; border-collapse: collapse; border: 1px solid black;">
-                        <thead>
-                            <th style="border-collapse: collapse; border: 1px solid black;">No</th>
-                            <th style="border-collapse: collapse; border: 1px solid black;">Nama Barang</th>
-                            <th style="border-collapse: collapse; border: 1px solid black;">G</th>
-                            <th style="border-collapse: collapse; border: 1px solid black;">Qty</th>
-                            <th style="border-collapse: collapse; border: 1px solid black;">Satuan</th>
-                            <th style="border-collapse: collapse; border: 1px solid black;">Harga</th>
-                            <th style="border-collapse: collapse; border: 1px solid black;">Disc %</th>
-                            <th style="border-collapse: collapse; border: 1px solid black;">Jumlah</th>
-                        </thead>
+                     <div class="page">
+                        <!-- Define Body -->
+                        <table width="100%" height="80%" style="margin-top:10px; border-collapse: collapse; border: 1px solid black;">
+                            <thead>
+                                <th style="border-collapse: collapse; border: 1px solid black;">No</th>
+                                <th style="border-collapse: collapse; border: 1px solid black;">Nama Barang</th>
+                                <th style="border-collapse: collapse; border: 1px solid black;">G</th>
+                                <th style="border-collapse: collapse; border: 1px solid black;">Qty</th>
+                                <th style="border-collapse: collapse; border: 1px solid black;">Satuan</th>
+                                <th style="border-collapse: collapse; border: 1px solid black;">Harga</th>
+                                <th style="border-collapse: collapse; border: 1px solid black;">Disc %</th>
+                                <th style="border-collapse: collapse; border: 1px solid black;">Jumlah</th>
+                            </thead>
 
-                        <t t-set="line_count" t-value="1"/>
-                        <t t-foreach="doc.invoice_line_ids" t-as="line">
-                            <tbody>
-                                <td style="border-collapse: collapse; border-right: 1px solid black;">
-                                    <center>
-                                        <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="str(line_index + 1)"/>
-                                    </center>
-                                </td>
+<!--                         <table width="100%" height="80%" style="margin-top:10px; border-collapse: collapse; border: 1px solid black;">-->
+<!--                            <tr>-->
+<!--                                <td></td>-->
+<!--                                <td></td>-->
+<!--                                <td></td>-->
+<!--                            </tr>-->
 
-                                <td style="border-collapse: collapse; border-right: 1px solid black;">
-                                    <span style="color: #000000;font-family:'arial'; font-size: 10px; padding-left:10px" t-esc="line.product_id.name"/>
-                                </td>
+                            <t t-foreach="doc.invoice_line_ids" t-as="line">
+                                <tbody>
+                                    <tr style="height:10px">
+                                        <td style="border-collapse: collapse; border-right: 1px solid black;" >
+                                            <center>
+                                                <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="str(line_index + 1)"/>
+                                            </center>
+                                        </td>
 
-                                <td style="border-collapse: collapse; border-right: 1px solid black;">
-                                    <center>
-                                        G1
-                                    </center>
-                                </td>
+                                        <td style="border-collapse: collapse; border-right: 1px solid black;">
+                                            <span style="color: #000000;font-family:'arial'; font-size: 10px; padding-left:10px" t-esc="line.product_id.name"/>
+                                        </td>
 
-                                <td style="border-collapse: collapse; border-right: 1px solid black;">
-                                    <center>
-                                        <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="int(line.quantity)"/>
-                                    </center>
-                                </td>
+                                        <td style="border-collapse: collapse; border-right: 1px solid black;">
+                                            <center>
+                                                G1
+                                            </center>
+                                        </td>
 
-                                <td style="border-collapse: collapse; border-right: 1px solid black;">
-                                    <center>
-                                        <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.product_uom_id.name"/>
-                                    </center>
-                                </td>
+                                        <td style="border-collapse: collapse; border-right: 1px solid black;">
+                                            <center>
+                                                <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="int(line.quantity)"/>
+                                            </center>
+                                        </td>
 
-                                <td style="border-collapse: collapse; border-right: 1px solid black; text-align:right;">
-                                    <span style="color: #000000;font-family:'arial'; font-size: 10px; padding-right:10px" t-esc="line.price_unit"/>
-                                </td>
+                                        <td style="border-collapse: collapse; border-right: 1px solid black;">
+                                            <center>
+                                                <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.product_uom_id.name"/>
+                                            </center>
+                                        </td>
 
-                                <td style="border-collapse: collapse; border-right: 1px solid black;">
-                                    <center>
-                                        <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.discount"/>
-                                    </center>
-                                </td>
+                                        <td style="border-collapse: collapse; border-right: 1px solid black; text-align:right;">
+                                            <span style="color: #000000;font-family:'arial'; font-size: 10px; padding-right:10px" t-esc="line.price_unit"/>
+                                        </td>
 
-                                <td style="border-collapse: collapse; border-right: 1px solid black; text-align:right; padding-right: 10px;">
-                                    <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.price_subtotal"/>
-                                </td>
-                            </tbody>
-                        </t>
+                                        <td style="border-collapse: collapse; border-right: 1px solid black;">
+                                            <center>
+                                                <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.discount"/>
+                                            </center>
+                                        </td>
 
-                        <tfoot style="border-collapse: collapse; border-top: 1px solid black;">
-                            <tr>
-                                <td rowspan="5" colspan="4" style="font-size: 10px; text-align: left; vertical-align: top; padding-left:10px">Memo</td>
-                                <td style="border-collapse: collapse; font-size: 10px; border-left: 1px solid black; padding-left:10px">Sub Total</td>
-                                <td>:</td>
-                                <td></td>
-                                <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
-                            </tr>
+                                        <td style="border-collapse: collapse; border-right: 1px solid black; text-align:right; padding-right: 10px;">
+                                            <span style="color: #000000;font-family:'arial'; font-size: 10px" t-esc="line.price_subtotal"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </t>
 
-                            <tr>
-                                <td style="padding-left:10px; font-size: 10px; ">Grand Total</td>
-                                <td>:</td>
-                                <td></td>
-                                <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
-                            </tr>
+                            <tfoot style="border-collapse: collapse; border-top: 1px solid black;">
+                                <tr>
+                                    <td rowspan="5" colspan="4" style="font-size: 10px; text-align: left; vertical-align: top; padding-left:10px" >Memo</td>
+                                    <td style="border-collapse: collapse; font-size: 10px; border-left: 1px solid black; padding-left:10px">Sub Total</td>
+                                    <td>:</td>
+                                    <td></td>
+                                    <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
+                                </tr>
 
-                            <tr>
-                                <td style="padding-left:10px; font-size: 10px; ">Disc</td>
-                                <td>:</td>
-                                <td style="font-size: 10px; ">0 %</td>
-                                <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
-                            </tr>
+                                <tr>
+                                    <td style="padding-left:10px; font-size: 10px; ">Grand Total</td>
+                                    <td>:</td>
+                                    <td></td>
+                                    <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
+                                </tr>
 
-                            <tr>
-                                <td style="padding-left:10px; font-size: 10px; ">DP</td>
-                                <td>:</td>
-                                <td></td>
-                                <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
-                            </tr>
+                                <tr>
+                                    <td style="padding-left:10px; font-size: 10px; ">Disc</td>
+                                    <td>:</td>
+                                    <td style="font-size: 10px; ">0 %</td>
+                                    <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
+                                </tr>
 
-                            <tr>
-                                <td style="padding-left:10px; font-size: 10px; ">Sisa</td>
-                                <td>:</td>
-                                <td></td>
-                                <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
-                            </tr>
-                        </tfoot>
+                                <tr>
+                                    <td style="padding-left:10px; font-size: 10px; ">DP</td>
+                                    <td>:</td>
+                                    <td></td>
+                                    <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
+                                </tr>
 
+                                <tr>
+                                    <td style="padding-left:10px; font-size: 10px; ">Sisa</td>
+                                    <td>:</td>
+                                    <td></td>
+                                    <td style="text-align:right; font-size: 10px; padding-right: 10px;">5.300.000</td>
+                                </tr>
+                            </tfoot>
+                    </table>
 
-                </table>
-
-                    <!-- Call Footer -->
-                    <t t-call="faktur_report.faktur_template_footer" />
-                </div>
+                    </div>
+                 </t>
             </t>
-        </t>
     </template>
 
 
