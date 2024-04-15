@@ -13,3 +13,4 @@ access_detail_total_pengeluaran,access.detail.total.pengeluaran,order_setoran.mo
 access_list_pembelian_setoran,access.list.pembelian.setoran,order_setoran.model_list_pembelian_setoran,group_order_setoran,1,1,1,1
 access_biaya_fee_setoran,access.biaya.fee.setoran,order_setoran.model_biaya_fee_setoran,group_order_setoran,1,1,1,1
 access_rekap_order,access.rekap.order,order_setoran.model_rekap_order,group_order_setoran,1,1,1,1
+access_buat_rekap_order,access.buat.rekap.order,order_setoran.model_buat_rekap_order,group_order_setoran,1,1,1,1

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="buat_rekap_order_form" model="ir.ui.view">
+        <field name="name">buat.rekap.order.form</field>
+        <field name="model">buat.rekap.order</field>
+        <field name="arch" type="xml">
+            <form string="Buat Rekap Order">
+                <group>
+                </group>
+                <footer>
+<!--                    <button name="generate_report_pendapatan" string="Print" type="object" class="btn-primary" data-hotkey="q"/>-->
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_buat_rekap_order" model="ir.actions.act_window">
+        <field name="name">Buat Rekap Order</field>
+        <field name="res_model">buat.rekap.order</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
