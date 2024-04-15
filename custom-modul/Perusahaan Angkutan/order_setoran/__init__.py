@@ -24,6 +24,14 @@ def post_init_hook(cr, registry):
                 'padding': 3,
                 'number_increment': 1,
                 'number_next_actual': 1,
+            },{
+                'name' : 'Rekap Order - ',
+                'code': 'rekap.order.sequence',
+                'implementation': 'standard',
+                'prefix': 'REK/%(day)s/%(month)s/%(year)s/',
+                'padding': 3,
+                'number_increment': 1,
+                'number_next_actual': 1,
             }
         ]
 

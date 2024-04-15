@@ -23,6 +23,14 @@
       parent="order_setoran.menu_order_setoran_root">
     </menuitem>
 
+    <menuitem id="menu_rekap_order"
+      groups="order_setoran.group_order_setoran"
+      sequence="3"
+      name="Rekap Order"
+      action="action_rekap_order"
+      parent="order_setoran.menu_order_setoran_root">
+    </menuitem>
+
     <menuitem id="menu_konfigurasi"
         groups="order_setoran.group_order_setoran"
         sequence="10"
