@@ -25,6 +25,7 @@
         'security/security_group.xml',
         'security/ir.model.access.csv',
         'views/rekap_order.xml',
+        'report/rekap_order.xml',
     ],
     # only loaded in demonstration mode
     'demo': [],
