@@ -1,0 +1,36 @@
+<odoo>
+	<data>
+		<!-- Group Category -->
+	    <record model="ir.module.category" id="pembayaran_komisi.module_pembayaran_komisi">
+	        <field name="name">Komisi</field>
+	        <field name="sequence">19</field>
+	    </record>
+
+	    <!-- Group -->
+	    <record model="res.groups" id ="group_klaim_komisi">
+	        <field name="name">Minta Komisi Saja</field>
+	        <field name="category_id" ref="pembayaran_komisi.module_pembayaran_komisi"/>
+	    </record>
+
+	    <record model="res.groups" id ="group_kelola_komisi">
+	        <field name="name">Kelola Komisi</field>
+	        <field name="category_id" ref="pembayaran_komisi.module_pembayaran_komisi"/>
+	        <field name="implied_ids" eval="[(4, ref('pembayaran_komisi.group_klaim_komisi'))]"/>
+	    </record>
+
+	    <!-- Record rules -->
+	        <!-- Multi-company : Tabung Komisi -->
+            <record model="ir.rule" id="tabung_komisi_multicompany_rule">
+                <field name="name">Tabung Komisi Multi-Company rule</field>
+                <field name="model_id" ref="pembayaran_komisi.model_tabung_komisi"/>
+                <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            </record>
+
+	        <!-- Multi-company : Bayar Komisi -->
+	        <record model="ir.rule" id="bayar_komisi_multicompany_rule">
+	            <field name="name">Bayar Komisi Multi-Company rule</field>
+	            <field name="model_id" ref="pembayaran_komisi.model_bayar_komisi"/>
+	            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+	        </record>
+	</data>
+</odoo>

@@ -1,0 +1,113 @@
+<odoo>
+	<data>
+		<menuitem id="rekap_order_root" name="Rekap Order"/>
+
+		<record id="rekap_order_act" model="ir.actions.act_window">
+			<field name="name">Rekap Order</field>
+			<field name="res_model">rekap.order</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<menuitem id="rekap_order_menu" name="Rekap Order" parent="rekap_order_pengiriman.rekap_order_root" action="rekap_order_act" sequence="5"/>
+
+		<record id="rekap_order_tree" model="ir.ui.view">
+			<field name="name">rekap_order_tree</field>
+			<field name="model">rekap.order</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="kode_rekap"/>
+					<field name="keterangan"/>
+					<field name="customer_id"/>
+					<field name="total"/>
+					<field name="jatuh_tempo"/>
+				</tree>
+			</field>
+		</record>
+
+		<record id="rekap_order_form" model="ir.ui.view">
+			<field name="name">rekap_order_form</field>
+			<field name="model">rekap.order</field>
+			<field name="arch" type="xml">
+				<form>
+					<header>
+						<button string="Isi Order" type="object" name="populate_item"/> 
+					</header>
+					<sheet>
+						<label for="kode_rekap"/>
+						<div class="oe_title">
+							<h1><field name="kode_rekap"/></h1>
+						</div>
+						<group>
+							<group>
+								<field name="keterangan"/>
+								<field name="customer_id"/>
+								<field name="tipe_order"/>
+								<label for="tanggal_awal" string="Tanggal"/>
+								<div class="o_row">
+									<span><field name="tanggal_awal"/></span>
+									<span>-</span>
+									<span><field name="tanggal_akhir"/></span>
+								</div>
+								<field name="jatuh_tempo"/>
+							</group>
+						</group>
+						<group string="Belum Masuk Rekap">
+							<field name="belum_rekap_ids" nolabel="1" colspan="2" attrs="{'invisible': [('tipe_order', '=', 'regular')]}">
+								<tree>
+									<field name="order_id"/>
+									<field name="tanggal" string="Tanggal"/>
+									<field name="no_surat_jalan"/>
+									<field name="nomor_kendaraan"/>
+									<field name="alamat_bongkar" string="Tujuan"/>
+									<field name="subtotal_ongkos"/>
+									<button string="Masuk Rekap" type="object" name="toggle_state" icon="fa-arrow-down"/>
+								</tree>
+							</field>
+							<field name="belum_rekap_ids" nolabel="1" colspan="2" attrs="{'invisible': [('tipe_order', '=', 'do')]}">
+								<tree>
+									<field name="order_id"/>
+									<field name="tanggal" string="Tanggal"/>
+									<field name="no_surat_jalan"/>
+									<field name="plant"/>
+									<field name="nomor_kendaraan"/>
+									<field name="alamat_muat" string="Dari"/>
+									<field name="alamat_bongkar" string="Tujuan"/>
+									<field name="subtotal_ongkos"/>
+									<button string="Masuk Rekap" type="object" name="toggle_state" icon="fa-arrow-down"/>
+								</tree>
+							</field>
+							<field name="total_belum_rekap"/>
+						</group>
+						<group string="Sudah Masuk Rekap">
+							<field name="sudah_rekap_ids" nolabel="1" colspan="2" attrs="{'invisible': [('tipe_order', '=', 'regular')]}">
+								<tree>
+									<field name="order_id"/>
+									<field name="tanggal" string="Tanggal"/>
+									<field name="no_surat_jalan"/>
+									<field name="nomor_kendaraan"/>
+									<field name="alamat_bongkar" string="Tujuan"/>
+									<field name="subtotal_ongkos"/>
+									<button string="Belum Rekap" type="object" name="toggle_state" icon="fa-arrow-up"/>
+								</tree>
+							</field>
+							<field name="sudah_rekap_ids" nolabel="1" colspan="2" attrs="{'invisible': [('tipe_order', '=', 'do')]}">
+								<tree>
+									<field name="order_id"/>
+									<field name="tanggal" string="Tanggal"/>
+									<field name="no_surat_jalan"/>
+									<field name="plant"/>
+									<field name="nomor_kendaraan"/>
+									<field name="alamat_muat" string="Dari"/>
+									<field name="alamat_bongkar" string="Tujuan"/>
+									<field name="subtotal_ongkos"/>
+									<button string="Belum Rekap" type="object" name="toggle_state" icon="fa-arrow-up"/>
+								</tree>
+							</field>
+							<field name="total_sudah_rekap"/>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record> 
+	</data>
+</odoo>

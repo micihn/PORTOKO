@@ -1,0 +1,51 @@
+<odoo>
+	<data>
+		<record id="inherit_employee_form" model="ir.ui.view">
+			<field name="name">inherit_employee_form</field>
+			<field name="model">hr.employee</field>
+			<field name="inherit_id" ref="hr.view_employee_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//div[@name='button_box']" position="inside">
+					<button name="view_sejarah_komisi" class="oe_stat_button" icon="fa-money" type="object">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value"><field name="komisi_pending"/></span>
+                            <span class="o_stat_text">Komisi</span>
+                        </div>
+                    </button>
+                    <button name="view_sejarah_ptu" class="oe_stat_button" icon="fa-money" type="object">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value"><field name="komisi_tertabung"/></span>
+                            <span class="o_stat_text">PTU</span>
+                        </div>
+                    </button>
+				</xpath>
+			</field>
+		</record>
+
+		<record id="sejarah_komisi_tree" model="ir.ui.view">
+			<field name="name">sejarah_komisi_tree</field>
+			<field name="model">hr.employee.komisi.sejarah</field>
+			<field name="arch" type="xml">
+				<tree create="false" edit="false" delete="false">
+					<field name='employee_id'/>
+					<field name='nominal'/>
+					<field name='setoran_id'/>
+					<field name='state' widget="badge" decoration-success="state=='diproses'" decoration-info="state=='pending'"/>
+				</tree>
+			</field>
+		</record>
+
+		<record id="ptu_line_tree" model="ir.ui.view">
+			<field name="name">ptu_line_tree</field>
+			<field name="model">hr.employee.ptu_line</field>
+			<field name="arch" type="xml">
+				<tree create="false" edit="false" delete="false">
+					<field name='employee_id'/>
+					<field name='nominal'/>
+					<field name='tipe' widget="badge" decoration-success="tipe=='pemasukan'" decoration-danger="tipe=='pengeluaran'"/>
+					<field name='state' widget="badge" decoration-success="state=='diproses'" decoration-danger="state=='pending'"/>
+				</tree>
+			</field>
+		</record>
+	</data>
+</odoo>

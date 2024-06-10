@@ -1,0 +1,31 @@
+<odoo>
+	<data>
+		<!-- Multi-company : Rekap Order -->
+        <record model="ir.rule" id="rekap_order_multicompany_rule">
+            <field name="name">Rekap Order Multi-Company rule</field>
+            <field name="model_id" ref="model_rekap_order"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Multi-company : Bayar Komisi -->
+        <record model="ir.rule" id="rekap_order_item_multicompany_rule">
+            <field name="name">Rekap Order Line Multi-Company rule</field>
+            <field name="model_id" ref="model_rekap_order_item"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Multi-company : Sudah Rekap -->
+        <record model="ir.rule" id="rekap_order_sudah_rekap_multicompany_rule">
+            <field name="name">Sudah Rekap Multi-Company rule</field>
+            <field name="model_id" ref="model_rekap_order_sudah_rekap"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Multi-company : Belum Rekap -->
+        <record model="ir.rule" id="rekap_order_belum_rekap_multicompany_rule">
+            <field name="name">Belum Rekap Multi-Company rule</field>
+            <field name="model_id" ref="model_rekap_order_belum_rekap"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+	</data>
+</odoo>

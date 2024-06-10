@@ -1,0 +1,54 @@
+<odoo>
+	<data>
+		<record id="tabung_komisi_act" model="ir.actions.act_window">
+			<field name="name">PTU</field>
+			<field name="res_model">tabung.komisi</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<record id="tabung_komisi_tree" model="ir.ui.view">
+			<field name="name">tabung_komisi_tree</field>
+			<field name="model">tabung.komisi</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="kode_ptu"/>
+					<field name="employee_id"/>
+					<field name="state" widget="badge" decoration-success="state=='dibayar'" decoration-info="state=='selesai'"/>
+				</tree>
+			</field>
+		</record>
+
+		<record id="tabung_komisi_form" model="ir.ui.view">
+			<field name="name">tabung_komisi_form</field>
+			<field name="model">tabung.komisi</field>
+			<field name="arch" type="xml">
+				<form>
+					<header>
+						<button string="Submit" type="object" name="action_submit" class="oe_highlight" states="dibuat"/>
+						<field name="state" widget="statusbar"/>
+					</header>
+					<sheet>
+						<label for="kode_ptu"/>
+						<div class="oe_title">
+							<h1><field name="kode_ptu"/></h1>
+						</div>
+						<group>
+							<group>
+								<field name="komisi_ids" nolabel="1" colspan="2"/>
+							</group>
+							<group>
+								<field name="employee_id"/>
+								<field name="total_komisi"/>
+								<field name="total_disimpan"/>
+								<field name="jumlah"/>
+								<field name="keterangan"/>
+								<field name="expense_id" invisible="1"/>
+								<field name="company_id" invisible="1"/>
+							</group>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+	</data>
+</odoo>

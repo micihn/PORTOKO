@@ -1,0 +1,21 @@
+<odoo>
+	<data>
+		<record id="bayar_komisi_sequence" model="ir.sequence">
+			<field name="name">Nomor Bayar Komisi</field>
+			<field name="implementation">standard</field>
+			<field name="code">bayar.komisi</field>
+			<field name="prefix">KM</field>
+			<field name="padding">7</field>
+			<field name="number_increment">1</field>
+		</record>
+
+		<record id="tabung_komisi_sequence" model="ir.sequence">
+			<field name="name">Nomor Tabung Komisi</field>
+			<field name="implementation">standard</field>
+			<field name="code">tabung.komisi</field>
+			<field name="prefix">PTU</field>
+			<field name="padding">7</field>
+			<field name="number_increment">1</field>
+		</record>
+	</data>
+</odoo>

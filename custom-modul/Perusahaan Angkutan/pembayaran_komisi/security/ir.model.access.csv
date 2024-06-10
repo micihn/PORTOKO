@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_sejarah_komisi_setoran,access_sejarah_komisi_setoran,model_hr_employee_komisi_sejarah,order_setoran.group_order_setoran,1,1,1,0
+access_ptu_line_setoran,access_ptu_line_setoran,model_hr_employee_ptu_line,order_setoran.group_order_setoran,1,1,1,0
+access_sejarah_komisi_fleet,access_sejarah_komisi_fleet,model_hr_employee_komisi_sejarah,fleet.fleet_group_manager,1,1,1,0
+access_ptu_line_fleet,access_ptu_line_fleet,model_hr_employee_ptu_line,fleet.fleet_group_manager,1,1,1,0
+
+access_tabung_komisi_user,access_tabung_komisi_user,model_tabung_komisi,pembayaran_komisi.group_klaim_komisi,1,1,1,0
+access_bayar_komisi_user,access_bayar_komisi_user,model_bayar_komisi,pembayaran_komisi.group_klaim_komisi,1,1,1,0
+
+access_expense_komisi_user,access_expense_komisi_user,hr_expense.model_hr_expense,pembayaran_komisi.group_klaim_komisi,1,0,1,0
