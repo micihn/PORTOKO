@@ -49,12 +49,12 @@
                             <field name="vendor_bills_count" widget="statinfo" string="Vendor Bill"/>
                         </button>
 
-                        <button
+                        <!-- <button
                                 name="action_get_expenses_view"
                                 icon="fa-dollar"
                                 type="object">
                             <field name="expense_count" widget="statinfo" string="Expenses"/>
-                        </button>
+                        </button> -->
 
                         <button
                                 name="action_get_invoice_view"

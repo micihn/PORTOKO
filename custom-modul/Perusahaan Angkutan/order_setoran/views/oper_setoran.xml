@@ -91,16 +91,16 @@
                     <notebook>
                         <page string="Detail Order">
                             <field name="detail_order" >
-                                <tree editable="bottom" create="0" delete="0">
-                                    <field name="oper_setoran" invisible="1" force_save="1" readonly="1"/>
-                                    <field name="order_pengiriman" width="20%" optional="show" force_save="1" readonly="1"/>
-                                    <field name="tanggal_order" width="20%" optional="show" force_save="1" readonly="1"/>
-                                    <field name="jenis_order" width="20%" optional="show" force_save="1" readonly="1"/>
-                                    <field name="customer" width="20%" optional="show" force_save="1" readonly="1"/>
-                                    <field name="plant" width="20%" optional="show" force_save="1" readonly="1"/>
+                                <tree editable="bottom">
+                                    <field name="oper_setoran" invisible="1" force_save="1"/>
+                                    <field name="order_pengiriman" width="20%" optional="show" force_save="1"/>
+                                    <field name="tanggal_order" width="20%" optional="show" force_save="1"/>
+                                    <field name="jenis_order" width="20%" optional="show" force_save="1"/>
+                                    <field name="customer" width="20%" optional="show" force_save="1"/>
+                                    <field name="plant" width="20%" optional="show" force_save="1"/>
                                     <field name="nomor_surat_jalan" width="20%" optional="show"/>
                                     <field name="tanggal_surat_jalan" optional="show"/>
-                                    <field name="jumlah" width="20%" optional="show" force_save="1" readonly="1"/>
+                                    <field name="jumlah" width="20%" optional="show" force_save="1"/>
                                     <field name="bayar_dimuka" width="20%" optional="show"/>
                                 </tree>
                             </field>
@@ -206,7 +206,7 @@
                                     <field name="oper_order" force_save="1" readonly="1"/>
                                     <field name="vendor_pa" force_save="1" readonly="1"/>
                                     <field name="kendaraan" force_save="1" readonly="1"/>
-                                    <field name="jumlah_oper_order" force_save="1" readonly="1"/>
+                                    <field name="jumlah_oper_order" force_save="1"/>
                                 </tree>
                             </field>
 

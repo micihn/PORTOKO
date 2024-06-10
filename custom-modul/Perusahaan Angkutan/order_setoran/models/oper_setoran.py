@@ -68,6 +68,38 @@ class OperSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
+    @api.onchange("detail_order")
+    def _populate_oper_order(self):
+        for i in self:
+            order_ids = [order.order_pengiriman.id for order in i.detail_order]
+            i.list_oper_order = [(5, 0, 0)]
+            i.biaya_fee_setoran = [(5, 0 ,0)]
+            if len(order_ids) > 0:
+                oper_order_line_ids = self.env['oper.order.line'].search([('order_pengiriman', 'in', order_ids)])
+                oper_order_values = []
+                biaya_fee_values = []
+
+                ids = []
+                for oper_order_line in oper_order_line_ids:
+                    if oper_order_line.id not in ids:
+                        ids.append(oper_order_line.id)
+                        oper_order_values.append({
+                            'oper_setoran': i.id,
+                            'oper_order': oper_order_line.oper_order.id,
+                            'vendor_pa': oper_order_line.oper_order.vendor_pa.id,
+                            'kendaraan': oper_order_line.oper_order.kendaraan,
+                            'jumlah_oper_order': oper_order_line.oper_order.biaya_total,
+                        })
+                        biaya_fee_values.append({
+                            'oper_setoran': i.id,
+                            'order_pengiriman': oper_order_line.order_pengiriman.id,
+                            'nominal': oper_order_line.order_pengiriman.total_biaya_fee,
+                        })
+                if len(oper_order_values) > 0:
+                    self.env['list.oper.order.setoran'].create(oper_order_values)
+                if len(biaya_fee_values) > 0:
+                    self.env['biaya.fee.setoran'].create(biaya_fee_values)
+
     list_pembelian_setoran = fields.One2many('list.pembelian.setoran', 'oper_setoran', copy=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
@@ -461,6 +493,16 @@ class DetailOrder(models.Model):
     tanggal_surat_jalan = fields.Date('Tanggal Surat Jalan')
     jumlah = fields.Float('Jumlah', digits=(6, 0))
     bayar_dimuka = fields.Float('Bayar Dimuka', digits=(6, 0))
+
+    @api.onchange("order_pengiriman")
+    def _get_default_values(self):
+        for i in self:
+            if i.order_pengiriman:
+                i.tanggal_order = i.order_pengiriman.create_date
+                i.jenis_order = i.order_pengiriman.jenis_order
+                i.customer = i.order_pengiriman.customer
+                i.plant = i.order_pengiriman.plant
+                i.nomor_surat_jalan = i.order_pengiriman.nomor_surat_jalan
 
 class ListOperOrder(models.Model):
     _name = 'list.oper.order.setoran'

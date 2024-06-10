@@ -153,32 +153,32 @@ class AccountInvoicePayment(models.TransientModel):
             formatted_dates_str = ', '.join(formatted_dates)
 
             # Buat Komisi Sopir
-            if setoran.komisi_sopir > 0 and setoran.sisa > 0:
-                self.env['hr.expense'].sudo().create({
-                    'company_id': self.env.company.id,
-                    'name': f"Komisi Sopir {setoran.sopir.name} {formatted_dates_str}",
-                    'employee_id': setoran.sopir.id,
-                    'product_id': find_master_jasa_pengiriman(setoran),
-                    'quantity': 1,
-                    'total_amount': setoran.komisi_sopir,
-                    'payment_mode': 'company_account',
-                    'tax_ids': None,
-                    'reference': setoran.kode_order_setoran,
-                })
+            # if setoran.komisi_sopir > 0 and setoran.sisa > 0:
+            #     self.env['hr.expense'].sudo().create({
+            #         'company_id': self.env.company.id,
+            #         'name': f"Komisi Sopir {setoran.sopir.name} {formatted_dates_str}",
+            #         'employee_id': setoran.sopir.id,
+            #         'product_id': find_master_jasa_pengiriman(setoran),
+            #         'quantity': 1,
+            #         'total_amount': setoran.komisi_sopir,
+            #         'payment_mode': 'company_account',
+            #         'tax_ids': None,
+            #         'reference': setoran.kode_order_setoran,
+            #     })
 
-            # Buat Komisi Kenek
-            if setoran.komisi_kenek > 0 and setoran.sisa > 0:
-                self.env['hr.expense'].sudo().create({
-                    'company_id': self.env.company.id,
-                    'name': f"Komisi Kenek {setoran.kenek.name} {formatted_dates_str}",
-                    'employee_id': setoran.kenek.id,
-                    'product_id': find_master_jasa_pengiriman(setoran),
-                    'quantity': 1,
-                    'total_amount': setoran.komisi_kenek,
-                    'payment_mode': 'company_account',
-                    'tax_ids': None,
-                    'reference': setoran.kode_order_setoran,
-                })
+            # # Buat Komisi Kenek
+            # if setoran.komisi_kenek > 0 and setoran.sisa > 0:
+            #     self.env['hr.expense'].sudo().create({
+            #         'company_id': self.env.company.id,
+            #         'name': f"Komisi Kenek {setoran.kenek.name} {formatted_dates_str}",
+            #         'employee_id': setoran.kenek.id,
+            #         'product_id': find_master_jasa_pengiriman(setoran),
+            #         'quantity': 1,
+            #         'total_amount': setoran.komisi_kenek,
+            #         'payment_mode': 'company_account',
+            #         'tax_ids': None,
+            #         'reference': setoran.kode_order_setoran,
+            #     })
 
             # Buat dan Validate Journal Entry pencatatan pengeluaran
             # Jika 'Total Pengeluaran' > 'Total Uang Jalan', maka hasil pengurangan akan dibuatkan journal

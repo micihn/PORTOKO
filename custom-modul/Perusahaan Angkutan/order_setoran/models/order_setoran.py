@@ -121,18 +121,18 @@ class OrderSetoran(models.Model):
     #     'done': [('readonly', False)],
     # })
 
-    relatable_uang_jalan = fields.Many2many('uang.jalan', compute="compute_relatable_uang_jalan", string='No. Uang Jalan', copy=False)
+    relatable_uang_jalan = fields.Many2many('uang.jalan', compute="_compute_total_uang_jalan", string='No. Uang Jalan', copy=False)
 
-    @api.depends('detail_order.order_pengiriman')
-    def compute_relatable_uang_jalan(self):
-        for rec in self:
-            list_uang_jalan = []
-            for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
-                if detail.order_pengiriman:
-                    for uj in detail.order_pengiriman.uang_jalan:
-                        list_uang_jalan.append((4, uj.id))  # Using (4, id) to add records to Many2many field
+    # @api.depends('detail_order.order_pengiriman')
+    # def compute_relatable_uang_jalan(self):
+    #     for rec in self:
+    #         list_uang_jalan = []
+    #         for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
+    #             if detail.order_pengiriman:
+    #                 for uj in detail.order_pengiriman.uang_jalan:
+    #                     list_uang_jalan.append(uj.id)  # Using (4, id) to add records to Many2many field
 
-            rec.relatable_uang_jalan = [(5, 0, 0)] + list_uang_jalan  # Clear existing records, then add new ones
+    #         rec.relatable_uang_jalan = [(6, 0, list_uang_jalan)]  # Clear existing records, then add new ones
 
     relatable_list_pembelian = fields.Many2many('biaya.pembelian', compute="compute_relatable_biaya_pembelian", copy=False)
     @api.depends('detail_order.order_pengiriman')
@@ -232,20 +232,20 @@ class OrderSetoran(models.Model):
             }
         }
 
-    def action_get_expenses_view(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Expenses',
-            'view_mode': 'tree,form',
-            'res_model': 'hr.expense',
-            'domain': [('reference', '=', str(self.kode_order_setoran))],
-            'context': {
-                'create': False,
-                'edit': False,  # Prevent record editing
-                'delete': False
-            }
-        }
+    # def action_get_expenses_view(self):
+    #     self.ensure_one()
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': 'Expenses',
+    #         'view_mode': 'tree,form',
+    #         'res_model': 'hr.expense',
+    #         'domain': [('reference', '=', str(self.kode_order_setoran))],
+    #         'context': {
+    #             'create': False,
+    #             'edit': False,  # Prevent record editing
+    #             'delete': False
+    #         }
+    #     }
 
     def unlink(self):
         if any(record.state not in ('draft', 'cancel') for record in self):
@@ -362,7 +362,16 @@ class OrderSetoran(models.Model):
     @api.depends('relatable_uang_jalan.total')
     def _compute_total_uang_jalan(self):
         for record in self:
-            record.total_uang_jalan = sum(record.relatable_uang_jalan.mapped('total'))
+            list_uang_jalan = []
+            total_uj = 0
+            for detail in record.detail_order:  # Assuming detail_order is a One2many or Many2many field
+                if detail.order_pengiriman:
+                    for uj in detail.order_pengiriman.uang_jalan:
+                        list_uang_jalan.append(uj.id)  # Using (4, id) to add records to Many2many field
+                        total_uj += uj.total
+
+            record.relatable_uang_jalan = [(6, 0, list_uang_jalan)]  # Clear existing records, then add new ones
+            record.total_uang_jalan = total_uj
 
     @api.depends('total_ongkos')
     def _compute_total_ongkos_calculated(self):
