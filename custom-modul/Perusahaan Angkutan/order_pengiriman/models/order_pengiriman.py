@@ -651,6 +651,7 @@ class OrderPengiriman(models.Model):
 class DetailOrderDO(models.Model):
     _name = 'detail.order.do'
     _description = 'Detail Order DO'
+    _rec_name = 'nama_barang'
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
@@ -668,6 +669,7 @@ class DetailOrderDO(models.Model):
 class DetailOrderReguler(models.Model):
     _name = 'detail.order.reguler'
     _description = 'Detail Order Reguler'
+    _rec_name = 'nama_barang'
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)

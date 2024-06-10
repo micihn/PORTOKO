@@ -45,6 +45,13 @@ class UangJalan(models.Model):
     })
 
     kas_gantung = fields.Float(digits=(6, 0), copy=False, compute="compute_kas_gantung_kendaraan")
+    kas_cadangan = fields.Float(digits=(6, 0), copy=False, states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
+    })
 
     @api.depends('kendaraan')
     def compute_kas_gantung_kendaraan(self):
@@ -249,6 +256,7 @@ class UangJalan(models.Model):
                     uang_jalan_list.append((6, 0, [uang_jalan.id]))
 
             for record in self.uang_jalan_line:
+                # Update order pengiriman
                 record.sudo().order_pengiriman.write({
                     'is_uang_jalan_terbit': True,
                     'state': 'dalam_perjalanan',
@@ -261,7 +269,6 @@ class UangJalan(models.Model):
                 })
 
                 # Buat Pengurangan Kas Pada Journal Entry
-
                 message = "Uang jalan untuk pengiriman ini telah terbit dengan nomor " + str(self.uang_jalan_name)
                 record.sudo().order_pengiriman.message_post(body=message)
 
@@ -460,13 +467,10 @@ class UangJalan(models.Model):
                 'nominal_close': self.balance_uang_jalan * -1,
             })
 
-
-
             self.state = 'cancel'
 
     def hitung_ulang_nominal_uj(self):
         for record in self.uang_jalan_line:
-
             nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].sudo().search([
                 ('tipe_muatan', '=', int(record.tipe_muatan.id)),
                 ('lokasi_muat', '=', int(record.sudo().muat.id)),
@@ -478,11 +482,19 @@ class UangJalan(models.Model):
             if nominal_uang_jalan:
                 record.sudo().nominal_uang_jalan = nominal_uang_jalan
 
-    @api.depends('uang_jalan_line.nominal_uang_jalan', 'biaya_tambahan_standar')
+    @api.depends('uang_jalan_line.nominal_uang_jalan', 'biaya_tambahan_standar', 'kas_cadangan')
     def _compute_total_uang_jalan_standar(self):
         for record in self:
+            total_ujt = 0
+            if record.kendaraan:
+                DOMAIN = [('kendaraan', '=', record.kendaraan.id), ('state', 'not in', ['closed', 'cancel'])]
+                if record.id:
+                    DOMAIN += [('id', '!=', record.id)]
+                uang_jalan_terbuka = self.env['uang.jalan'].search(DOMAIN)
+                total_ujt = sum([uj.kas_cadangan for uj in uang_jalan_terbuka])
+
             uang_jalan_line = record.sudo().uang_jalan_line
-            record.total_uang_jalan_standar = sum(uang_jalan_line.mapped('nominal_uang_jalan')) + record.biaya_tambahan_standar
+            record.total_uang_jalan_standar = sum(uang_jalan_line.mapped('nominal_uang_jalan')) + record.biaya_tambahan_standar + record.kas_cadangan - total_ujt
 
     @api.depends('uang_jalan_nominal_tree.nominal_uang_jalan', 'biaya_tambahan_nominal_saja')
     def _compute_total_nominal_uang_jalan_saja(self):
