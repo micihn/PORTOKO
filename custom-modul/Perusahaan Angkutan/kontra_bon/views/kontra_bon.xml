@@ -1,0 +1,56 @@
+<odoo>
+    <data>
+        <menuitem id="kontra_bon_root_menu" name="Kontra Bon"/>
+
+        <record id="kontra_bon_action" model="ir.actions.act_window">
+            <field name="name">Kontra Bon</field>
+            <field name="res_model">kontra.bon</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="kontra_bon_modal_action" model="ir.actions.act_window">
+            <field name="name">Buat Kontra Bon</field>
+            <field name="res_model">kontra.bon</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="account.model_account_move"/>
+        </record>
+
+        <menuitem id="kontra_bon_menu" name="Kontra Bon" parent="kontra_bon.kontra_bon_root_menu" action="kontra_bon_action"/>
+
+        <record id="kontra_bon_tree_view" model="ir.ui.view">
+            <field name="name">kontra_bon_tree_view</field>
+            <field name="model">kontra.bon</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="due_date"/>
+                    <field name="invoice_ids"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="kontra_bon_form_view" model="ir.ui.view">
+            <field name="name">kontra_bon_form_view</field>
+            <field name="model">kontra.bon</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <label for="name"/>
+                        <div class="oe_title">
+                            <h1><field name="name"/></h1>
+                        </div>
+                        <group>
+                            <field name="partner_id" options="{'no_create': 1, 'no_create_edit': 1}"/>
+                            <field name="due_date"/>
+                        </group>
+                        <group string="Faktur">
+                            <field name="invoice_ids" nolabel="1" colspan="2"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

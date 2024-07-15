@@ -1,0 +1,23 @@
+<odoo>
+	<data>
+		<!-- Group Category -->
+	    <record model="ir.module.category" id="kontra_bon.module_kontra_bon">
+	        <field name="name">Kontra Bon</field>
+	        <field name="sequence">19</field>
+	    </record>
+
+	    <!-- Group -->
+	    <record model="res.groups" id="group_kelola_kontra_bon">
+	        <field name="name">Kelola Kontra Bon</field>
+	        <field name="category_id" ref="kontra_bon.module_kontra_bon"/>
+	    </record>
+
+	    <!-- Record rules -->
+	        <!-- Multi-company : Tabung Komisi -->
+            <record model="ir.rule" id="kontra_bon_multicompany_rule">
+                <field name="name">Kontra Bon Multi-Company rule</field>
+                <field name="model_id" ref="kontra_bon.model_kontra_bon"/>
+                <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            </record>
+	</data>
+</odoo>

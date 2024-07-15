@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_kontra_bon_inv_user,access_kontra_bon_inv_user,model_kontra_bon,account.group_account_invoice,1,1,1,0
+access_kontra_bon_inv_admin,access_kontra_bon_inv_admin,model_kontra_bon,account.group_account_manager,1,1,1,1
+access_kontra_bon_admin,access_kontra_bon_admin,model_kontra_bon,kontra_bon.group_kelola_kontra_bon,1,1,1,1
