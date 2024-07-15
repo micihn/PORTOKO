@@ -27,7 +27,7 @@ class BayarKomisi(models.Model):
 		('selesai', 'Selesai'),
 		('dibayar', 'Dibayar'),
 	], default="dibuat")
-	company_id = fields.Many2one("res.company", ondelete="cascade", default=lambda self: self.env.user.company_id)
+	company_id = fields.Many2one("res.company", ondelete="cascade", default=lambda self: self.env.context['allowed_company_ids'][0])
 
 	@api.model
 	def create(self, vals_list):

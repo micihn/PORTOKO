@@ -1,7 +1,7 @@
 <odoo>
 	<data>
 		<menuitem id="komisi_root_menu" name="Komisi" groups="pembayaran_komisi.group_klaim_komisi"/> 
-		<menuitem id="tabung_komisi_menu" parent="pembayaran_komisi.komisi_root_menu" name="PTU" action="tabung_komisi_act" sequence="10"/>
-		<menuitem id="bayar_komisi_menu" parent="pembayaran_komisi.komisi_root_menu" name="Klaim Komisi" action="bayar_komisi_act" sequence="20"/>
+		<menuitem id="tabung_komisi_menu" parent="pembayaran_komisi.komisi_root_menu" name="Pembayaran Komisi" action="tabung_komisi_act" sequence="10"/>
+		<menuitem id="bayar_komisi_menu" parent="pembayaran_komisi.komisi_root_menu" name="Pengambilan Komisi" action="bayar_komisi_act" sequence="20"/>
 	</data>
 </odoo>
