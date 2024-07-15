@@ -104,98 +104,101 @@
                                     <field name="bayar_dimuka" width="20%" optional="show"/>
                                 </tree>
                             </field>
+                            <group>
+                                <button colspan="2" string="Order" type="object" name="action_create_order_pengiriman" icon="fa-plus"/>
+                            </group>
 
-                        <!-- Panel Kanan -->
-                        <!-- Total Jumlah & Total Bayar Dimuka -->
-                        <div class="oe_right">
-                            <!-- Total Jumlah -->
-                            <div style="display: flex; justify-content: space-between;">
-                                <div class="oe_total_field" style="margin-left: auto;">
-                                    <field name="total_jumlah" style="text-align: right;"/>
-                                </div>
-                            </div>
-
-                            <!-- Total Bayar Dimuka -->
-                            <div style="display: flex; justify-content: space-between;">
-                                <div class="oe_total_field" style="margin-left: auto;">
-                                    <field name="total_bayar_dimuka" style="text-align: right !important;"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="oe_right" style="margin-right:50px">
-                                <!-- Label Total Jumlah -->
-                                <div style="display: flex; justify-content: space-between; align-items: left;">
-                                    <div class="oe_total_label" style="color:#000000;">
-                                        <label for="total_jumlah" string="Total Pendapatan : " style="text-align: left;"/>
+                            <!-- Panel Kanan -->
+                            <!-- Total Jumlah & Total Bayar Dimuka -->
+                            <div class="oe_right">
+                                <!-- Total Jumlah -->
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div class="oe_total_field" style="margin-left: auto;">
+                                        <field name="total_jumlah" style="text-align: right;"/>
                                     </div>
                                 </div>
 
-                                <!-- Label Bayar Dimuka-->
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <div class="oe_total_label" style="color:#000000;">
-                                        <label for="total_bayar_dimuka" string="Total Bayar Dimuka : "
-                                               style="text-align: left;"/>
+                                <!-- Total Bayar Dimuka -->
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div class="oe_total_field" style="margin-left: auto;">
+                                        <field name="total_bayar_dimuka" style="text-align: right !important;"/>
                                     </div>
                                 </div>
                             </div>
+                            <div class="oe_right" style="margin-right:50px">
+                                    <!-- Label Total Jumlah -->
+                                    <div style="display: flex; justify-content: space-between; align-items: left;">
+                                        <div class="oe_total_label" style="color:#000000;">
+                                            <label for="total_jumlah" string="Total Pendapatan : " style="text-align: left;"/>
+                                        </div>
+                                    </div>
 
-                       <!-- Panel Kiri -->
-                        <div class="oe_left">
-                            <separator string="Pengeluaran"/>
-                            <div style="display: flex; justify-content: space-between; ">
-                                <label for="total_oper_order" string="Total Pengeluaran : "/>
-
-                                <div style="text-align: right; margin-right:0px">
-                                    <field name="total_oper_order"/>
+                                    <!-- Label Bayar Dimuka-->
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div class="oe_total_label" style="color:#000000;">
+                                            <label for="total_bayar_dimuka" string="Total Bayar Dimuka : "
+                                                   style="text-align: left;"/>
+                                        </div>
+                                    </div>
                                 </div>
+
+                           <!-- Panel Kiri -->
+                            <div class="oe_left">
+                                <separator string="Pengeluaran"/>
+                                <div style="display: flex; justify-content: space-between; ">
+                                    <label for="total_oper_order" string="Total Pengeluaran : "/>
+
+                                    <div style="text-align: right; margin-right:0px">
+                                        <field name="total_oper_order"/>
+                                    </div>
+                                </div>
+
+                                <separator string="Rincian Biaya"/>
+                                <div style="display: flex; justify-content: space-between; ">
+                                    <label for="total_list_pembelian" string="Total Pembelian : "/>
+                                    <field name="total_list_pembelian" style="margin-left: 10px;"/>
+                                </div>
+
+    <!--                            <div style="display: flex; justify-content: space-between; ">-->
+    <!--                                <label for="total_ongkos" string="Total Ongkos : "/>-->
+    <!--                                <div style="width: 12%; text-align: center;">-->
+    <!--                                    <field name="total_ongkos"/>-->
+    <!--                                </div>-->
+    <!--                                <label for="total_ongkos" string="%"/>-->
+    <!--                                <field name="total_ongkos_calculated" />-->
+    <!--                            </div>-->
+
+                                <div style="display: flex; justify-content: space-between; ">
+                                    <label for="total_biaya_fee" string="Total Biaya Fee : "/>
+                                    <field name="total_biaya_fee" style="margin-left: 10px;"/>
+                                </div>
+
+                                <div style="display: flex; justify-content: space-between; ">
+                                    <label for="sisa" string="Sisa : "/>
+                                    <field name="sisa" style="margin-left: 10px;" />
+                                </div>
+
+    <!--                            <separator string="Komisi"/>-->
+    <!--                            <div style="display: flex; justify-content: space-between; ">-->
+    <!--                                <label for="komisi_sopir_percentage" string="Komisi Sopir : "/>-->
+    <!--                                <div style="width: 12%; text-align: center;">-->
+    <!--                                    <field name="komisi_sopir_percentage"/>-->
+    <!--                                </div>-->
+    <!--                                <label for="komisi_sopir_percentage" string="%"/>-->
+    <!--                                <field name="komisi_sopir"/>-->
+    <!--                            </div>-->
+
+    <!--                            <div style="display: flex; justify-content: space-between; ">-->
+    <!--                                <label for="komisi_kenek_percentage" string="Komisi Kenek : "/>-->
+    <!--                                <div style="width: 12%; text-align: center;">-->
+    <!--                                    <field name="komisi_kenek_percentage"/>-->
+    <!--                                </div>-->
+    <!--                                <label for="komisi_kenek_percentage" string="%"/>-->
+    <!--                                <field name="komisi_kenek"/>-->
+    <!--                            </div>-->
+
+
                             </div>
-
-                            <separator string="Rincian Biaya"/>
-                            <div style="display: flex; justify-content: space-between; ">
-                                <label for="total_list_pembelian" string="Total Pembelian : "/>
-                                <field name="total_list_pembelian" style="margin-left: 10px;"/>
-                            </div>
-
-<!--                            <div style="display: flex; justify-content: space-between; ">-->
-<!--                                <label for="total_ongkos" string="Total Ongkos : "/>-->
-<!--                                <div style="width: 12%; text-align: center;">-->
-<!--                                    <field name="total_ongkos"/>-->
-<!--                                </div>-->
-<!--                                <label for="total_ongkos" string="%"/>-->
-<!--                                <field name="total_ongkos_calculated" />-->
-<!--                            </div>-->
-
-                            <div style="display: flex; justify-content: space-between; ">
-                                <label for="total_biaya_fee" string="Total Biaya Fee : "/>
-                                <field name="total_biaya_fee" style="margin-left: 10px;"/>
-                            </div>
-
-                            <div style="display: flex; justify-content: space-between; ">
-                                <label for="sisa" string="Sisa : "/>
-                                <field name="sisa" style="margin-left: 10px;" />
-                            </div>
-
-<!--                            <separator string="Komisi"/>-->
-<!--                            <div style="display: flex; justify-content: space-between; ">-->
-<!--                                <label for="komisi_sopir_percentage" string="Komisi Sopir : "/>-->
-<!--                                <div style="width: 12%; text-align: center;">-->
-<!--                                    <field name="komisi_sopir_percentage"/>-->
-<!--                                </div>-->
-<!--                                <label for="komisi_sopir_percentage" string="%"/>-->
-<!--                                <field name="komisi_sopir"/>-->
-<!--                            </div>-->
-
-<!--                            <div style="display: flex; justify-content: space-between; ">-->
-<!--                                <label for="komisi_kenek_percentage" string="Komisi Kenek : "/>-->
-<!--                                <div style="width: 12%; text-align: center;">-->
-<!--                                    <field name="komisi_kenek_percentage"/>-->
-<!--                                </div>-->
-<!--                                <label for="komisi_kenek_percentage" string="%"/>-->
-<!--                                <field name="komisi_kenek"/>-->
-<!--                            </div>-->
-
-
-                        </div>
 
                         </page>
 
@@ -209,6 +212,9 @@
                                     <field name="jumlah_oper_order" force_save="1"/>
                                 </tree>
                             </field>
+                            <group>
+                                <button colspan="2" string="Oper Order" type="object" name="action_create_oper_order" icon="fa-plus"/>
+                            </group>
 
                             <div class="oe_right" >
                                 <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000">

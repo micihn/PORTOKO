@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+	<template id="report_uang_jalan_rincian_template">
+		<t t-call="web.html_container">
+			<t t-call="web.basic_layout">
+				<div class="header">
+					<div class="row">
+						<div class="col-12">
+							<div>LAPORAN RINCIAN <b t-out="kendaraan"/></div>
+							<div>Periode <b t-out="date_from"/> s/d <b t-out="date_to"/></div>
+						</div>
+					</div>
+				</div>
+				<div class="page">
+					<div class="row">
+						<div class="col-12">
+							<table class="table table-bordered table-sm" style="font-size:0.75em">
+								<thead>
+									<tr>
+										<td><b>Tanggal</b></td>
+										<td><b>No. UJ</b></td>
+										<td><b>Supir</b></td>
+										<td><b>Kenek</b></td>
+										<td class="text-end"><b>Jumlah</b></td>
+										<td class="text-end"><b>Sisa Kas Cadangan</b></td>
+										<td class="text-end"><b>Kas Cadangan</b></td>
+										<td class="text-end"><b>Biaya Lain</b></td>
+										<td class="text-end"><b>Total UJ</b></td>
+										<td><b>Setoran</b></td>
+										<td><b>Asal</b></td>
+										<td><b>Tujuan</b></td>
+										<td><b>Keterangan</b></td>
+									</tr>
+								</thead>
+								<tbody>
+									<t t-set="total" t-value="0"/>
+									<t t-set="sisa_kas_cadangan" t-value="0"/>
+									<t t-set="kas_cadangan" t-value="0"/>
+									<t t-set="biaya_lain" t-value="0"/>
+									<t t-set="total_uj" t-value="0"/>
+									<tr t-foreach="data" t-as="line" style="page-break-inside: avoid">
+										<td><span t-out="line['create_date']"/></td>
+										<td><span t-out="line['uang_jalan_name']"/></td>
+										<td><span t-out="line['sopir']"/></td>
+										<td><span t-out="line['kenek']"/></td>
+										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['nominal_uang_jalan'])"/></td>
+										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['sisa_kas_cadangan'])"/></td>
+										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['kas_cadangan'])"/></td>
+										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['biaya_lain'])"/></td>
+										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['total'])"/></td>
+										<td><span t-out="line['setoran']"/></td>
+										<td><span t-out="line['muat']"/></td>
+										<td><span t-out="line['bongkar']"/></td>
+										<td><span t-out="line['keterangan']"/></td>
+
+										<t t-set="total" t-value="total + line['nominal_uang_jalan']"/>
+										<t t-set="sisa_kas_cadangan" t-value="sisa_kas_cadangan + line['sisa_kas_cadangan']"/>
+										<t t-set="kas_cadangan" t-value="kas_cadangan + line['kas_cadangan']"/>
+										<t t-set="biaya_lain" t-value="biaya_lain + line['biaya_lain']"/>
+										<t t-set="total_uj" t-value="total_uj + line['total']"/>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr style="page-break-inside: avoid">
+										<td class="text-end" colspan="4"><b>TOTAL</b></td>
+										<td class="text-end"><b><t t-out="'Rp. {:,}'.format(total)"/></b></td>
+										<td class="text-end"><b><t t-out="'Rp. {:,}'.format(sisa_kas_cadangan)"/></b></td>
+										<td class="text-end"><b><t t-out="'Rp. {:,}'.format(kas_cadangan)"/></b></td>
+										<td class="text-end"><b><t t-out="'Rp. {:,}'.format(biaya_lain)"/></b></td>
+										<td class="text-end"><b><t t-out="'Rp. {:,}'.format(total_uj)"/></b></td>
+										<td colspan="4"></td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</t>
+		</t>
+	</template>
+
+	<report
+		id="report_uang_jalan_rincian"
+		model="uang.jalan"
+		string="Rincian Uang Jalan"
+		name="order_setoran.report_uang_jalan_rincian_template"
+		file="order_setoran.report_uang_jalan_rincian_template"
+		paperformat="order_pengiriman.f4_landscape"
+		report_type="qweb-pdf"/>
+</odoo>

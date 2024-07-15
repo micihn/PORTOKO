@@ -195,6 +195,26 @@ class OperSetoran(models.Model):
             }
         }
 
+    def action_create_order_pengiriman(self):
+        for i in self:
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'order.pengiriman', 
+                'view_mode': 'form',
+                'view_type': 'form',
+                'target': 'new',
+            }
+
+    def action_create_oper_order(self):
+        for i in self:
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'oper.order', 
+                'view_mode': 'form',
+                'view_type': 'form',
+                'target': 'new',
+            }
+
     def unlink(self):
         if any(record.state not in ('draft', 'cancel') for record in self):
             raise UserError("Anda tidak dapat menghapus record yang tidak berada dalam status 'Draft' atau 'Cancel'.")
@@ -484,7 +504,7 @@ class DetailOrder(models.Model):
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
-    order_pengiriman = fields.Many2one('order.pengiriman', 'Nomor Order', )
+    order_pengiriman = fields.Many2one('order.pengiriman', 'Nomor Order')
     tanggal_order = fields.Datetime('Tanggal Order')
     jenis_order = fields.Selection([('do', 'DO'),('regular', 'Regular'),], required=True, tracking=True)
     customer = fields.Many2one('res.partner', 'Customer', required=True, tracking=True)
