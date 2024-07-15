@@ -117,8 +117,11 @@
                             <field name="uang_jalan_nominal_tree">
                                 <tree editable="bottom">
                                     <field name="uang_jalan_nominal_saja" invisible="1"/>
+                                    <field name="tipe_muatan" optional="show"/>
+                                    <field name="customer_id" optional="show"/>
                                     <field name="muat" width="100%" optional="show"/>
                                     <field name="bongkar" width="100%" optional="show"/>
+                                    <field name="keterangan" optional="show"/>
                                     <field name="nominal_uang_jalan" width="100%" optional="show"/>
                                 </tree>
                             </field>
@@ -189,9 +192,4 @@
             </form>
         </field>
     </record>
-
-
-
-
-
 </odoo>

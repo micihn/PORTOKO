@@ -31,12 +31,12 @@
       parent="order_pengiriman.menu_order_pengiriman_root">
     </menuitem>
 
+    <menuitem id="menu_report_main" groups="order_pengiriman.group_order_pengiriman" sequence="4" name="Laporan" parent="order_pengiriman.menu_order_pengiriman_root"/>
+
     <menuitem id="menu_report"
-      groups="order_pengiriman.group_order_pengiriman"
-      sequence="4"
-      name="Laporan"
+      name="Laporan Uang Jalan Gantung"
       action="report_uang_jalan_gantung_act"
-      parent="order_pengiriman.menu_order_pengiriman_root">
+      parent="menu_report_main">
     </menuitem>
 
     <menuitem id="menu_konfigurasi"

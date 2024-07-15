@@ -1,0 +1,11 @@
+<odoo>
+    <data noupdate="1">
+        <record id="sequence_uang_jalan_tutup" model="ir.sequence">
+            <field name="name">Sequence Uang Jalan Tertutup</field>
+            <field name="code">uang.jalan.tutup</field>
+            <field name="prefix">KK</field>
+            <field name="padding">7</field>
+	        <field name="company_id" eval="False" />
+        </record>
+    </data>
+</odoo>

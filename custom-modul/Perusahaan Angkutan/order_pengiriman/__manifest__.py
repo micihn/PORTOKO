@@ -20,6 +20,8 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'data/ir_sequence.xml',
+        'data/report_paperformat.xml',
         'views/order_pengiriman.xml',
         'views/konfigurasi_lokasi.xml',
         'views/konfigurasi_tipe_muatan.xml',
@@ -33,6 +35,7 @@
         'views/fleet_vehicle.xml',
         'views/uang_jalan.xml',
         'report/report_uang_jalan.xml',
+        'report/report_uang_jalan_tutup.xml',
         'report/report_uang_jalan_action.xml',
         'report/report_uang_jalan_gantung.xml',
         'report/report_uang_jalan_gantung_action.xml',
