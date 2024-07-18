@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
-    'name': 'Order Pengiriman',
+    'name': 'Uang Jalan',
     'author': 'Altela Software',
     'version': '0.2',
     'summary': 'Pencatatan serta tracking pengiriman',
