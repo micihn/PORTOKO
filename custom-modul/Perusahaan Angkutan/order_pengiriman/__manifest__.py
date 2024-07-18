@@ -40,7 +40,6 @@
         'report/report_uang_jalan_gantung.xml',
         'report/report_uang_jalan_gantung_action.xml',
         'views/menu.xml',
-
     ],
     'demo': [],
     'post_init_hook': 'post_init_hook',

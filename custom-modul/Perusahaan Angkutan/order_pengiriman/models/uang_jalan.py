@@ -24,6 +24,7 @@ class UangJalan(models.Model):
     lines_count = fields.Integer(compute='compute_total_line')
     order_disetor = fields.Integer()
     can_use_all_balance = fields.Boolean(default=True)
+    nomor_setoran = fields.Char()
 
     @api.depends('uang_jalan_line', 'uang_jalan_nominal_tree')
     def compute_total_line(self):

@@ -64,6 +64,7 @@
                             <field name="sisa_kas_cadangan" readonly="1" force_save="1"/>
                             <field name="sopir" />
                             <field name="kenek" />
+                            <field name="nomor_setoran" readonly="1" force_save="1"/>
                         </group>
 
                         <group>
