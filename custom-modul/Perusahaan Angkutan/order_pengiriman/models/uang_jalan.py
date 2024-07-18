@@ -53,6 +53,13 @@ class UangJalan(models.Model):
         'paid': [('readonly', True)],
         'closed': [('readonly', True)],
     })
+    sisa_kas_cadangan = fields.Float(digits=(6, 0), copy=False, states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
+    })
 
     @api.depends('kendaraan')
     def compute_kas_gantung_kendaraan(self):
@@ -163,6 +170,25 @@ class UangJalan(models.Model):
             vals['uang_jalan_name'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('uang.jalan.sequence') or 'New'
         result = super(UangJalan, self).create(vals)
         return result
+
+    @api.onchange('kendaraan')
+    def get_available_kas_cadangan(self):
+        if self.uang_jalan_name == 'New':
+            self.kas_cadangan = 0
+            self.sisa_kas_cadangan = 0
+            previous_uang_jalan = self.env['uang.jalan'].search([('kendaraan','=', self.kendaraan.id)])
+            if bool(previous_uang_jalan):
+                for uj in previous_uang_jalan:
+                    self.kas_cadangan += uj.kas_cadangan
+                    self.sisa_kas_cadangan += uj.kas_cadangan
+        else:
+            self.kas_cadangan = 0
+            self.sisa_kas_cadangan = 0
+            previous_uang_jalan = self.env['uang.jalan'].search([('kendaraan','=', self.kendaraan.id), ('uang_jalan_name', '!=', self.uang_jalan_name)])
+            if bool(previous_uang_jalan):
+                for uj in previous_uang_jalan:
+                    self.kas_cadangan += uj.kas_cadangan
+                    self.sisa_kas_cadangan += uj.kas_cadangan
 
     @api.model
     def terbilang(self, bil):
