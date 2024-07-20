@@ -174,22 +174,7 @@ class UangJalan(models.Model):
 
     @api.onchange('kendaraan')
     def get_available_kas_cadangan(self):
-        if self.uang_jalan_name == 'New':
-            self.kas_cadangan = 0
-            self.sisa_kas_cadangan = 0
-            previous_uang_jalan = self.env['uang.jalan'].search([('kendaraan','=', self.kendaraan.id)])
-            if bool(previous_uang_jalan):
-                for uj in previous_uang_jalan:
-                    self.kas_cadangan += uj.kas_cadangan
-                    self.sisa_kas_cadangan += uj.kas_cadangan
-        else:
-            self.kas_cadangan = 0
-            self.sisa_kas_cadangan = 0
-            previous_uang_jalan = self.env['uang.jalan'].search([('kendaraan','=', self.kendaraan.id), ('uang_jalan_name', '!=', self.uang_jalan_name)])
-            if bool(previous_uang_jalan):
-                for uj in previous_uang_jalan:
-                    self.kas_cadangan += uj.kas_cadangan
-                    self.sisa_kas_cadangan += uj.kas_cadangan
+        self.sisa_kas_cadangan = self.kendaraan.kas_cadangan
 
     @api.model
     def terbilang(self, bil):
@@ -565,6 +550,11 @@ class UangJalan(models.Model):
             record.total = record.total_uang_jalan_standar + record.total_uang_jalan_nominal_saja
 
     def validate(self):
+        if bool(self.kas_cadangan):
+            self.kendaraan.kas_cadangan += self.kas_cadangan
+
+        if bool(self.sisa_kas_cadangan):
+            self.kendaraan.kas_cadangan -= self.sisa_kas_cadangan
         self.state = 'validated'
 
     def unlink(self):
