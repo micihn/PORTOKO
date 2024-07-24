@@ -174,7 +174,10 @@ class UangJalan(models.Model):
 
     @api.onchange('kendaraan')
     def get_available_kas_cadangan(self):
-        self.sisa_kas_cadangan = self.kendaraan.kas_cadangan
+        if bool(self.kendaraan.kas_cadangan):
+            self.sisa_kas_cadangan = self.kendaraan.kas_cadangan
+        else:
+            self.sisa_kas_cadangan = 0
 
     @api.model
     def terbilang(self, bil):
@@ -269,6 +272,12 @@ class UangJalan(models.Model):
         account_uang_jalan = account_settings.account_uang_jalan
         journal_uang_jalan = account_settings.journal_uang_jalan
         account_kas = account_settings.account_kas
+
+        if bool(self.kas_cadangan):
+            self.kendaraan.kas_cadangan += self.kas_cadangan
+
+        if bool(self.sisa_kas_cadangan):
+            self.kendaraan.kas_cadangan -= self.sisa_kas_cadangan
 
         if bool(account_uang_jalan) == False:
             raise ValidationError("Konfigurasi Account belum diisi")
@@ -509,7 +518,7 @@ class UangJalan(models.Model):
             if nominal_uang_jalan:
                 record.sudo().nominal_uang_jalan = nominal_uang_jalan
 
-    @api.depends('uang_jalan_line.nominal_uang_jalan', 'biaya_tambahan_standar', 'kas_cadangan', 'tipe_uang_jalan')
+    @api.depends('uang_jalan_line.nominal_uang_jalan', 'biaya_tambahan_standar', 'kas_cadangan', 'sisa_kas_cadangan', 'tipe_uang_jalan')
     def _compute_total_uang_jalan_standar(self):
         for record in self:
             if record.tipe_uang_jalan == 'standar':
@@ -519,14 +528,18 @@ class UangJalan(models.Model):
                     if record.id:
                         DOMAIN += [('id', '!=', record.id)]
                     uang_jalan_terbuka = self.env['uang.jalan'].search(DOMAIN)
-                    total_ujt = sum([uj.kas_cadangan for uj in uang_jalan_terbuka])
+                    for uj in uang_jalan_terbuka:
+                        total_ujt += uj.kas_cadangan
+                        break
+                    # uang_jalan_terbuka = self.env['uang.jalan'].search(DOMAIN)
+                    # total_ujt = sum([uj.kas_cadangan for uj in uang_jalan_terbuka])
 
                 uang_jalan_line = record.sudo().uang_jalan_line
                 record.total_uang_jalan_standar = sum(uang_jalan_line.mapped('nominal_uang_jalan')) + record.biaya_tambahan_standar + record.kas_cadangan - total_ujt
             else:
                 record.total_uang_jalan_standar = 0
 
-    @api.depends('uang_jalan_nominal_tree.nominal_uang_jalan', 'biaya_tambahan_nominal_saja', 'kas_cadangan', 'tipe_uang_jalan')
+    @api.depends('uang_jalan_nominal_tree.nominal_uang_jalan', 'biaya_tambahan_nominal_saja', 'kas_cadangan', 'sisa_kas_cadangan', 'tipe_uang_jalan')
     def _compute_total_nominal_uang_jalan_saja(self):
         for record in self:
             if record.tipe_uang_jalan == 'nominal_saja':
@@ -550,11 +563,6 @@ class UangJalan(models.Model):
             record.total = record.total_uang_jalan_standar + record.total_uang_jalan_nominal_saja
 
     def validate(self):
-        if bool(self.kas_cadangan):
-            self.kendaraan.kas_cadangan += self.kas_cadangan
-
-        if bool(self.sisa_kas_cadangan):
-            self.kendaraan.kas_cadangan -= self.sisa_kas_cadangan
         self.state = 'validated'
 
     def unlink(self):
