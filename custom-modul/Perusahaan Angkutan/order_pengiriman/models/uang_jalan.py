@@ -11,7 +11,7 @@ class UangJalan(models.Model):
     active = fields.Boolean('Archive', default=True, tracking=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     tipe_uang_jalan = fields.Selection([
-        ('standar', "Standar"),
+        # ('standar', "Standar"),
         ('nominal_saja', "Nominal Saja"),
     ], required=True, default='nominal_saja', states={
         'to_submit': [('readonly', False)],
@@ -522,21 +522,8 @@ class UangJalan(models.Model):
     def _compute_total_uang_jalan_standar(self):
         for record in self:
             if record.tipe_uang_jalan == 'standar':
-                total_ujt = 0
-                if record.kendaraan:
-                    DOMAIN = [('kendaraan', '=', record.kendaraan.id), ('state', 'not in', ['closed', 'cancel'])]
-                    if record.id:
-                        DOMAIN += [('id', '!=', record.id)]
-                    uang_jalan_terbuka = self.env['uang.jalan'].search(DOMAIN)
-                    for uj in uang_jalan_terbuka:
-                        total_ujt += uj.kas_cadangan
-                        break
-                    # Aal
-                    # uang_jalan_terbuka = self.env['uang.jalan'].search(DOMAIN)
-                    # total_ujt = sum([uj.kas_cadangan for uj in uang_jalan_terbuka])
-
                 uang_jalan_line = record.sudo().uang_jalan_line
-                record.total_uang_jalan_standar = sum(uang_jalan_line.mapped('nominal_uang_jalan')) + record.biaya_tambahan_standar + record.kas_cadangan - total_ujt
+                record.total_uang_jalan_standar = sum(uang_jalan_line.mapped('nominal_uang_jalan')) + record.biaya_tambahan_standar + record.kas_cadangan - record.sisa_kas_cadangan
             else:
                 record.total_uang_jalan_standar = 0
 
@@ -544,14 +531,6 @@ class UangJalan(models.Model):
     def _compute_total_nominal_uang_jalan_saja(self):
         for record in self:
             if record.tipe_uang_jalan == 'nominal_saja':
-                total_ujt = 0
-                # if record.kendaraan:
-                #     DOMAIN = [('kendaraan', '=', record.kendaraan.id), ('state', 'not in', ['closed', 'cancel'])]
-                #     if record.id:
-                #         DOMAIN += [('id', '!=', record.id)]
-                #     uang_jalan_terbuka = self.env['uang.jalan'].search(DOMAIN)
-                #     total_ujt = sum([uj.kas_cadangan for uj in uang_jalan_terbuka])
-
                 uang_jalan_nominal_tree = record.sudo().uang_jalan_nominal_tree
                 record.total_uang_jalan_nominal_saja = sum(
                 uang_jalan_nominal_tree.mapped('nominal_uang_jalan')) + record.biaya_tambahan_nominal_saja + record.kas_cadangan - record.sisa_kas_cadangan
