@@ -156,4 +156,3 @@ class CloseUangJalan(models.TransientModel):
 					'keterangan_tutup': self.keterangan
 				})
 
-

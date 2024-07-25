@@ -531,6 +531,7 @@ class UangJalan(models.Model):
                     for uj in uang_jalan_terbuka:
                         total_ujt += uj.kas_cadangan
                         break
+                    # Aal
                     # uang_jalan_terbuka = self.env['uang.jalan'].search(DOMAIN)
                     # total_ujt = sum([uj.kas_cadangan for uj in uang_jalan_terbuka])
 
@@ -544,16 +545,16 @@ class UangJalan(models.Model):
         for record in self:
             if record.tipe_uang_jalan == 'nominal_saja':
                 total_ujt = 0
-                if record.kendaraan:
-                    DOMAIN = [('kendaraan', '=', record.kendaraan.id), ('state', 'not in', ['closed', 'cancel'])]
-                    if record.id:
-                        DOMAIN += [('id', '!=', record.id)]
-                    uang_jalan_terbuka = self.env['uang.jalan'].search(DOMAIN)
-                    total_ujt = sum([uj.kas_cadangan for uj in uang_jalan_terbuka])
+                # if record.kendaraan:
+                #     DOMAIN = [('kendaraan', '=', record.kendaraan.id), ('state', 'not in', ['closed', 'cancel'])]
+                #     if record.id:
+                #         DOMAIN += [('id', '!=', record.id)]
+                #     uang_jalan_terbuka = self.env['uang.jalan'].search(DOMAIN)
+                #     total_ujt = sum([uj.kas_cadangan for uj in uang_jalan_terbuka])
 
                 uang_jalan_nominal_tree = record.sudo().uang_jalan_nominal_tree
                 record.total_uang_jalan_nominal_saja = sum(
-                uang_jalan_nominal_tree.mapped('nominal_uang_jalan')) + record.biaya_tambahan_nominal_saja + record.kas_cadangan - total_ujt
+                uang_jalan_nominal_tree.mapped('nominal_uang_jalan')) + record.biaya_tambahan_nominal_saja + record.kas_cadangan - record.sisa_kas_cadangan
             else:
                 record.total_uang_jalan_nominal_saja = 0
 
