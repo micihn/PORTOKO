@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='horsepower_tax']" position="after">
                     <separator string="Uang Kas Gantung" />
-                    <field name="kas_gantung_vehicle" />
+                    <field name="kas_gantung_vehicle" force_save="1" readonly="1"/>
                     <separator string="Uang Kas Cadangan" />
                     <field name="kas_cadangan" force_save="1" readonly="1"/>
                 </xpath>
