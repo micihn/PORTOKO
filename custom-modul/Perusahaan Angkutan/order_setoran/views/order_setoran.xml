@@ -76,6 +76,7 @@
 
                     <group>
                         <group>
+                            <field name="tanggal_kasbon"/>
                             <field name="kendaraan"/>
                             <field name="sopir"/>
                             <field name="kenek"/>
@@ -218,10 +219,10 @@
 
                         <page string="List Uang Jalan">
                             <field name="list_uang_jalan" optional="show">
-                                <tree>
+                                <tree editable="bottom">
                                     <field name="uang_jalan_name" optional="show"/>
                                     <field name="keterangan" optional="show"/>
-                                    <field name="tanggal" optional="show"/>
+                                    <field name="tanggal" optional="show" readonly="1" force_save="1"/>
                                     <field name="total" optional="show"/>
                                 </tree>
                             </field>

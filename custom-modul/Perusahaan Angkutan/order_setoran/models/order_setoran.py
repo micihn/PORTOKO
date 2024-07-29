@@ -140,6 +140,28 @@ class OrderSetoran(models.Model):
 
     #         rec.relatable_uang_jalan = [(6, 0, list_uang_jalan)]  # Clear existing records, then add new ones
 
+    @api.onchange('kendaraan', 'tanggal_kasbon')
+    def set_driver_and_kenek(self):
+        self.sopir = self.kendaraan.sopir_id.id
+        self.kenek = self.kendaraan.kenek_id.id
+
+        if bool(self.kendaraan) and bool(self.tanggal_kasbon):
+            list_uang_jalan = self.env['uang.jalan'].sudo().search([
+                ('kendaraan', '=', self.kendaraan.id),
+                ('create_date', '>=', self.tanggal_kasbon),
+                ('create_date', '<=', self.tanggal_kasbon),
+            ])
+
+            if bool(list_uang_jalan):
+                for uang_jalan in list_uang_jalan:
+                    self.list_uang_jalan.create({
+                        'order_setoran': self.id,
+                        'uang_jalan_name': uang_jalan.id,
+                        'tanggal': uang_jalan.create_date.date() if uang_jalan.create_date else False,
+                    })
+            else:
+                self.list_uang_jalan.unlink()
+
     relatable_list_pembelian = fields.Many2many('biaya.pembelian', compute="compute_relatable_biaya_pembelian", copy=False)
     @api.depends('detail_order.order_pengiriman')
     def compute_relatable_biaya_pembelian(self):
@@ -1090,8 +1112,8 @@ class ListUangJalan(models.Model):
     order_setoran = fields.Many2one('order.setoran', invisible=True)
     tanggal = fields.Date('Tanggal')
     uang_jalan_name = fields.Many2one('uang.jalan', 'No Uang Jalan')
-    total = fields.Float('Total', digits=(6, 0))
-    keterangan = fields.Text('Keterangan')
+    total = fields.Float('Total', digits=(6, 0), related="uang_jalan_name.total")
+    keterangan = fields.Text('Keterangan', related="uang_jalan_name.keterangan")
 
 # class ListPembelian(models.Model):
 #     _name = 'detail.list.pembelian'
