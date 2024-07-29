@@ -127,7 +127,7 @@ class OrderSetoran(models.Model):
     #     'done': [('readonly', False)],
     # })
 
-    relatable_uang_jalan = fields.Many2many('uang.jalan', compute="_compute_total_uang_jalan", string='No. Uang Jalan', copy=False)
+    # relatable_uang_jalan = fields.Many2many('uang.jalan', compute="_compute_total_uang_jalan", string='No. Uang Jalan', copy=False)
 
     # @api.depends('detail_order.order_pengiriman')
     # def compute_relatable_uang_jalan(self):
@@ -387,19 +387,25 @@ class OrderSetoran(models.Model):
         for record in self:
             record.total_pembelian = sum(record.relatable_list_pembelian.mapped('nominal'))
 
-    @api.depends('relatable_uang_jalan.total')
+    @api.depends('list_uang_jalan.total')
     def _compute_total_uang_jalan(self):
-        for record in self:
-            list_uang_jalan = []
-            total_uj = 0
-            for detail in record.detail_order:  # Assuming detail_order is a One2many or Many2many field
-                if detail.order_pengiriman:
-                    for uj in detail.order_pengiriman.uang_jalan:
-                        list_uang_jalan.append(uj.id)  # Using (4, id) to add records to Many2many field
-                        total_uj += uj.total
+        total = 0
+        for record in self.list_uang_jalan:
+            total += record.total
 
-            record.relatable_uang_jalan = [(6, 0, list_uang_jalan)]  # Clear existing records, then add new ones
-            record.total_uang_jalan = total_uj
+        self.total_uang_jalan = total
+
+        # for record in self:
+        #     list_uang_jalan = []
+        #     total_uj = 0
+        #     for detail in record.detail_order:  # Assuming detail_order is a One2many or Many2many field
+        #         if detail.order_pengiriman:
+        #             for uj in detail.order_pengiriman.uang_jalan:
+        #                 list_uang_jalan.append(uj.id)  # Using (4, id) to add records to Many2many field
+        #                 total_uj += uj.total
+        #
+        #     record.relatable_uang_jalan = [(6, 0, list_uang_jalan)]  # Clear existing records, then add new ones
+        #     record.total_uang_jalan = total_uj
 
     @api.depends('total_ongkos')
     def _compute_total_ongkos_calculated(self):
