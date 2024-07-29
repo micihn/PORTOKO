@@ -25,7 +25,7 @@ class OrderSetoran(models.Model):
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     fetch_order_automatic = fields.Boolean()
 
-    kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', tracking=True, states={
+    kendaraan = fields.Many2one('fleet.vehicle', 'No. Truk', tracking=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
@@ -43,8 +43,14 @@ class OrderSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    tanggal_st = fields.Date('Tanggal ST', tracking=True, default=fields.Date.today(), required=True, states={
+    tanggal_st = fields.Date('Tgl. Setor', tracking=True, default=fields.Date.today(), required=True, states={
         'draft': [('readonly', True)],
+        'done': [('readonly', True)],
+        'cancel': [('readonly', True)],
+    })
+
+    tanggal_kasbon = fields.Date('Tgl. Kasbon', tracking=True, required=True, states={
+        'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     })
@@ -106,10 +112,10 @@ class OrderSetoran(models.Model):
         'done': [('readonly', True)],
     })
 
-    # list_uang_jalan = fields.One2many('detail.list.uang.jalan', 'order_setoran', states={
-    #     'draft': [('readonly', False)],
-    #     'done': [('readonly', True)],
-    # })
+    list_uang_jalan = fields.One2many('detail.list.uang.jalan', 'order_setoran', states={
+        'draft': [('readonly', False)],
+        'done': [('readonly', True)],
+    })
 
     # list_pembelian = fields.One2many('detail.list.pembelian', 'order_setoran', states={
     #     'draft': [('readonly', False)],
@@ -1075,17 +1081,17 @@ class DetailOrder(models.Model):
             self.plant = order.plant
             self.jumlah = order.total_ongkos
 
-# class ListUangJalan(models.Model):
-#     _name = 'detail.list.uang.jalan'
-#     _description = 'List Uang Jalan'
-#
-#     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
-#     order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
-#     order_setoran = fields.Many2one('order.setoran', invisible=True)
-#     tanggal = fields.Date('Tanggal')
-#     uang_jalan_name = fields.Many2one('uang.jalan', 'No Uang Jalan')
-#     total = fields.Float('Total', digits=(6, 0))
-#     keterangan = fields.Text('Keterangan')
+class ListUangJalan(models.Model):
+    _name = 'detail.list.uang.jalan'
+    _description = 'List Uang Jalan'
+
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+    # order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
+    order_setoran = fields.Many2one('order.setoran', invisible=True)
+    tanggal = fields.Date('Tanggal')
+    uang_jalan_name = fields.Many2one('uang.jalan', 'No Uang Jalan')
+    total = fields.Float('Total', digits=(6, 0))
+    keterangan = fields.Text('Keterangan')
 
 # class ListPembelian(models.Model):
 #     _name = 'detail.list.pembelian'

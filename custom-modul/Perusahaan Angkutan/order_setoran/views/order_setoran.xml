@@ -89,145 +89,144 @@
                     </group>
 
                     <notebook>
-                        <page string="Detail Order">
-                            <field name="detail_order">
-                                <tree editable="bottom">
-                                    <field name="order_pengiriman" optional="show" force_save="True" />
-                                    <field name="tanggal_order" optional="show" force_save="True" readonly="True"/>
-                                    <field name="jenis_order" optional="show" force_save="True" readonly="True"/>
-                                    <field name="customer" optional="show" force_save="True" readonly="True"/>
-                                    <field name="plant" optional="show" force_save="True" readonly="True"/>
-                                    <field name="nomor_surat_jalan" optional="show" />
-                                    <field name="tanggal_surat_jalan" optional="show"/>
-                                    <field name="jumlah" optional="show" force_save="True" readonly="True"/>
-                                    <field name="bayar_dimuka" optional="show"/>
-                                </tree>
-                            </field>
+<!--                        <page string="Detail Order">-->
+<!--                            <field name="detail_order">-->
+<!--                                <tree editable="bottom">-->
+<!--                                    <field name="order_pengiriman" optional="show" force_save="True" />-->
+<!--                                    <field name="tanggal_order" optional="show" force_save="True" readonly="True"/>-->
+<!--                                    <field name="jenis_order" optional="show" force_save="True" readonly="True"/>-->
+<!--                                    <field name="customer" optional="show" force_save="True" readonly="True"/>-->
+<!--                                    <field name="plant" optional="show" force_save="True" readonly="True"/>-->
+<!--                                    <field name="nomor_surat_jalan" optional="show" />-->
+<!--                                    <field name="tanggal_surat_jalan" optional="show"/>-->
+<!--                                    <field name="jumlah" optional="show" force_save="True" readonly="True"/>-->
+<!--                                    <field name="bayar_dimuka" optional="show"/>-->
+<!--                                </tree>-->
+<!--                            </field>-->
 
-                            <!-- Panel Kiri -->
-                            <div class="oe_left">
-                                <separator string="Pengeluaran"/>
-                                <div style="display: flex; justify-content: space-between; ">
-                                    <label for="total_pengeluaran" string="Total Pengeluaran : "/>
+<!--                            &lt;!&ndash; Panel Kiri &ndash;&gt;-->
+<!--                            <div class="oe_left">-->
+<!--                                <separator string="Pengeluaran"/>-->
+<!--                                <div style="display: flex; justify-content: space-between; ">-->
+<!--                                    <label for="total_pengeluaran" string="Total Pengeluaran : "/>-->
 
-                                    <div style="text-align: right; margin-right:0px">
-                                        <field name="total_pengeluaran"/>
-                                    </div>
-                                </div>
+<!--                                    <div style="text-align: right; margin-right:0px">-->
+<!--                                        <field name="total_pengeluaran"/>-->
+<!--                                    </div>-->
+<!--                                </div>-->
 
-                                <separator string="Rincian Biaya"/>
-                                <div style="display: flex; justify-content: space-between; ">
-                                    <label for="total_ongkos" string="Total Ongkos : "/>
-                                    <div style="width: 20%; text-align: center;">
-                                        <field name="total_ongkos"/>
-                                    </div>
-                                    <label for="total_ongkos" string="%"/>
-                                    <field name="total_ongkos_calculated"/>
-                                </div>
+<!--                                <separator string="Rincian Biaya"/>-->
+<!--                                <div style="display: flex; justify-content: space-between; ">-->
+<!--                                    <label for="total_ongkos" string="Total Ongkos : "/>-->
+<!--                                    <div style="width: 20%; text-align: center;">-->
+<!--                                        <field name="total_ongkos"/>-->
+<!--                                    </div>-->
+<!--                                    <label for="total_ongkos" string="%"/>-->
+<!--                                    <field name="total_ongkos_calculated"/>-->
+<!--                                </div>-->
 
-                                <div style="display: flex; justify-content: space-between; ">
-                                    <label for="total_uang_jalan" string="Total Uang Jalan : "/>
-                                    <field name="total_uang_jalan" style="margin-left: 10px;"/>
-                                </div>
+<!--                                <div style="display: flex; justify-content: space-between; ">-->
+<!--                                    <label for="total_uang_jalan" string="Total Uang Jalan : "/>-->
+<!--                                    <field name="total_uang_jalan" style="margin-left: 10px;"/>-->
+<!--                                </div>-->
 
-                                <div style="display: flex; justify-content: space-between; ">
-                                    <label for="total_biaya_fee" string="Total Biaya Fee : "/>
-                                    <field name="total_biaya_fee" style="margin-left: 10px;"/>
-                                </div>
+<!--                                <div style="display: flex; justify-content: space-between; ">-->
+<!--                                    <label for="total_biaya_fee" string="Total Biaya Fee : "/>-->
+<!--                                    <field name="total_biaya_fee" style="margin-left: 10px;"/>-->
+<!--                                </div>-->
 
-                                <div style="display: flex; justify-content: space-between; ">
-                                    <label for="total_pembelian" string="Total Pembelian : "/>
-                                    <field name="total_pembelian" style="margin-left: 10px;"/>
-                                </div>
+<!--                                <div style="display: flex; justify-content: space-between; ">-->
+<!--                                    <label for="total_pembelian" string="Total Pembelian : "/>-->
+<!--                                    <field name="total_pembelian" style="margin-left: 10px;"/>-->
+<!--                                </div>-->
 
-                                <div style="display: flex; justify-content: space-between; ">
-                                    <label for="sisa" string="Sisa : "/>
-                                    <field name="sisa" style="margin-left: 10px;"/>
-                                </div>
+<!--                                <div style="display: flex; justify-content: space-between; ">-->
+<!--                                    <label for="sisa" string="Sisa : "/>-->
+<!--                                    <field name="sisa" style="margin-left: 10px;"/>-->
+<!--                                </div>-->
 
-                                <separator string="Komisi"/>
-                                <div style="display: flex; justify-content: space-between; ">
-                                    <label for="komisi_sopir_percentage" string="Komisi Sopir : "/>
-                                    <div style="width: 20%; text-align: center; ">
-                                        <field name="komisi_sopir_percentage"/>
-                                    </div>
-                                    <label for="komisi_sopir_percentage" string="%"/>
-                                    <field name="komisi_sopir"/>
-                                </div>
+<!--                                <separator string="Komisi"/>-->
+<!--                                <div style="display: flex; justify-content: space-between; ">-->
+<!--                                    <label for="komisi_sopir_percentage" string="Komisi Sopir : "/>-->
+<!--                                    <div style="width: 20%; text-align: center; ">-->
+<!--                                        <field name="komisi_sopir_percentage"/>-->
+<!--                                    </div>-->
+<!--                                    <label for="komisi_sopir_percentage" string="%"/>-->
+<!--                                    <field name="komisi_sopir"/>-->
+<!--                                </div>-->
 
-                                 <div style="display: flex; justify-content: space-between; ">
-                                    <label for="keterangan_komisi_sopir" string="Keterangan"/>
-                                    <div style="width: 100%; text-align: left;">
-                                        <field name="keterangan_komisi_sopir" />
-                                    </div>
-                                </div><br/><br/>
+<!--                                 <div style="display: flex; justify-content: space-between; ">-->
+<!--                                    <label for="keterangan_komisi_sopir" string="Keterangan"/>-->
+<!--                                    <div style="width: 100%; text-align: left;">-->
+<!--                                        <field name="keterangan_komisi_sopir" />-->
+<!--                                    </div>-->
+<!--                                </div><br/><br/>-->
 
-                                <div style="display: flex; justify-content: space-between; ">
-                                    <label for="komisi_kenek_percentage" string="Komisi Kenek : "/>
-                                    <div style="width: 20%; text-align: center;">
-                                        <field name="komisi_kenek_percentage"/>
-                                    </div>
-                                    <label for="komisi_kenek_percentage" string="%" />
-                                    <field name="komisi_kenek"/>
-                                </div>
+<!--                                <div style="display: flex; justify-content: space-between; ">-->
+<!--                                    <label for="komisi_kenek_percentage" string="Komisi Kenek : "/>-->
+<!--                                    <div style="width: 20%; text-align: center;">-->
+<!--                                        <field name="komisi_kenek_percentage"/>-->
+<!--                                    </div>-->
+<!--                                    <label for="komisi_kenek_percentage" string="%" />-->
+<!--                                    <field name="komisi_kenek"/>-->
+<!--                                </div>-->
 
-                                 <div style="display: flex; justify-content: space-between; ">
-                                    <label for="keterangan_komisi_kenek" string="Keterangan"/>
-                                    <div style="width: 100%; text-align: left;">
-                                        <field name="keterangan_komisi_kenek" />
-                                    </div>
-                                </div>
-                            </div>
+<!--                                 <div style="display: flex; justify-content: space-between; ">-->
+<!--                                    <label for="keterangan_komisi_kenek" string="Keterangan"/>-->
+<!--                                    <div style="width: 100%; text-align: left;">-->
+<!--                                        <field name="keterangan_komisi_kenek" />-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
 
 
-                            <!-- Panel Kanan -->
-                            <!-- Total Jumlah & Total Bayar Dimuka -->
-                            <div class="oe_right">
-                                <!-- Total Jumlah -->
-                                <div style="display: flex; justify-content: space-between;">
-                                    <div class="oe_total_field" style="margin-left: auto;">
-                                        <field name="total_jumlah" style="text-align: right;"/>
-                                    </div>
-                                </div>
+<!--                            &lt;!&ndash; Panel Kanan &ndash;&gt;-->
+<!--                            &lt;!&ndash; Total Jumlah & Total Bayar Dimuka &ndash;&gt;-->
+<!--                            <div class="oe_right">-->
+<!--                                &lt;!&ndash; Total Jumlah &ndash;&gt;-->
+<!--                                <div style="display: flex; justify-content: space-between;">-->
+<!--                                    <div class="oe_total_field" style="margin-left: auto;">-->
+<!--                                        <field name="total_jumlah" style="text-align: right;"/>-->
+<!--                                    </div>-->
+<!--                                </div>-->
 
-                                <!-- Total Bayar Dimuka -->
-                                <div style="display: flex; justify-content: space-between;">
-                                    <div class="oe_total_field" style="margin-left: auto;">
-                                        <field name="total_bayar_dimuka" style="text-align: right !important;"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="oe_right" style="margin-right:50px">
-                                <!-- Label Total Jumlah -->
-                                <div style="display: flex; justify-content: space-between; align-items: left;">
-                                    <div class="oe_total_label" style="color:#000000;">
-                                        <label for="total_jumlah" string="Total Jumlah : " style="text-align: left;"/>
-                                    </div>
-                                </div>
+<!--                                &lt;!&ndash; Total Bayar Dimuka &ndash;&gt;-->
+<!--                                <div style="display: flex; justify-content: space-between;">-->
+<!--                                    <div class="oe_total_field" style="margin-left: auto;">-->
+<!--                                        <field name="total_bayar_dimuka" style="text-align: right !important;"/>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="oe_right" style="margin-right:50px">-->
+<!--                                &lt;!&ndash; Label Total Jumlah &ndash;&gt;-->
+<!--                                <div style="display: flex; justify-content: space-between; align-items: left;">-->
+<!--                                    <div class="oe_total_label" style="color:#000000;">-->
+<!--                                        <label for="total_jumlah" string="Total Jumlah : " style="text-align: left;"/>-->
+<!--                                    </div>-->
+<!--                                </div>-->
 
-                                <!-- Label Bayar Dimuka-->
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <div class="oe_total_label" style="color:#000000;">
-                                        <label for="total_bayar_dimuka" string="Total Bayar Dimuka : "
-                                               style="text-align: left;"/>
-                                    </div>
-                                </div>
-                            </div>
+<!--                                &lt;!&ndash; Label Bayar Dimuka&ndash;&gt;-->
+<!--                                <div style="display: flex; justify-content: space-between; align-items: center;">-->
+<!--                                    <div class="oe_total_label" style="color:#000000;">-->
+<!--                                        <label for="total_bayar_dimuka" string="Total Bayar Dimuka : "-->
+<!--                                               style="text-align: left;"/>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
 
-                        </page>
+<!--                        </page>-->
 
                         <page string="List Uang Jalan">
-
-                            <field name="relatable_uang_jalan" optional="show" force_save="True" readonly="True">
+                            <field name="list_uang_jalan" optional="show">
                                 <tree>
                                     <field name="uang_jalan_name" optional="show"/>
                                     <field name="keterangan" optional="show"/>
-                                    <field name="create_date" optional="show"/>
+                                    <field name="tanggal" optional="show"/>
                                     <field name="total" optional="show"/>
                                 </tree>
                             </field>
 
-<!--                            <field name="list_uang_jalan" force_save="1" readonly="1">-->
+<!--                            <field name="relatable_uang_jalan" >-->
 <!--                                <tree editable="bottom" >-->
 <!--                                    <field name="tanggal" optional="show"/>-->
 <!--                                    <field name="uang_jalan_name" optional="show"/>-->
