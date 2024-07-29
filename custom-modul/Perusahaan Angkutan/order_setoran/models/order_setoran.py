@@ -43,8 +43,8 @@ class OrderSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    tanggal_st = fields.Date('Tanggal ST', tracking=True, required=True, states={
-        'draft': [('readonly', False)],
+    tanggal_st = fields.Date('Tanggal ST', tracking=True, default=fields.Date.today(), required=True, states={
+        'draft': [('readonly', True)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     })
