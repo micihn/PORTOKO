@@ -12,7 +12,7 @@
                                 <field name="order_pengiriman" options="{'no_create': True, 'no_open': True}" force_save="1" readonly="1"/>
                                 <field name="customer" force_save="1" readonly="1"/>
                                 <field name="pembayaran" />
-                                <field name="tanggal_surat_jalan" force_save="1" readonly="1"/>
+                                <field name="tanggal_order" force_save="1" readonly="1"/>
                                 <field name="nominal_invoice" force_save="1" readonly="1"/>
                                 <field name="bayar_dimuka" force_save="1" readonly="1" />
                             </tree>
