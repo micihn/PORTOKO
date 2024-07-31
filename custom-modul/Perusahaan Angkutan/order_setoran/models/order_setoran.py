@@ -11,7 +11,7 @@ class OrderSetoran(models.Model):
     _inherit = ['mail.thread']
     _rec_name = 'kode_order_setoran'
 
-    kode_order_setoran = fields.Char(readonly=True, required=True, copy=False, default='New')
+    kode_order_setoran = fields.Char(readonly=True, required=True, copy=False, string="No. Setoran", default='New')
     total_jumlah = fields.Float('Total', compute='_compute_total', digits=(6, 0))
     total_bayar_dimuka = fields.Float('Bayar Dimuka', compute='_compute_total_bayar_dimuka', digits=(6, 0))
     total_uang_jalan = fields.Float(compute='_compute_total_uang_jalan', digits=(6, 0))
