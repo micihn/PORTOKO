@@ -103,8 +103,8 @@
                             <!-- Total Jumlah & Total Bayar Dimuka -->
 
                             <div class="oe_left" style="display: flex; gap: 10px;">
-                            <button name="create_regular_op" type="object" string="RG" class="btn-primary" />
-                            <button name="create_do_op" type="object" string="D/O" class="btn-primary"/>
+                            <button name="create_regular_op" type="object" string="RG" class="btn-primary" attrs="{'invisible': [('state', '=', 'done')]}"/>
+                            <button name="create_do_op" type="object" string="D/O" class="btn-primary" attrs="{'invisible': [('state', '=', 'done')]}"/>
                             </div>
 
 

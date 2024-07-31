@@ -156,7 +156,6 @@ class AccountInvoicePayment(models.TransientModel):
             # Jika 'Total Pengeluaran' > 'Total Uang Jalan', maka hasil pengurangan akan dibuatkan journal
             # entry tambahan
             if setoran.total_pengeluaran > setoran.total_uang_jalan:
-                print("A")
                 # Journal Entry untuk selisih
                 journal_entry_selisih = self.env['account.move'].create({
                     'company_id': setoran.company_id.id,
@@ -213,7 +212,6 @@ class AccountInvoicePayment(models.TransientModel):
 
             # Jika 'Total Uang Jalan' > 'Total Pengeluaran', maka kelebihan dana akan dibuatkan journal
             elif setoran.total_uang_jalan > setoran.total_pengeluaran:
-                print("B")
                 # Journal Entry untuk selisih
                 journal_entry_selisih = self.env['account.move'].create({
                     'company_id': setoran.company_id.id,
@@ -269,7 +267,6 @@ class AccountInvoicePayment(models.TransientModel):
                 journal_entry_total_pengeluaran.action_post()
 
             elif setoran.total_uang_jalan == setoran.total_pengeluaran:
-                print("C")
                 # Journal Entry untuk pemindahan account
                 journal_entry_total_pengeluaran = self.env['account.move'].create({
                     'company_id': setoran.company_id.id,
@@ -299,7 +296,6 @@ class AccountInvoicePayment(models.TransientModel):
 
             # This will close uang jalan
             for line in setoran.detail_order:
-                print("D")
                 for uang_jalan in line.order_pengiriman.uang_jalan:
                     uang_jalan.order_disetor += 1
 
@@ -308,7 +304,6 @@ class AccountInvoicePayment(models.TransientModel):
 
             # Block dibawah akan mengurangi saldo uang jalan gantung
             for line in setoran.detail_order:
-                print("E")
                 for uang_jalan in line.order_pengiriman.uang_jalan:
                     if uang_jalan.balance_uang_jalan > 0:
                         # Deakumulasi kas gantung kepada kendaraan
