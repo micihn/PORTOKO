@@ -89,10 +89,10 @@
                                         <field name="alamat_bongkar" style="font-weight:450"/>
                                     </div>
 
-                                    <div class="o_kanban_record_details" style="float: right;">
-                                        <field name="tanggal_estimasi_muat" /><br/>
-                                        <field name="tanggal_estimasi_bongkar" />
-                                    </div>
+<!--                                    <div class="o_kanban_record_details" style="float: right;">-->
+<!--                                        <field name="tanggal_estimasi_muat" /><br/>-->
+<!--                                        <field name="tanggal_estimasi_bongkar" />-->
+<!--                                    </div>-->
 
                             </div>
 
@@ -116,10 +116,10 @@
                                             <field name="alamat_bongkar" style="font-weight:450"/>
                                         </div>
 
-                                        <div class="o_kanban_record_details" style="float: right;">
-                                            <field name="tanggal_estimasi_muat" /><br/>
-                                            <field name="tanggal_estimasi_bongkar" />
-                                        </div>
+<!--                                        <div class="o_kanban_record_details" style="float: right;">-->
+<!--                                            <field name="tanggal_estimasi_muat" /><br/>-->
+<!--                                            <field name="tanggal_estimasi_bongkar" />-->
+<!--                                        </div>-->
                                     </div>
                         </div>
                     </t>
@@ -156,17 +156,17 @@
                             <field name="plant" options="{'not_delete': True}" attrs="{'invisible': [('jenis_order', '=', 'do')]}" />
                             <field name="alamat_muat" />
                             <field name="detail_alamat_muat" />
-                            <field name="tanggal_estimasi_muat" />
+<!--                            <field name="tanggal_estimasi_muat" />-->
                             <field name="create_uid" string="Dibuat Oleh" readonly="1"/>
 
                         </group>
 
                         <group>
                             <field name="jenis_order" />
-                            <field name="create_date" string="Tanggal Order" />
+                            <field name="tanggal_order" string="Tanggal Order" />
                             <field name="alamat_bongkar" />
                             <field name="detail_alamat_bongkar" />
-                            <field name="tanggal_estimasi_bongkar" />
+<!--                            <field name="tanggal_estimasi_bongkar" />-->
                             <field name="nomor_surat_jalan" />
 
                         </group>

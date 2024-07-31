@@ -151,17 +151,20 @@
 <div class="oe_left">
 
     <div style="display: flex; justify-content: space-between; ">
+        <label for="total_pengeluaran" string="Pengeluaran : "/>
+
+        <div style="text-align: right; margin-right:0px">
+            <field name="total_pengeluaran"/>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; ">
         <label for="total_ongkos" string="Total Ongkos : "/>
         <div style="width: 20%; text-align: center;">
             <field name="total_ongkos"/>
         </div>
         <label for="total_ongkos" string="%"/>
         <field name="total_ongkos_calculated"/>
-    </div>
-
-    <div style="display: flex; justify-content: space-between; ">
-        <label for="total_uang_jalan" string="Total Uang Jalan : "/>
-        <field name="total_uang_jalan" style="margin-left: 10px;"/>
     </div>
 
     <div style="display: flex; justify-content: space-between; ">

@@ -69,6 +69,13 @@ class OrderPengiriman(models.Model):
         'sudah_setor': [('readonly', False)],
     })
 
+    tanggal_order = fields.Date(string='Tanggal Order', tracking=True, digits=(6, 0), default=fields.Date.today(), states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
+    })
+
     tanggal_estimasi_bongkar = fields.Date(string='Estimasi Tanggal Bongkar', tracking=True, digits=(6, 0), states={
         'order_baru': [('readonly', False)],
         'dalam_perjalanan': [('readonly', True)],

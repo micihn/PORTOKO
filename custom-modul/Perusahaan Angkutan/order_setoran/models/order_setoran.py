@@ -306,9 +306,6 @@ class OrderSetoran(models.Model):
             if order.nomor_surat_jalan == False:
                 raise ValidationError('Nomor Surat Jalan belum terisi ' + str(order.order_pengiriman.order_pengiriman_name))
 
-            if order.tanggal_surat_jalan == False:
-                raise ValidationError('Tanggal Surat Jalan belum terisi! ' + str(order.order_pengiriman.order_pengiriman_name))
-
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'account.invoice.payment',
@@ -1116,7 +1113,6 @@ class DetailOrder(models.Model):
     customer = fields.Many2one('res.partner', 'Customer', required=True, tracking=True)
     plant = fields.Many2one('konfigurasi.plant', 'PLANT', tracking=True)
     nomor_surat_jalan = fields.Char('Nomor')
-    tanggal_surat_jalan = fields.Date('Tanggal Surat Jalan')
     jumlah = fields.Float('Jumlah', digits=(6, 0))
     bayar_dimuka = fields.Float('Bayar Dimuka', digits=(6, 0))
     jenis_order = fields.Selection([
