@@ -167,7 +167,7 @@
                             <field name="alamat_bongkar" />
                             <field name="detail_alamat_bongkar" />
                             <field name="tanggal_estimasi_bongkar" />
-                            <field name="nomor_surat_jalan" force_save="1" readonly="1"/>
+                            <field name="nomor_surat_jalan" />
 
                         </group>
                     </group>
@@ -284,27 +284,27 @@
 
                         </page>
 
-                        <page string="Info Pengiriman">
-                            <group>
-                                <group attrs="{'invisible': [('is_oper_order', '=', True)]}">
-                                    <separator string="Info Pengiriman" />
-                                    <field name="is_oper_order" invisible="1"/>
-                                    <field name="uang_jalan" widget="many2many_tags" />
-                                    <field name="sopir" />
-                                    <field name="kenek" />
-                                    <field name="nomor_kendaraan" />
-                                    <field name="model_kendaraan" />
-                                </group>
+<!--                        <page string="Info Pengiriman">-->
+<!--                            <group>-->
+<!--                                <group attrs="{'invisible': [('is_oper_order', '=', True)]}">-->
+<!--                                    <separator string="Info Pengiriman" />-->
+<!--                                    <field name="is_oper_order" invisible="1"/>-->
+<!--                                    <field name="uang_jalan" widget="many2many_tags" />-->
+<!--                                    <field name="sopir" />-->
+<!--                                    <field name="kenek" />-->
+<!--                                    <field name="nomor_kendaraan" />-->
+<!--                                    <field name="model_kendaraan" />-->
+<!--                                </group>-->
 
-                                <group attrs="{'invisible': [('is_oper_order', '=', False)]}">
-                                    <separator string="Info Pengiriman (Oper Order)" />
-                                    <field name="is_oper_order" invisible="1"/>
-                                    <field name="oper_order" />
-                                    <field name="vendor_pa" />
-                                    <field name="nomor_kendaraan" />
-                                </group>
-                            </group>
-                        </page>
+<!--                                <group attrs="{'invisible': [('is_oper_order', '=', False)]}">-->
+<!--                                    <separator string="Info Pengiriman (Oper Order)" />-->
+<!--                                    <field name="is_oper_order" invisible="1"/>-->
+<!--                                    <field name="oper_order" />-->
+<!--                                    <field name="vendor_pa" />-->
+<!--                                    <field name="nomor_kendaraan" />-->
+<!--                                </group>-->
+<!--                            </group>-->
+<!--                        </page>-->
 
                     </notebook>
                 </sheet>

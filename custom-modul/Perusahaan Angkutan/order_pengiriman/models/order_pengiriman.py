@@ -594,6 +594,20 @@ class OrderPengiriman(models.Model):
 
         result = super(OrderPengiriman, self).create(vals)
 
+        print(vals)
+
+        context = self.env.context
+        if 'created_from_setoran' in context:
+            self.env['detail.order'].sudo().create({
+                'order_setoran': context['order_setoran_id'],
+                'order_pengiriman': result.id,
+                'customer': vals['customer'],
+                'tanggal_order': fields.Datetime.now(),
+                'nomor_surat_jalan': vals['nomor_surat_jalan'] if 'nomor_surat_jalan' in vals else False,
+                'plant': vals['plant'] if 'plant' in vals else False,
+                'jumlah': float(vals['total_ongkos_reguler']) + float(vals['total_ongkos_do']),
+            })
+
         return result
 
     # Method untuk menampilkan kanban

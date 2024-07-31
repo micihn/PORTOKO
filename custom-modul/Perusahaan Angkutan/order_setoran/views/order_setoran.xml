@@ -35,7 +35,7 @@
                 <header>
                     <field name="state" widget="statusbar" statusbar_visible="draft, done"/>
                     <button name="validate" type="object" string="Validate" class="btn-primary" attrs="{'invisible': [('state', 'in', ('cancel', 'done'))]}"/>
-                    <button name="ambil_order_pengiriman" type="object" string="Ambil Order Setoran" attrs="{'invisible': ['|', ('fetch_order_automatic', '=', True), ('state', 'in', ('cancel', 'done'))]}"/>
+<!--                    <button name="ambil_order_pengiriman" type="object" string="Ambil Order Setoran" attrs="{'invisible': ['|', ('fetch_order_automatic', '=', True), ('state', 'in', ('cancel', 'done'))]}"/>-->
                     <button name="cancel" type="object" string="Cancel" attrs="{'invisible': [('state', 'in', ('draft', 'cancel'))]}"/>
                     <button name="set_to_draft" type="object" string="Set to Draft" attrs="{'invisible': [('state', 'in', ('draft', 'done'))]}"/>
                 </header>
@@ -86,14 +86,13 @@
                     <notebook>
                         <page string="Detail Order">
                             <field name="detail_order">
-                                <tree editable="bottom">
+                                <tree editable="bottom" create="0">
                                     <field name="order_pengiriman" optional="show" force_save="True" />
-                                    <field name="tanggal_order" optional="show" force_save="True" readonly="True"/>
                                     <field name="jenis_order" optional="show" force_save="True" readonly="True"/>
+                                    <field name="tanggal_order" optional="show" force_save="True" readonly="True"/>
+                                    <field name="nomor_surat_jalan" optional="show" />
                                     <field name="customer" optional="show" force_save="True" readonly="True"/>
                                     <field name="plant" optional="show" force_save="True" readonly="True"/>
-                                    <field name="nomor_surat_jalan" optional="show" />
-                                    <field name="tanggal_surat_jalan" optional="show"/>
                                     <field name="jumlah" optional="show" force_save="True" readonly="True"/>
                                     <field name="bayar_dimuka" optional="show"/>
                                 </tree>
@@ -102,6 +101,13 @@
 
                             <!-- Panel Kanan -->
                             <!-- Total Jumlah & Total Bayar Dimuka -->
+
+                            <div class="oe_left" style="display: flex; gap: 10px;">
+                            <button name="create_regular_op" type="object" string="RG" class="btn-primary" />
+                            <button name="create_do_op" type="object" string="D/O" class="btn-primary"/>
+                            </div>
+
+
                             <div class="oe_right">
                                 <!-- Total Jumlah -->
                                 <div style="display: flex; justify-content: space-between;">
