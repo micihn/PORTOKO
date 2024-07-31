@@ -32,7 +32,7 @@ class AccountInvoicePayment(models.TransientModel):
                 'pembayaran': pembayaran,
                 'nominal_invoice': record.jumlah,
                 'bayar_dimuka': record.bayar_dimuka,
-                'tanggal_surat_jalan': record.tanggal_surat_jalan,
+                'tanggal_surat_jalan': record.tanggal_order,
             }))
 
         default_vals['invoice'] = list_invoice
@@ -106,8 +106,8 @@ class AccountInvoicePayment(models.TransientModel):
                 self.env['account.move'].sudo().create({
                     'company_id': self.env.company.id,
                     'move_type': 'out_invoice',
-                    'invoice_date': order.tanggal_surat_jalan,
-                    'date': order.tanggal_surat_jalan,
+                    'invoice_date': order.tanggal_order,
+                    'date': order.tanggal_order,
                     'partner_id': order.customer.id,
                     'currency_id': self.env.user.company_id.currency_id.id,
                     'invoice_origin': order.order_pengiriman.order_pengiriman_name,
