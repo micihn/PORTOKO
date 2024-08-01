@@ -580,24 +580,24 @@ class ListOperOrder(models.Model):
     jumlah_oper_order = fields.Float('Nominal', digits=(6, 0))
     tanggal_dibuat = fields.Datetime('Tanggal Dibuat')
 
-class ListPembelian(models.Model):
-    _name = 'list.pembelian.setoran'
-    _description = 'List Pembelian'
-
-    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
-    oper_setoran = fields.Many2one('oper.setoran', invisible=True)
-    order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
-    supplier = fields.Many2one('res.partner', 'Supplier', ondelete='restrict')
-    nama_barang = fields.Char('Nama Barang')
-    ukuran = fields.Text('Ukuran')
-    nominal = fields.Float('Nominal', digits=(6, 0))
-
-class BiayaFee(models.Model):
-    _name = 'biaya.fee.setoran'
-    _description = 'Biaya Fee'
-
-    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
-    oper_setoran = fields.Many2one('oper.setoran', invisible=True)
-    order_pengiriman = fields.Many2one('order.pengiriman', 'Nomor Order', )
-    fee_contact = fields.Many2one('res.partner', 'Name', ondelete='restrict')
-    nominal = fields.Float('Nominal', digits=(6, 0))
+# class ListPembelian(models.Model):
+#     _name = 'list.pembelian.setoran'
+#     _description = 'List Pembelian'
+#
+#     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+#     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
+#     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
+#     supplier = fields.Many2one('res.partner', 'Supplier', ondelete='restrict')
+#     nama_barang = fields.Char('Nama Barang')
+#     ukuran = fields.Text('Ukuran')
+#     nominal = fields.Float('Nominal', digits=(6, 0))
+#
+# class BiayaFee(models.Model):
+#     _name = 'biaya.fee.setoran'
+#     _description = 'Biaya Fee'
+#
+#     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+#     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
+#     order_pengiriman = fields.Many2one('order.pengiriman', 'Nomor Order', )
+#     fee_contact = fields.Many2one('res.partner', 'Name', ondelete='restrict')
+#     nominal = fields.Float('Nominal', digits=(6, 0))
