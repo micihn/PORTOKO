@@ -1,1 +1,1 @@
-from . import order_setoran, oper_setoran, res_company, konfigurasi_account, order_pengiriman, oper_order
+from . import order_setoran, oper_setoran, res_company, konfigurasi_account, oper_order

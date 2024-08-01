@@ -601,9 +601,8 @@ class OrderPengiriman(models.Model):
 
         result = super(OrderPengiriman, self).create(vals)
 
-        print(vals)
-
         context = self.env.context
+
         if 'created_from_setoran' in context:
             self.env['detail.order'].sudo().create({
                 'order_setoran': context['order_setoran_id'],
@@ -614,6 +613,29 @@ class OrderPengiriman(models.Model):
                 'plant': vals['plant'] if 'plant' in vals else False,
                 'jumlah': float(vals['total_ongkos_reguler']) + float(vals['total_ongkos_do']),
             })
+
+        if 'created_from_oper_setoran' in context:
+            self.env['detail.order.setoran'].sudo().create({
+                'oper_setoran': context['oper_setoran_id'],
+                'order_pengiriman': result.id,
+                'customer': vals['customer'],
+                'tanggal_order': fields.Datetime.now(),
+                'nomor_surat_jalan': vals['nomor_surat_jalan'] if 'nomor_surat_jalan' in vals else False,
+                'plant': vals['plant'] if 'plant' in vals else False,
+                'jumlah': float(vals['total_ongkos_reguler']) + float(vals['total_ongkos_do']),
+            })
+
+            if 'biaya_pembelian' in vals:
+                self.env.cr.execute("""
+                    INSERT INTO biaya_pembelian_oper_setoran_rel (oper_setoran_id, biaya_pembelian_id)
+                    SELECT %s, id FROM biaya_pembelian WHERE order_pengiriman = %s
+                """, (context['oper_setoran_id'], result.id))
+
+            if 'biaya_fee' in vals:
+                self.env.cr.execute("""
+                    INSERT INTO biaya_fee_oper_setoran_rel (oper_setoran_id, biaya_fee_id)
+                    SELECT %s, id FROM biaya_fee WHERE order_pengiriman = %s
+                """, (context['oper_setoran_id'], result.id))
 
         return result
 

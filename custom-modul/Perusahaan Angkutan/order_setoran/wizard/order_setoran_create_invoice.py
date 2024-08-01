@@ -32,7 +32,7 @@ class AccountInvoicePayment(models.TransientModel):
                 'pembayaran': pembayaran,
                 'nominal_invoice': record.jumlah,
                 'bayar_dimuka': record.bayar_dimuka,
-                'tanggal_order': record.tanggal_order,
+                'tanggal_surat_jalan': record.tanggal_surat_jalan,
             }))
 
         default_vals['invoice'] = list_invoice
@@ -59,7 +59,6 @@ class AccountInvoicePayment(models.TransientModel):
             return product_id
 
         for setoran in self.env['order.setoran'].browse(self._context.get('active_ids', [])):
-
             account_settings = self.env['konfigurasi.account.setoran'].search([('company_id', '=', setoran.company_id.id)])
             account_kas = account_settings.account_kas
             account_piutang = account_settings.account_piutang
@@ -106,8 +105,8 @@ class AccountInvoicePayment(models.TransientModel):
                 self.env['account.move'].sudo().create({
                     'company_id': self.env.company.id,
                     'move_type': 'out_invoice',
-                    'invoice_date': order.tanggal_order,
-                    'date': order.tanggal_order,
+                    'invoice_date': order.tanggal_surat_jalan,
+                    'date': order.tanggal_surat_jalan,
                     'partner_id': order.customer.id,
                     'currency_id': self.env.user.company_id.currency_id.id,
                     'invoice_origin': order.order_pengiriman.order_pengiriman_name,

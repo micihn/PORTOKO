@@ -31,7 +31,7 @@ class AccountOperInvoicePayment(models.TransientModel):
                 'pembayaran': pembayaran,
                 'nominal_invoice': record.jumlah,
                 'bayar_dimuka': record.bayar_dimuka,
-                'tanggal_surat_jalan': record.tanggal_surat_jalan,
+                'tanggal_surat_jalan': record.tanggal_order,
             }))
 
         default_vals['invoice'] = list_invoice
@@ -71,6 +71,8 @@ class AccountOperInvoicePayment(models.TransientModel):
             return product_id
 
         for setoran in self.env['oper.setoran'].browse(self._context.get('active_ids', [])):
+
+            print(setoran)
 
             # Write Nomor Surat Jalan
             for record in setoran.detail_order:
@@ -117,7 +119,7 @@ class AccountOperInvoicePayment(models.TransientModel):
 
             # Pembuatan Invoice Biaya Fee
             if setoran.total_biaya_fee > 0 :
-                for biaya in setoran.biaya_fee_setoran.order_pengiriman:
+                for biaya in setoran.biaya_fee.order_pengiriman:
                     for fee in biaya.biaya_fee:
                         self.env['account.move'].sudo().create({
                             'move_type': 'in_invoice',
@@ -140,7 +142,7 @@ class AccountOperInvoicePayment(models.TransientModel):
 
             # Membuat Vendor Bill (List Pembelian)
             if setoran.total_list_pembelian > 0:
-                for bill in setoran.list_pembelian_setoran.order_pengiriman:
+                for bill in setoran.list_pembelian.order_pengiriman:
                     for purchase in bill.biaya_pembelian:
                         self.env['account.move'].sudo().create({
                             'move_type': 'in_invoice',
@@ -191,7 +193,12 @@ class AccountOperInvoicePayment(models.TransientModel):
                     'nomor_surat_jalan': detail.nomor_surat_jalan or None,
                 })
 
-            setoran.state = 'done'
+            self.env.cr.execute("""
+                UPDATE oper_setoran
+                SET state = 'done'
+                WHERE id = %s
+            """, (setoran.id,))
+
 
 class AccountInvoicePaymentLine(models.TransientModel):
     _name = "account.invoice.oper.payment.line"

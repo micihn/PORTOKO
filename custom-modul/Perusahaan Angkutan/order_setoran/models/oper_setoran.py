@@ -34,16 +34,16 @@ class OperSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    tanggal_stlo = fields.Date('Tanggal STL/O', states={
+    tanggal_stlo = fields.Date('Tanggal STL/O', default=fields.Date.today(), states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
     })
-    tanggal_oper = fields.Date('Tanggal Oper', states={
-        'draft': [('readonly', False)],
-        'done': [('readonly', True)],
-        'cancel': [('readonly', True)],
-    })
+    # tanggal_oper = fields.Date('Tanggal Oper', states={
+    #     'draft': [('readonly', False)],
+    #     'done': [('readonly', True)],
+    #     'cancel': [('readonly', True)],
+    # })
     keterangan = fields.Text('Keterangan', states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
@@ -68,49 +68,52 @@ class OperSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    @api.onchange("detail_order")
-    def _populate_oper_order(self):
-        for i in self:
-            order_ids = [order.order_pengiriman.id for order in i.detail_order]
-            i.list_oper_order = [(5, 0, 0)]
-            i.biaya_fee_setoran = [(5, 0 ,0)]
-            if len(order_ids) > 0:
-                oper_order_line_ids = self.env['oper.order.line'].search([('order_pengiriman', 'in', order_ids)])
-                oper_order_values = []
-                biaya_fee_values = []
+    # @api.onchange("detail_order")
+    # def _populate_oper_order(self):
+    #     for i in self:
+    #         order_ids = [order.order_pengiriman.id for order in i.detail_order]
+    #         i.list_oper_order = [(5, 0, 0)]
+    #         i.biaya_fee_setoran = [(5, 0 ,0)]
+    #         if len(order_ids) > 0:
+    #             oper_order_line_ids = self.env['oper.order.line'].search([('order_pengiriman', 'in', order_ids)])
+    #             oper_order_values = []
+    #             biaya_fee_values = []
+    #
+    #             ids = []
+    #             for oper_order_line in oper_order_line_ids:
+    #                 if oper_order_line.id not in ids:
+    #                     ids.append(oper_order_line.id)
+    #                     oper_order_values.append({
+    #                         'oper_setoran': i.id,
+    #                         'oper_order': oper_order_line.oper_order.id,
+    #                         'vendor_pa': oper_order_line.oper_order.vendor_pa.id,
+    #                         'kendaraan': oper_order_line.oper_order.kendaraan,
+    #                         'jumlah_oper_order': oper_order_line.oper_order.biaya_total,
+    #                     })
+    #                     biaya_fee_values.append({
+    #                         'oper_setoran': i.id,
+    #                         'order_pengiriman': oper_order_line.order_pengiriman.id,
+    #                         'nominal': oper_order_line.order_pengiriman.total_biaya_fee,
+    #                     })
+    #             if len(oper_order_values) > 0:
+    #                 self.env['list.oper.order.setoran'].create(oper_order_values)
+    #             if len(biaya_fee_values) > 0:
+    #                 self.env['biaya.fee.setoran'].create(biaya_fee_values)
 
-                ids = []
-                for oper_order_line in oper_order_line_ids:
-                    if oper_order_line.id not in ids:
-                        ids.append(oper_order_line.id)
-                        oper_order_values.append({
-                            'oper_setoran': i.id,
-                            'oper_order': oper_order_line.oper_order.id,
-                            'vendor_pa': oper_order_line.oper_order.vendor_pa.id,
-                            'kendaraan': oper_order_line.oper_order.kendaraan,
-                            'jumlah_oper_order': oper_order_line.oper_order.biaya_total,
-                        })
-                        biaya_fee_values.append({
-                            'oper_setoran': i.id,
-                            'order_pengiriman': oper_order_line.order_pengiriman.id,
-                            'nominal': oper_order_line.order_pengiriman.total_biaya_fee,
-                        })
-                if len(oper_order_values) > 0:
-                    self.env['list.oper.order.setoran'].create(oper_order_values)
-                if len(biaya_fee_values) > 0:
-                    self.env['biaya.fee.setoran'].create(biaya_fee_values)
+    list_pembelian = fields.Many2many('biaya.pembelian')
+    biaya_fee = fields.Many2many('biaya.fee')
 
-    list_pembelian_setoran = fields.One2many('list.pembelian.setoran', 'oper_setoran', copy=True, states={
-        'draft': [('readonly', False)],
-        'done': [('readonly', True)],
-        'cancel': [('readonly', True)],
-    })
+    # list_pembelian_setoran = fields.One2many('list.pembelian.setoran', 'oper_setoran', copy=True, states={
+    #     'draft': [('readonly', False)],
+    #     'done': [('readonly', True)],
+    #     'cancel': [('readonly', True)],
+    # })
 
-    biaya_fee_setoran = fields.One2many('biaya.fee.setoran', 'oper_setoran', copy=True, states={
-        'draft': [('readonly', False)],
-        'done': [('readonly', True)],
-        'cancel': [('readonly', True)],
-    })
+    # biaya_fee_setoran = fields.One2many('biaya.fee.setoran', 'oper_setoran', copy=True, states={
+    #     'draft': [('readonly', False)],
+    #     'done': [('readonly', True)],
+    #     'cancel': [('readonly', True)],
+    # })
 
     total_pengeluaran = fields.Float(digits=(6, 0), states={
         'draft': [('readonly', False)],
@@ -195,15 +198,37 @@ class OperSetoran(models.Model):
             }
         }
 
-    def action_create_order_pengiriman(self):
-        for i in self:
-            return {
-                'type': 'ir.actions.act_window',
-                'res_model': 'order.pengiriman', 
-                'view_mode': 'form',
-                'view_type': 'form',
-                'target': 'new',
-            }
+    def create_regular_op(self):
+        context = {
+            'created_from_oper_setoran': True,
+            'oper_setoran_id': self.id,
+            'default_jenis_order': 'regular',
+        }
+
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'view_id': self.env.ref('order_pengiriman.order_pengiriman_form_view').id,
+            'res_model': 'order.pengiriman',
+            'target': 'new',
+            'context': context,
+        }
+
+    def create_do_op(self):
+        context = {
+            'created_from_oper_setoran': True,
+            'oper_setoran_id': self.id,
+            'default_jenis_order': 'do',
+        }
+
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'view_id': self.env.ref('order_pengiriman.order_pengiriman_form_view').id,
+            'res_model': 'order.pengiriman',
+            'target': 'new',
+            'context': context,
+        }
 
     def action_create_oper_order(self):
         for i in self:
@@ -227,198 +252,218 @@ class OperSetoran(models.Model):
             vals['kode_oper_setoran'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('oper.setoran.sequence') or 'New'
         result = super(OperSetoran, self).create(vals)
 
-        oper_order_detail_list_ids = []
-        oper_order_list_ids = []
-
-        kendaraan_orm = str(vals['kendaraan']).replace(" ", "").lower()
-
-        for record in self.env['oper.order'].search([
-            ('vendor_pa', '=', vals['vendor_pa']),
-            ('kendaraan_orm','=', kendaraan_orm),
-            ('state', '=', 'confirmed'),
-            ('company_id', '=', self.env.company.id)
-        ]):
-        ############################## Membuat Dictionary-List Oper Order ###########################
-            oper_order_detail_list_ids += record.mapped('oper_order_line.order_pengiriman').ids
-
-            for order_pengiriman_id in oper_order_detail_list_ids:
-                order_pengiriman = self.env['order.pengiriman'].browse(order_pengiriman_id)
-                order_pengiriman.oper_setoran = result.kode_oper_setoran
-
-            # Meng-assign nomor setoran ke dalam order pengiriman meskipun statusnya masih draft
-            # Untuk membantu proses perubahan atau update biaya fee (jika ada)
-
-            list_oper_order_dict = {
-                'oper_order': record.id,
-                'vendor_pa': record.vendor_pa.id,
-                'kendaraan' : record.kendaraan,
-                'jumlah_oper_order' : record.biaya_total,
-            }
-            oper_order_list_ids.append(list_oper_order_dict)
-
-        ############################## Mengeksekusi Create Record ################################
-        for item in oper_order_list_ids:
-            self.env['list.oper.order.setoran'].create([{
-                'oper_setoran': result.id,
-                'oper_order': item['oper_order'],
-                'vendor_pa': item['vendor_pa'],
-                'kendaraan': item['kendaraan'],
-                'jumlah_oper_order': item['jumlah_oper_order'],
-            }])
-
-        for record_id in oper_order_detail_list_ids:
-            record = self.env['order.pengiriman'].browse(record_id)
-            self.env['detail.order.setoran'].create([{
-                'oper_setoran': result.id,
-                'order_pengiriman' : record.id,
-                'tanggal_order' : record.create_date,
-                'jenis_order' : record.jenis_order,
-                'customer' : record.customer.id,
-                'plant' : record.plant if record.plant else None,
-                'jumlah' : record.total_ongkos,
-            }])
-
-            if record.biaya_pembelian:
-                self.env['list.pembelian.setoran'].create([{
-                    'oper_setoran': result.id,
-                    'order_pengiriman' : record.id,
-                    'nominal' : record.total_biaya_pembelian,
-                }])
-
-            if record.biaya_fee:
-                self.env['biaya.fee.setoran'].create([{
-                    'oper_setoran': result.id,
-                    'order_pengiriman' : record.id,
-                    'nominal' : record.total_biaya_fee,
-                }])
-
-        oper_order_model = self.env['oper.order'].search([
-            ('vendor_pa', '=', vals.get('vendor_pa', self.vendor_pa.id)),
-            ('kendaraan_orm', '=', kendaraan_orm),
-            ('state', '=', 'confirmed'),
-            ('company_id', '=', self.env.company.id),
-        ])
-
-        if not oper_order_model:
-            self.env.user.notify_warning(
-                message='Oper Order dengan kriteria Vendor PA serta kendaraan yang Anda pilih tidak ditemukan. Pastikan Oper order ada dan berstatus "Confirmed".',
-                sticky=True, title='Oper Setoran ' + str(vals.get('kode_oper_setoran')) + ' : Detail Oper Order Tidak Ditemukan')
-        else:
-            pass
+        # oper_order_detail_list_ids = []
+        # oper_order_list_ids = []
+        #
+        # kendaraan_orm = str(vals['kendaraan']).replace(" ", "").lower()
+        #
+        # for record in self.env['oper.order'].search([
+        #     ('vendor_pa', '=', vals['vendor_pa']),
+        #     ('kendaraan_orm','=', kendaraan_orm),
+        #     ('state', '=', 'confirmed'),
+        #     ('company_id', '=', self.env.company.id)
+        # ]):
+        #
+        # ############################## Membuat Dictionary-List Oper Order ###########################
+        #     oper_order_detail_list_ids += record.mapped('oper_order_line.order_pengiriman').ids
+        #
+        #     for order_pengiriman_id in oper_order_detail_list_ids:
+        #         order_pengiriman = self.env['order.pengiriman'].browse(order_pengiriman_id)
+        #         order_pengiriman.oper_setoran = result.kode_oper_setoran
+        #
+        #     # Meng-assign nomor setoran ke dalam order pengiriman meskipun statusnya masih draft
+        #     # Untuk membantu proses perubahan atau update biaya fee (jika ada)
+        #
+        #     list_oper_order_dict = {
+        #         'oper_order': record.id,
+        #         'vendor_pa': record.vendor_pa.id,
+        #         'kendaraan' : record.kendaraan,
+        #         'jumlah_oper_order' : record.biaya_total,
+        #     }
+        #     oper_order_list_ids.append(list_oper_order_dict)
+        #
+        # ############################## Mengeksekusi Create Record ################################
+        # for item in oper_order_list_ids:
+        #     self.env['list.oper.order.setoran'].create([{
+        #         'oper_setoran': result.id,
+        #         'oper_order': item['oper_order'],
+        #         'vendor_pa': item['vendor_pa'],
+        #         'kendaraan': item['kendaraan'],
+        #         'jumlah_oper_order': item['jumlah_oper_order'],
+        #     }])
+        #
+        #
+        # oper_order_model = self.env['oper.order'].search([
+        #     ('vendor_pa', '=', vals.get('vendor_pa', self.vendor_pa.id)),
+        #     ('kendaraan_orm', '=', kendaraan_orm),
+        #     ('state', '=', 'confirmed'),
+        #     ('company_id', '=', self.env.company.id),
+        # ])
+        #
+        # if not oper_order_model:
+        #     self.env.user.notify_warning(
+        #         message='Oper Order dengan kriteria Vendor PA serta kendaraan yang Anda pilih tidak ditemukan. Pastikan Oper order ada dan berstatus "Confirmed".',
+        #         sticky=True, title='Oper Setoran ' + str(vals.get('kode_oper_setoran')) + ' : Detail Oper Order Tidak Ditemukan')
+        # else:
+        #     pass
 
         return result
 
     def write(self, vals):
-        if 'kendaraan' in vals or 'vendor_pa' in vals:
+        if 'detail_order' in vals:
+            if 'detail_order' in vals:
+                # Retrieve existing detail_order records and their order_pengiriman before the update
+                existing_detail_orders = self.mapped('detail_order')
+                existing_detail_orders_dict = {rec.id: rec.order_pengiriman.id for rec in existing_detail_orders}
 
-            if 'kendaraan' in vals and vals['kendaraan']:
-                kendaraan_orm = str(vals['kendaraan']).replace(" ", "").lower()
-            elif self.kendaraan:
-                kendaraan_orm = str(self.kendaraan).replace(" ", "").lower()
+                # Call the super method to perform the write
+                result = super(OperSetoran, self).write(vals)
 
-            ############################## Rewrite Dictionary-List Detail Order ###########################
+                # Retrieve updated detail_order records and their order_pengiriman after the update
+                updated_detail_orders = self.mapped('detail_order')
+                updated_detail_orders_dict = {rec.id: rec.order_pengiriman.id for rec in updated_detail_orders}
 
-            for record in self.detail_order:
-                record.order_pengiriman.nomor_surat_jalan = None
-                record.unlink()
+                # Determine deleted detail_order records by comparing the sets
+                deleted_detail_orders = set(existing_detail_orders_dict.keys()) - set(updated_detail_orders_dict.keys())
+                deleted_order_pengiriman_ids = [existing_detail_orders_dict[rec_id] for rec_id in deleted_detail_orders]
+                # print("Deleted order_pengiriman IDs:", deleted_order_pengiriman_ids)
 
-            for record in self.list_oper_order:
-                record.unlink()
+                # Now you can handle the deleted records as needed
+                # For example, logging or performing additional actions
+                for line in self.list_pembelian:
+                    if line.order_pengiriman.id in deleted_order_pengiriman_ids:
+                        line.unlink()
 
-            for record in self.list_pembelian_setoran:
-                record.unlink()
+                for line in self.biaya_fee:
+                    if line.order_pengiriman.id in deleted_order_pengiriman_ids:
+                        line.unlink()
 
-            for record in self.biaya_fee_setoran:
-                record.unlink()
+                for order_pengiriman_id in deleted_order_pengiriman_ids:
+                    self.env['order.pengiriman'].search([('id', '=', order_pengiriman_id)]).unlink()
 
-            oper_order_detail_list_ids = []
-            oper_order_list_ids = []
-
-            for record in self.env['oper.order'].search([
-                ('state', '=', 'confirmed'),
-                ('vendor_pa', '=', vals.get('vendor_pa', self.vendor_pa.id)),
-                ('kendaraan_orm', '=', kendaraan_orm),
-                ('company_id', '=', self.env.company.id),
-            ]):
-
-            ############################## Membuat Dictionary-List Oper Order ###########################
-                oper_order_detail_list_ids += record.mapped('oper_order_line.order_pengiriman').ids
-
-                list_oper_order_dict = {
-                    'oper_order': record.id,
-                    'vendor_pa': record.vendor_pa.id,
-                    'kendaraan': record.kendaraan,
-                    'jumlah_oper_order': record.biaya_total,
-                }
-                oper_order_list_ids.append(list_oper_order_dict)
-
-            ############################## Mengeksekusi Create Record ################################
-            for item in oper_order_list_ids:
-                self.env['list.oper.order.setoran'].create([{
-                    'oper_setoran': self.id,
-                    'oper_order': item['oper_order'],
-                    'vendor_pa': item['vendor_pa'],
-                    'kendaraan': item['kendaraan'],
-                    'jumlah_oper_order': item['jumlah_oper_order'],
-                }])
-
-            for record in self.env['order.pengiriman'].search([('id', 'in', oper_order_detail_list_ids)]):
-                self.env['detail.order.setoran'].create([{
-                    'oper_setoran': self.id,
-                    'order_pengiriman': record.id,
-                    'tanggal_order': record.create_date,
-                    'jenis_order': record.jenis_order,
-                    'customer': record.customer.id,
-                    'plant': record.plant if record.plant else None,
-                    'jumlah': record.total_ongkos,
-                }])
-
-                if record.biaya_pembelian:
-                    self.env['list.pembelian.setoran'].create([{
-                        'oper_setoran': self.id,
-                        'order_pengiriman': record.id,
-                        'nominal': record.total_biaya_pembelian,
-                    }])
-
-                if record.biaya_fee:
-                    self.env['biaya.fee.setoran'].create([{
-                        'oper_setoran': self.id,
-                        'order_pengiriman': record.id,
-                        'nominal': record.total_biaya_fee,
-                    }])
-
-            oper_order_model = self.env['oper.order'].search([
-                ('vendor_pa', '=', vals.get('vendor_pa', self.vendor_pa.id)),
-                ('kendaraan_orm', '=', kendaraan_orm),
-                ('state', '=', 'confirmed'),
-                ('company_id', '=', self.env.company.id)
-            ])
-
-            if not oper_order_model:
-                self.env.user.notify_warning(
-                    message='Oper Order dengan kriteria Vendor PA serta kendaraan yang Anda pilih tidak ditemukan. Pastikan Oper order ada dan berstatus "Confirmed".',
-                    sticky=True,
-                    title='Oper Setoran ' + str(self.kode_oper_setoran) + ' : Detail Oper Order Tidak Ditemukan')
+                return result
             else:
-                pass
+                return super(OperSetoran, self).write(vals)
 
-        return super(OperSetoran, self).write(vals)
+    #     if 'detail_order' in vals:
+    #         for record in vals['detail_order']:
+    #             related_order_pengiriman = self.env['detail.order.setoran'].sudo().search([
+    #                 ('id', '=', record[1])
+    #             ]).order_pengiriman.id
+    #
+    #             print(vals)
+    #             print(related_order_pengiriman)
+    #
+    #             for pembelian in self.list_pembelian_setoran:
+    #                 if pembelian.order_pengiriman.id == related_order_pengiriman:
+    #                     pembelian.unlink()
+    #
+    #             for biaya in self.biaya_fee_setoran:
+    #                 if biaya.order_pengiriman.id == related_order_pengiriman:
+    #                     biaya.unlink()
+    #
+    #     return super(OperSetoran, self).write(vals)
+
+    #     if 'kendaraan' in vals or 'vendor_pa' in vals:
+    #
+    #         if 'kendaraan' in vals and vals['kendaraan']:
+    #             kendaraan_orm = str(vals['kendaraan']).replace(" ", "").lower()
+    #         elif self.kendaraan:
+    #             kendaraan_orm = str(self.kendaraan).replace(" ", "").lower()
+    #
+    #         ############################## Rewrite Dictionary-List Detail Order ###########################
+    #
+    #         for record in self.detail_order:
+    #             record.order_pengiriman.nomor_surat_jalan = None
+    #             record.unlink()
+    #
+    #         for record in self.list_oper_order:
+    #             record.unlink()
+    #
+    #         for record in self.list_pembelian_setoran:
+    #             record.unlink()
+    #
+    #         for record in self.biaya_fee_setoran:
+    #             record.unlink()
+    #
+    #         oper_order_detail_list_ids = []
+    #         oper_order_list_ids = []
+    #
+    #         for record in self.env['oper.order'].search([
+    #             ('state', '=', 'confirmed'),
+    #             ('vendor_pa', '=', vals.get('vendor_pa', self.vendor_pa.id)),
+    #             ('kendaraan_orm', '=', kendaraan_orm),
+    #             ('company_id', '=', self.env.company.id),
+    #         ]):
+    #
+    #         ############################## Membuat Dictionary-List Oper Order ###########################
+    #             oper_order_detail_list_ids += record.mapped('oper_order_line.order_pengiriman').ids
+    #
+    #             list_oper_order_dict = {
+    #                 'oper_order': record.id,
+    #                 'vendor_pa': record.vendor_pa.id,
+    #                 'kendaraan': record.kendaraan,
+    #                 'jumlah_oper_order': record.biaya_total,
+    #             }
+    #             oper_order_list_ids.append(list_oper_order_dict)
+    #
+    #         ############################## Mengeksekusi Create Record ################################
+    #         for item in oper_order_list_ids:
+    #             self.env['list.oper.order.setoran'].create([{
+    #                 'oper_setoran': self.id,
+    #                 'oper_order': item['oper_order'],
+    #                 'vendor_pa': item['vendor_pa'],
+    #                 'kendaraan': item['kendaraan'],
+    #                 'jumlah_oper_order': item['jumlah_oper_order'],
+    #             }])
+    #
+    #         for record in self.env['order.pengiriman'].search([('id', 'in', oper_order_detail_list_ids)]):
+    #             # self.env['detail.order.setoran'].create([{
+    #             #     'oper_setoran': self.id,
+    #             #     'order_pengiriman': record.id,
+    #             #     'tanggal_order': record.create_date,
+    #             #     'jenis_order': record.jenis_order,
+    #             #     'customer': record.customer.id,
+    #             #     'plant': record.plant if record.plant else None,
+    #             #     'jumlah': record.total_ongkos,
+    #             # }])
+    #
+    #             if record.biaya_pembelian:
+    #                 self.env['list.pembelian.setoran'].create([{
+    #                     'oper_setoran': self.id,
+    #                     'order_pengiriman': record.id,
+    #                     'nominal': record.total_biaya_pembelian,
+    #                 }])
+    #
+    #             if record.biaya_fee:
+    #                 self.env['biaya.fee.setoran'].create([{
+    #                     'oper_setoran': self.id,
+    #                     'order_pengiriman': record.id,
+    #                     'nominal': record.total_biaya_fee,
+    #                 }])
+    #
+    #         oper_order_model = self.env['oper.order'].search([
+    #             ('vendor_pa', '=', vals.get('vendor_pa', self.vendor_pa.id)),
+    #             ('kendaraan_orm', '=', kendaraan_orm),
+    #             ('state', '=', 'confirmed'),
+    #             ('company_id', '=', self.env.company.id)
+    #         ])
+    #
+    #         if not oper_order_model:
+    #             self.env.user.notify_warning(
+    #                 message='Oper Order dengan kriteria Vendor PA serta kendaraan yang Anda pilih tidak ditemukan. Pastikan Oper order ada dan berstatus "Confirmed".',
+    #                 sticky=True,
+    #                 title='Oper Setoran ' + str(self.kode_oper_setoran) + ' : Detail Oper Order Tidak Ditemukan')
+    #         else:
+    #             pass
+    #
+        # return super(OperSetoran, self).write(vals)
 
     def validate(self):
-
-        # Cek Detail Order
-        if bool(self.detail_order) == False:
-            raise ValidationError('Detail Order Belum Terisi!')
-        elif bool(self.list_oper_order) == False:
-            raise ValidationError('List Oper Order Belum Terisi!')
-
         # Cek Nomor Surat Jalan & Tanggal
         for order in self.detail_order:
             if order.nomor_surat_jalan == False:
                 raise ValidationError('Nomor Surat Jalan belum terisi ' + str(order.order_pengiriman.order_pengiriman_name))
-
-            if order.tanggal_surat_jalan == False:
-                raise ValidationError('Tanggal Surat Jalan belum terisi! ' + str(order.order_pengiriman.order_pengiriman_name))
 
         return {
             'type': 'ir.actions.act_window',
@@ -483,20 +528,20 @@ class OperSetoran(models.Model):
         for record in self:
             record.total_oper_order = sum(record.list_oper_order.mapped('jumlah_oper_order'))
 
-    @api.depends('list_pembelian_setoran.nominal')
+    @api.depends('list_pembelian.nominal')
     def _compute_jumlah_list_pembelian(self):
         for record in self:
-            record.total_list_pembelian = sum(record.list_pembelian_setoran.mapped('nominal'))
+            record.total_list_pembelian = sum(record.list_pembelian.mapped('nominal'))
 
-    @api.depends('biaya_fee_setoran.nominal')
+    @api.depends('biaya_fee.nominal')
     def _compute_total_biaya_fee(self):
         for record in self:
-            record.total_biaya_fee = sum(record.biaya_fee_setoran.mapped('nominal'))
+            record.total_biaya_fee = sum(record.biaya_fee.mapped('nominal'))
 
-    @api.depends('list_pembelian_setoran.nominal')
-    def _compute_total_pembelian(self):
-        for record in self:
-            record.total_pembelian = sum(record.list_pembelian_setoran.mapped('nominal'))
+    # @api.depends('list_pembelian_setoran.nominal')
+    # def _compute_total_pembelian(self):
+    #     for record in self:
+    #         record.total_pembelian = sum(record.list_pembelian_setoran.mapped('nominal'))
 
 class DetailOrder(models.Model):
     _name = 'detail.order.setoran'
@@ -504,13 +549,12 @@ class DetailOrder(models.Model):
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
-    order_pengiriman = fields.Many2one('order.pengiriman', 'Nomor Order')
-    tanggal_order = fields.Datetime('Tanggal Order')
-    jenis_order = fields.Selection([('do', 'DO'),('regular', 'Regular'),], required=True, tracking=True)
+    order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
+    tanggal_order = fields.Datetime('Tanggal')
+    jenis_order = fields.Selection([('do', 'DO'),('regular', 'Regular'),], string="Jenis", required=True, tracking=True)
     customer = fields.Many2one('res.partner', 'Customer', required=True, tracking=True)
-    plant = fields.Many2one('konfigurasi.plant', 'PLANT', tracking=True)
-    nomor_surat_jalan = fields.Char('No Surat Jalan')
-    tanggal_surat_jalan = fields.Date('Tanggal Surat Jalan')
+    plant = fields.Many2one('konfigurasi.plant', 'Plant', tracking=True)
+    nomor_surat_jalan = fields.Char('Nomor')
     jumlah = fields.Float('Jumlah', digits=(6, 0))
     bayar_dimuka = fields.Float('Bayar Dimuka', digits=(6, 0))
 
@@ -542,7 +586,10 @@ class ListPembelian(models.Model):
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
-    order_pengiriman = fields.Many2one('order.pengiriman', 'Nomor Order', )
+    order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
+    supplier = fields.Many2one('res.partner', 'Supplier', ondelete='restrict')
+    nama_barang = fields.Char('Nama Barang')
+    ukuran = fields.Text('Ukuran')
     nominal = fields.Float('Nominal', digits=(6, 0))
 
 class BiayaFee(models.Model):
@@ -552,4 +599,5 @@ class BiayaFee(models.Model):
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'Nomor Order', )
+    fee_contact = fields.Many2one('res.partner', 'Name', ondelete='restrict')
     nominal = fields.Float('Nominal', digits=(6, 0))
