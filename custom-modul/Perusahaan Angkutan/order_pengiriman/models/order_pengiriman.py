@@ -614,6 +614,18 @@ class OrderPengiriman(models.Model):
                 'jumlah': float(vals['total_ongkos_reguler']) + float(vals['total_ongkos_do']),
             })
 
+            if 'biaya_pembelian' in vals:
+                self.env.cr.execute("""
+                    INSERT INTO biaya_pembelian_order_setoran_rel (order_setoran_id, biaya_pembelian_id)
+                    SELECT %s, id FROM biaya_pembelian WHERE order_pengiriman = %s
+                """, (context['order_setoran_id'], result.id))
+
+            if 'biaya_fee' in vals:
+                self.env.cr.execute("""
+                    INSERT INTO biaya_fee_order_setoran_rel (order_setoran_id, biaya_fee_id)
+                    SELECT %s, id FROM biaya_fee WHERE order_pengiriman = %s
+                """, (context['order_setoran_id'], result.id))
+
         if 'created_from_oper_setoran' in context:
             self.env['detail.order.setoran'].sudo().create({
                 'oper_setoran': context['oper_setoran_id'],

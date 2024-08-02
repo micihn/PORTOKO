@@ -117,6 +117,9 @@ class OrderSetoran(models.Model):
         'done': [('readonly', True)],
     })
 
+    list_pembelian = fields.Many2many('biaya.pembelian')
+    biaya_fee = fields.Many2many('biaya.fee')
+
     # list_pembelian = fields.One2many('detail.list.pembelian', 'order_setoran', states={
     #     'draft': [('readonly', False)],
     #     'done': [('readonly', False)],
@@ -162,44 +165,41 @@ class OrderSetoran(models.Model):
             else:
                 self.list_uang_jalan.unlink()
 
-    relatable_list_pembelian = fields.Many2many('biaya.pembelian', compute="compute_relatable_biaya_pembelian", copy=False)
-    @api.depends('detail_order.order_pengiriman')
-    def compute_relatable_biaya_pembelian(self):
-        for rec in self:
-            list_biaya_pembelian = []
-            for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
-                if detail.order_pengiriman:
-                    for pembelian in detail.order_pengiriman.biaya_pembelian:
-                        list_biaya_pembelian.append((4, pembelian.id))  # Using (4, id) to add records to Many2many field
+    # relatable_list_pembelian = fields.Many2many('biaya.pembelian', compute="compute_relatable_biaya_pembelian", copy=False)
+    # @api.depends('detail_order.order_pengiriman')
+    # def compute_relatable_biaya_pembelian(self):
+    #     for rec in self:
+    #         list_biaya_pembelian = []
+    #         for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
+    #             if detail.order_pengiriman:
+    #                 for pembelian in detail.order_pengiriman.biaya_pembelian:
+    #                     list_biaya_pembelian.append((4, pembelian.id))  # Using (4, id) to add records to Many2many field
+    #
+    #         rec.relatable_list_pembelian = [(5, 0, 0)] + list_biaya_pembelian  # Clear existing records, then add new ones
 
-            rec.relatable_list_pembelian = [(5, 0, 0)] + list_biaya_pembelian  # Clear existing records, then add new ones
+    # relatable_list_pembelian = fields.Many2many('biaya.pembelian', compute="compute_relatable_biaya_pembelian", copy=False)
+    # @api.depends('detail_order.order_pengiriman')
+    # def compute_relatable_biaya_pembelian(self):
+    #     for rec in self:
+    #         list_biaya_pembelian = []
+    #         for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
+    #             if detail.order_pengiriman:
+    #                 for pembelian in detail.order_pengiriman.biaya_pembelian:
+    #                     list_biaya_pembelian.append((4, pembelian.id))  # Using (4, id) to add records to Many2many field
+    #
+    #         rec.relatable_list_pembelian = [(5, 0, 0)] + list_biaya_pembelian  # Clear existing records, then add new ones
 
-    relatable_list_pembelian = fields.Many2many('biaya.pembelian', compute="compute_relatable_biaya_pembelian", copy=False)
-    @api.depends('detail_order.order_pengiriman')
-    def compute_relatable_biaya_pembelian(self):
-        for rec in self:
-            list_biaya_pembelian = []
-            for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
-                if detail.order_pengiriman:
-                    for pembelian in detail.order_pengiriman.biaya_pembelian:
-                        list_biaya_pembelian.append((4, pembelian.id))  # Using (4, id) to add records to Many2many field
-
-            rec.relatable_list_pembelian = [(5, 0, 0)] + list_biaya_pembelian  # Clear existing records, then add new ones
-
-    relatable_biaya_fee = fields.Many2many('biaya.fee', compute="compute_relatable_biaya_fee", copy=False)
-    @api.depends('detail_order.order_pengiriman')
-    def compute_relatable_biaya_fee(self):
-        for rec in self:
-            list_biaya_fee = []
-            for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
-                if detail.order_pengiriman:
-                    for biaya_fee in detail.order_pengiriman.biaya_fee:
-                        list_biaya_fee.append((4, biaya_fee.id))  # Using (4, id) to add records to Many2many field
-
-            rec.relatable_biaya_fee = [(5, 0, 0)] + list_biaya_fee  # Clear existing records, then add new ones
-
-
-
+    # relatable_biaya_fee = fields.Many2many('biaya.fee', copy=False)
+    # @api.depends('detail_order.order_pengiriman')
+    # def compute_relatable_biaya_fee(self):
+    #     for rec in self:
+    #         list_biaya_fee = []
+    #         for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
+    #             if detail.order_pengiriman:
+    #                 for biaya_fee in detail.order_pengiriman.biaya_fee:
+    #                     list_biaya_fee.append((4, biaya_fee.id))  # Using (4, id) to add records to Many2many field
+    #
+    #         rec.relatable_biaya_fee = [(5, 0, 0)] + list_biaya_fee  # Clear existing records, then add new ones
 
     expense_count = fields.Integer(compute='_compute_expense_count')
     invoice_count = fields.Integer(compute='_compute_invoice_count')
@@ -374,15 +374,15 @@ class OrderSetoran(models.Model):
         for record in self:
             record.sisa = record.total_ongkos_calculated - record.total_pengeluaran - record.total_pembelian - record.total_biaya_fee
 
-    @api.depends('relatable_biaya_fee.nominal')
+    @api.depends('biaya_fee.nominal')
     def _compute_biaya_fee(self):
         for record in self:
-            record.total_biaya_fee = sum(record.relatable_biaya_fee.mapped('nominal'))
+            record.total_biaya_fee = sum(record.biaya_fee.mapped('nominal'))
 
-    @api.depends('relatable_list_pembelian.nominal')
+    @api.depends('list_pembelian.nominal')
     def _compute_total_pembelian(self):
         for record in self:
-            record.total_pembelian = sum(record.relatable_list_pembelian.mapped('nominal'))
+            record.total_pembelian = sum(record.list_pembelian.mapped('nominal'))
 
     @api.depends('list_uang_jalan.total')
     def _compute_total_uang_jalan(self):
@@ -766,9 +766,9 @@ class OrderSetoran(models.Model):
         #     pass
 
         return result
-
-    def write(self, vals):
-        res = super(OrderSetoran, self).write(vals)
+    #
+    # def write(self, vals):
+    #     res = super(OrderSetoran, self).write(vals)
 
         # if 'detail_order' in vals:
         #     for uang_jalan in self.list_uang_jalan:
@@ -1068,7 +1068,46 @@ class OrderSetoran(models.Model):
         #             'nominal': item['nominal'],
         #         })
 
-        return res
+        # return res
+
+
+    def write(self, vals):
+        if 'detail_order' in vals:
+            if 'detail_order' in vals:
+                # Retrieve existing detail_order records and their order_pengiriman before the update
+                existing_detail_orders = self.mapped('detail_order')
+                existing_detail_orders_dict = {rec.id: rec.order_pengiriman.id for rec in existing_detail_orders}
+
+                # Call the super method to perform the write
+                result = super(OrderSetoran, self).write(vals)
+
+                # Retrieve updated detail_order records and their order_pengiriman after the update
+                updated_detail_orders = self.mapped('detail_order')
+                updated_detail_orders_dict = {rec.id: rec.order_pengiriman.id for rec in updated_detail_orders}
+
+                # Determine deleted detail_order records by comparing the sets
+                deleted_detail_orders = set(existing_detail_orders_dict.keys()) - set(updated_detail_orders_dict.keys())
+                deleted_order_pengiriman_ids = [existing_detail_orders_dict[rec_id] for rec_id in deleted_detail_orders]
+                # print("Deleted order_pengiriman IDs:", deleted_order_pengiriman_ids)
+
+                # Now you can handle the deleted records as needed
+                # For example, logging or performing additional actions
+                for line in self.list_pembelian:
+                    if line.order_pengiriman.id in deleted_order_pengiriman_ids:
+                        line.unlink()
+
+                for line in self.biaya_fee:
+                    if line.order_pengiriman.id in deleted_order_pengiriman_ids:
+                        line.unlink()
+
+                for order_pengiriman_id in deleted_order_pengiriman_ids:
+                    self.env['order.pengiriman'].search([('id', '=', order_pengiriman_id)]).unlink()
+
+                return result
+            else:
+                return super(OrderSetoran, self).write(vals)
+
+        return super(OrderSetoran, self).write(vals)
 
     def create_regular_op(self):
         context = {
@@ -1110,15 +1149,15 @@ class DetailOrder(models.Model):
     order_setoran = fields.Many2one('order.setoran', invisible=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
     tanggal_order = fields.Datetime('Tanggal')
-    customer = fields.Many2one('res.partner', 'Customer', required=True, tracking=True)
-    plant = fields.Many2one('konfigurasi.plant', 'PLANT', tracking=True)
+    customer = fields.Many2one('res.partner', 'Customer', tracking=True, related="order_pengiriman.customer")
+    plant = fields.Many2one('konfigurasi.plant', 'PLANT', tracking=True, related="order_pengiriman.plant")
     nomor_surat_jalan = fields.Char('Nomor')
-    jumlah = fields.Float('Jumlah', digits=(6, 0))
+    jumlah = fields.Float('Jumlah', digits=(6, 0), related="order_pengiriman.total_ongkos")
     bayar_dimuka = fields.Float('Bayar Dimuka', digits=(6, 0))
     jenis_order = fields.Selection([
         ('do', 'DO'),
         ('regular', 'Regular'),
-    ], required=True, string="Jenis", tracking=True)
+    ], required=True, string="Jenis", tracking=True, related="order_pengiriman.jenis_order")
 
     @api.constrains('bayar_dimuka', 'jumlah')
     def _check_bayar_dimuka(self):

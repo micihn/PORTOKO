@@ -155,8 +155,8 @@
 
                                     <separator string="Rincian Biaya"/>
                                     <div style="display: flex; justify-content: space-between; ">
-                                        <label for="total_list_pembelian" string="Total Pembelian : "/>
-                                        <field name="total_list_pembelian" style="margin-left: 10px;"/>
+                                        <label for="total_pembelian" string="Total Pembelian : "/>
+                                        <field name="total_pembelian" style="margin-left: 10px;"/>
                                     </div>
 
                                     <div style="display: flex; justify-content: space-between; ">

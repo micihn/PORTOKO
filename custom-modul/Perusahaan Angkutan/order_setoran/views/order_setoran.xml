@@ -324,18 +324,59 @@
 
                         </page>
 
-
-
                         <page string="List Pembelian">
-                            <field name="relatable_list_pembelian" optional="show" force_save="True" readonly="True">
-                                <tree>
-                                    <field name="order_pengiriman" optional="show"/>
-                                    <field name="supplier" optional="show"/>
-                                    <field name="nama_barang" optional="show"/>
-                                    <field name="ukuran" optional="show"/>
-                                    <field name="nominal" optional="show"/>
+                           <field name="list_pembelian" force_save="1" readonly="1">
+                                <tree editable="bottom">
+                                    <field name="order_pengiriman" />
+                                    <field name="supplier" force_save="1" readonly="1"/>
+                                    <field name="nama_barang" force_save="1" readonly="1"/>
+                                    <field name="ukuran" force_save="1" readonly="1"/>
+                                    <field name="nominal" force_save="1" readonly="1"/>
                                 </tree>
                             </field>
+
+                            <div class="oe_right" style="display: inline-block; margin-right: 0px;">
+                                <!-- Total Jalan -->
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 30px;">
+                                    <label for="total_pembelian" string="Total Pembelian : "/>
+                                </div>
+                                <div class="oe_total_field" style="display: inline-block;">
+                                    <field name="total_pembelian"/>
+                                </div>
+                            </div>
+                        </page>
+
+                        <page string="Biaya Fee">
+                            <field name="biaya_fee" force_save="1" readonly="1">
+                                <tree editable="bottom">
+                                    <field name="order_pengiriman" />
+                                    <field name="fee_contact" />
+                                    <field name="nominal" />
+                                </tree>
+                            </field>
+
+                            <div class="oe_right" >
+                                <div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000">
+                                    <label for="total_biaya_fee" string="Total : "/>
+                                </div>
+                                <div class="oe_total_field" style="display: inline-block;">
+                                    <field name="total_biaya_fee" style="text-align:right"/>
+                                </div>
+                            </div>
+                        </page>
+
+
+
+<!--                        <page string="List Pembelian">-->
+<!--                            <field name="relatable_list_pembelian" optional="show" force_save="True" readonly="True">-->
+<!--                                <tree>-->
+<!--                                    <field name="order_pengiriman" optional="show"/>-->
+<!--                                    <field name="supplier" optional="show"/>-->
+<!--                                    <field name="nama_barang" optional="show"/>-->
+<!--                                    <field name="ukuran" optional="show"/>-->
+<!--                                    <field name="nominal" optional="show"/>-->
+<!--                                </tree>-->
+<!--                            </field>-->
 
 <!--                            <field name="list_pembelian" force_save="1" readonly="1">-->
 <!--                                <tree editable="bottom" >-->
@@ -348,46 +389,46 @@
 
 
 
-                            <div class="oe_right" style="display: inline-block; margin-right: 0px;">
-                                <!-- Total Jalan -->
-                                <div class="oe_total_label" style="display: inline-block; margin-right: 30px;">
-                                    <label for="total_pembelian" string="Total Pembelian : "/>
-                                </div>
-                                <div class="oe_total_field" style="display: inline-block;">
-                                    <field name="total_pembelian"/>
-                                </div>
-                            </div>
+<!--                            <div class="oe_right" style="display: inline-block; margin-right: 0px;">-->
+<!--                                &lt;!&ndash; Total Jalan &ndash;&gt;-->
+<!--                                <div class="oe_total_label" style="display: inline-block; margin-right: 30px;">-->
+<!--                                    <label for="total_pembelian" string="Total Pembelian : "/>-->
+<!--                                </div>-->
+<!--                                <div class="oe_total_field" style="display: inline-block;">-->
+<!--                                    <field name="total_pembelian"/>-->
+<!--                                </div>-->
+<!--                            </div>-->
 
-                        </page>
+<!--                        </page>-->
 
-                        <page string="Biaya Fee" >
-                             <field name="relatable_biaya_fee" optional="show" force_save="True" readonly="True">
-                                <tree>
-                                    <field name="order_pengiriman" optional="show"/>
-                                    <field name="fee_contact" optional="show"/>
-                                    <field name="nominal" optional="show"/>
-                                </tree>
-                            </field>
-
-<!--                            <field name="biaya_fee" force_save="1" readonly="1">-->
-<!--                                <tree editable="bottom" >-->
+<!--                        <page string="Biaya Fee" >-->
+<!--                             <field name="relatable_biaya_fee" optional="show" force_save="True" readonly="True">-->
+<!--                                <tree>-->
 <!--                                    <field name="order_pengiriman" optional="show"/>-->
 <!--                                    <field name="fee_contact" optional="show"/>-->
 <!--                                    <field name="nominal" optional="show"/>-->
 <!--                                </tree>-->
 <!--                            </field>-->
 
-                            <div class="oe_right" style="display: inline-block; margin-right: 0px;">
-                                <!-- Total Jalan -->
-                                <div class="oe_total_label" style="display: inline-block; margin-right: 30px;">
-                                    <label for="total_biaya_fee" string="Total Fee : "/>
-                                </div>
-                                <div class="oe_total_field" style="display: inline-block;">
-                                    <field name="total_biaya_fee"/>
-                                </div>
-                            </div>
+<!--&lt;!&ndash;                            <field name="biaya_fee" force_save="1" readonly="1">&ndash;&gt;-->
+<!--&lt;!&ndash;                                <tree editable="bottom" >&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <field name="order_pengiriman" optional="show"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <field name="fee_contact" optional="show"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                                    <field name="nominal" optional="show"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                                </tree>&ndash;&gt;-->
+<!--&lt;!&ndash;                            </field>&ndash;&gt;-->
 
-                        </page>
+<!--                            <div class="oe_right" style="display: inline-block; margin-right: 0px;">-->
+<!--                                &lt;!&ndash; Total Jalan &ndash;&gt;-->
+<!--                                <div class="oe_total_label" style="display: inline-block; margin-right: 30px;">-->
+<!--                                    <label for="total_biaya_fee" string="Total Fee : "/>-->
+<!--                                </div>-->
+<!--                                <div class="oe_total_field" style="display: inline-block;">-->
+<!--                                    <field name="total_biaya_fee"/>-->
+<!--                                </div>-->
+<!--                            </div>-->
+
+<!--                        </page>-->
 
                         <page string="Rincian Pengeluaran">
                             <field name="rincian_pengeluaran">

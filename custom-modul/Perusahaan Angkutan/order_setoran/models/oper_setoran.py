@@ -14,13 +14,18 @@ class OperSetoran(models.Model):
     total_pendapatan = fields.Float(digits=(6, 0))
     total_pembelian = fields.Float(compute='_compute_total_pembelian', digits=(6, 0))
     total_biaya_fee = fields.Float(compute='_compute_total_biaya_fee', digits=(6, 0))
-    total_oper_order = fields.Float(compute='_compute_jumlah_oper_order', digits=(6, 0))
+    total_oper_order = fields.Float(digits=(6, 0), store=True)
     total_list_pembelian = fields.Float(compute='_compute_jumlah_list_pembelian', digits=(6, 0))
     sisa = fields.Float(compute='_calculate_sisa', digits=(6, 0))
     active = fields.Boolean('Archive', default=True, tracking=True)
     invoice_count = fields.Integer(compute='_compute_invoice_count')
     vendor_bills_count = fields.Integer(compute='_compute_bills_count')
     total_ongkos_calculated = fields.Float(digits=(6, 0), compute='_compute_total_ongkos_calculated')
+
+    @api.depends('list_pembelian.nominal')
+    def _compute_jumlah_list_pembelian(self):
+        for record in self:
+            record.total_list_pembelian = sum(record.list_pembelian.mapped('nominal'))
 
     vendor_pa = fields.Many2one('res.partner', 'Vendor PA', required=True, states={
         'draft': [('readonly', False)],
@@ -62,11 +67,11 @@ class OperSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    list_oper_order = fields.One2many('list.oper.order.setoran', 'oper_setoran', copy=True, states={
-        'draft': [('readonly', False)],
-        'done': [('readonly', True)],
-        'cancel': [('readonly', True)],
-    })
+    # list_oper_order = fields.One2many('list.oper.order.setoran', 'oper_setoran', copy=True, states={
+    #     'draft': [('readonly', False)],
+    #     'done': [('readonly', True)],
+    #     'cancel': [('readonly', True)],
+    # })
 
     # @api.onchange("detail_order")
     # def _populate_oper_order(self):
@@ -345,6 +350,8 @@ class OperSetoran(models.Model):
             else:
                 return super(OperSetoran, self).write(vals)
 
+        return super(OperSetoran, self).write(vals)
+
     #     if 'detail_order' in vals:
     #         for record in vals['detail_order']:
     #             related_order_pengiriman = self.env['detail.order.setoran'].sudo().search([
@@ -502,11 +509,11 @@ class OperSetoran(models.Model):
 
     def set_to_draft(self):
         self.state = 'draft'
-
+    #
     @api.depends('total_jumlah', 'total_oper_order', 'total_list_pembelian', 'total_biaya_fee')
     def _calculate_sisa(self):
         for record in self:
-            record.sisa = record.total_jumlah - record.total_oper_order - record.total_list_pembelian - record.total_biaya_fee
+            record.sisa = record.total_jumlah - record.total_oper_order -  record.total_list_pembelian - record.total_biaya_fee
 
     @api.depends('total_ongkos')
     def _compute_total_ongkos_calculated(self):
@@ -523,25 +530,15 @@ class OperSetoran(models.Model):
         for record in self:
             record.total_bayar_dimuka = sum(record.detail_order.mapped('bayar_dimuka'))
 
-    @api.depends('list_oper_order.jumlah_oper_order')
-    def _compute_jumlah_oper_order(self):
-        for record in self:
-            record.total_oper_order = sum(record.list_oper_order.mapped('jumlah_oper_order'))
-
-    @api.depends('list_pembelian.nominal')
-    def _compute_jumlah_list_pembelian(self):
-        for record in self:
-            record.total_list_pembelian = sum(record.list_pembelian.mapped('nominal'))
-
     @api.depends('biaya_fee.nominal')
     def _compute_total_biaya_fee(self):
         for record in self:
             record.total_biaya_fee = sum(record.biaya_fee.mapped('nominal'))
 
-    # @api.depends('list_pembelian_setoran.nominal')
-    # def _compute_total_pembelian(self):
-    #     for record in self:
-    #         record.total_pembelian = sum(record.list_pembelian_setoran.mapped('nominal'))
+    @api.depends('list_pembelian.nominal')
+    def _compute_total_pembelian(self):
+        for record in self:
+            record.total_pembelian = sum(record.list_pembelian.mapped('nominal'))
 
 class DetailOrder(models.Model):
     _name = 'detail.order.setoran'
@@ -551,34 +548,34 @@ class DetailOrder(models.Model):
     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
     tanggal_order = fields.Datetime('Tanggal')
-    jenis_order = fields.Selection([('do', 'DO'),('regular', 'Regular'),], string="Jenis", required=True, tracking=True)
-    customer = fields.Many2one('res.partner', 'Customer', required=True, tracking=True)
-    plant = fields.Many2one('konfigurasi.plant', 'Plant', tracking=True)
+    jenis_order = fields.Selection([('do', 'DO'),('regular', 'Regular'),], string="Jenis", required=True, tracking=True, related="order_pengiriman.jenis_order")
+    customer = fields.Many2one('res.partner', 'Customer', required=True, tracking=True, related="order_pengiriman.customer")
+    plant = fields.Many2one('konfigurasi.plant', 'Plant', tracking=True, related="order_pengiriman.plant")
     nomor_surat_jalan = fields.Char('Nomor')
-    jumlah = fields.Float('Jumlah', digits=(6, 0))
+    jumlah = fields.Float('Jumlah', digits=(6, 0), related="order_pengiriman.total_ongkos")
     bayar_dimuka = fields.Float('Bayar Dimuka', digits=(6, 0))
 
-    @api.onchange("order_pengiriman")
-    def _get_default_values(self):
-        for i in self:
-            if i.order_pengiriman:
-                i.tanggal_order = i.order_pengiriman.create_date
-                i.jenis_order = i.order_pengiriman.jenis_order
-                i.customer = i.order_pengiriman.customer
-                i.plant = i.order_pengiriman.plant
-                i.nomor_surat_jalan = i.order_pengiriman.nomor_surat_jalan
+    # @api.onchange("order_pengiriman")
+    # def _get_default_values(self):
+    #     for i in self:
+    #         if i.order_pengiriman:
+    #             i.tanggal_order = i.order_pengiriman.create_date
+    #             i.jenis_order = i.order_pengiriman.jenis_order
+    #             i.customer = i.order_pengiriman.customer
+    #             i.plant = i.order_pengiriman.plant
+    #             i.nomor_surat_jalan = i.order_pengiriman.nomor_surat_jalan
 
-class ListOperOrder(models.Model):
-    _name = 'list.oper.order.setoran'
-    _description = 'List Oper Order'
-
-    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
-    oper_setoran = fields.Many2one('oper.setoran', invisible=True)
-    oper_order = fields.Many2one('oper.order', 'No. Oper Order')
-    vendor_pa = fields.Many2one('res.partner', 'Vendor PA')
-    kendaraan = fields.Char('Kendaraan')
-    jumlah_oper_order = fields.Float('Nominal', digits=(6, 0))
-    tanggal_dibuat = fields.Datetime('Tanggal Dibuat')
+# class ListOperOrder(models.Model):
+#     _name = 'list.oper.order.setoran'
+#     _description = 'List Oper Order'
+#
+#     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+#     oper_setoran = fields.Many2one('oper.setoran', invisible=True)
+#     oper_order = fields.Many2one('oper.order', 'No. Oper Order')
+#     vendor_pa = fields.Many2one('res.partner', 'Vendor PA')
+#     kendaraan = fields.Char('Kendaraan')
+#     jumlah_oper_order = fields.Float('Nominal', digits=(6, 0))
+#     tanggal_dibuat = fields.Datetime('Tanggal Dibuat')
 
 # class ListPembelian(models.Model):
 #     _name = 'list.pembelian.setoran'

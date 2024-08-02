@@ -165,21 +165,21 @@ class AccountOperInvoicePayment(models.TransientModel):
 
             # Membuat Vendor Bill (Pembayaran Oper Kiriman)
             if setoran.total_oper_order > 0:
-                for order in setoran.list_oper_order:
+                for order in setoran.detail_order:
                     self.env['account.move'].sudo().create({
                         'move_type': 'in_invoice',
                         'invoice_date': order.create_date,
                         'date': order.create_date,
                         'partner_id': setoran.vendor_pa.id,
                         'currency_id': self.env.user.company_id.currency_id.id,
-                        'ref': order.oper_order.oper_order_name,
+                        'ref': order.display_name,
                         'nomor_setoran': setoran.kode_oper_setoran,
                         'company_id': self.env.company.id,
                         'invoice_line_ids': [
                             (0, 0, {
                                 'product_id': find_master_delivery_service(self),
                                 'name': 'Jasa Pengiriman',
-                                'price_unit': order.jumlah_oper_order,
+                                'price_unit': order.jumlah,
                                 'tax_ids': None,
                             })
                         ],
