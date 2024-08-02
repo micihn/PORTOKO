@@ -39,7 +39,6 @@ class AccountOperInvoicePayment(models.TransientModel):
         return default_vals
 
     def create_invoice(self):
-
         def find_master_delivery_service(self):
             # Mengambil ID Database Produk berdasarkan external ID
             external_id = self.env.ref('order_setoran.product_vendor_service_delivery')
@@ -71,9 +70,6 @@ class AccountOperInvoicePayment(models.TransientModel):
             return product_id
 
         for setoran in self.env['oper.setoran'].browse(self._context.get('active_ids', [])):
-
-            print(setoran)
-
             # Write Nomor Surat Jalan
             for record in setoran.detail_order:
                 record.order_pengiriman.write({
@@ -163,7 +159,7 @@ class AccountOperInvoicePayment(models.TransientModel):
                             ],
                         })
 
-            # Membuat Vendor Bill (Pembayaran Oper Kiriman)
+            # Membuat Vendor Bill (Total Oper Order)
             if setoran.total_oper_order > 0:
                 for order in setoran.detail_order:
                     self.env['account.move'].sudo().create({
@@ -179,7 +175,7 @@ class AccountOperInvoicePayment(models.TransientModel):
                             (0, 0, {
                                 'product_id': find_master_delivery_service(self),
                                 'name': 'Jasa Pengiriman',
-                                'price_unit': order.jumlah,
+                                'price_unit': setoran.total_oper_order,
                                 'tax_ids': None,
                             })
                         ],
