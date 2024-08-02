@@ -10,10 +10,6 @@ access_account_invoice_payment_line,access.account.invoice.payment.line,order_se
 access_account_invoice_oper_payment,access.account.invoice.oper.payment,order_setoran.model_account_invoice_oper_payment,group_order_setoran,1,1,1,1
 access_account_invoice_oper_payment_line,access.account.invoice.oper.payment.line,order_setoran.model_account_invoice_oper_payment_line,group_order_setoran,1,1,1,1
 access_detail_total_pengeluaran,access.detail.total.pengeluaran,order_setoran.model_detail_total_pengeluaran,group_order_setoran,1,1,1,1
-access_list_pembelian_setoran,access.list.pembelian.setoran,order_setoran.model_list_pembelian_setoran,group_order_setoran,1,1,1,1
-access_biaya_fee_setoran,access.biaya.fee.setoran,order_setoran.model_biaya_fee_setoran,group_order_setoran,1,1,1,1
 access_uang_jalan_rincian,access.uang.jalan.rincian,model_uang_jalan_rincian,order_pengiriman.group_order_pengiriman,1,1,1,1
-
-
 access_detail_list_uang_jalan,access.detail.list.uang.jalan,model_detail_list_uang_jalan,order_setoran.group_order_setoran,1,1,1,1
 
