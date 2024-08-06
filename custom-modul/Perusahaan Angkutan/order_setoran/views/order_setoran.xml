@@ -72,7 +72,8 @@
                             <field name="kode_order_setoran"/>
                             <field name="kendaraan"/>
                             <field name="tanggal_st"/>
-                            <field name="tanggal_kasbon"/>
+                            <field name="tanggal_kasbon_start"/>
+                            <field name="tanggal_kasbon_finish"/>
                             <field name="fetch_order_automatic" invisible="1"/>
                         </group>
 

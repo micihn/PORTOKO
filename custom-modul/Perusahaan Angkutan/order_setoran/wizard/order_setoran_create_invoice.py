@@ -144,6 +144,28 @@ class AccountInvoicePayment(models.TransientModel):
                             ],
                         })
 
+            # Membuat Vendor Bill (Biaya Fee)
+            if setoran.total_biaya_fee > 0:
+                for fee in setoran.biaya_fee:
+                    self.env['account.move'].sudo().create({
+                        'company_id': self.env.company.id,
+                        'move_type': 'in_invoice',
+                        'invoice_date': setoran.tanggal_st,
+                        'date': setoran.tanggal_st,
+                        'partner_id': fee.fee_contact.id,
+                        'currency_id': self.env.user.company_id.currency_id.id,
+                        'ref': fee.order_pengiriman.order_pengiriman_name,
+                        'nomor_setoran': setoran.kode_order_setoran,
+                        'invoice_line_ids': [
+                            (0, 0, {
+                                'product_id': find_master_pembelian(self),
+                                'name': 'Jasa Pengiriman',
+                                'price_unit': fee.nominal,
+                                'tax_ids': None,
+                            })
+                        ],
+                    })
+
             tanggal_uang_jalan = []
             for rec in setoran.list_uang_jalan:
                 tanggal_uang_jalan.append(rec.tanggal)

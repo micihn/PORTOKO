@@ -49,7 +49,13 @@ class OrderSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    tanggal_kasbon = fields.Date('Tgl. Kasbon', tracking=True, required=True, states={
+    tanggal_kasbon_start = fields.Date('Tgl. Kasbon (Start)', tracking=True, required=True, states={
+        'draft': [('readonly', False)],
+        'done': [('readonly', True)],
+        'cancel': [('readonly', True)],
+    })
+
+    tanggal_kasbon_finish = fields.Date('Tgl. Kasbon (Finish)', tracking=True, required=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
@@ -143,16 +149,16 @@ class OrderSetoran(models.Model):
 
     #         rec.relatable_uang_jalan = [(6, 0, list_uang_jalan)]  # Clear existing records, then add new ones
 
-    @api.onchange('kendaraan', 'tanggal_kasbon')
+    @api.onchange('kendaraan', 'tanggal_kasbon_start', 'tanggal_kasbon_finish')
     def set_driver_and_kenek(self):
         self.sopir = self.kendaraan.sopir_id.id
         self.kenek = self.kendaraan.kenek_id.id
 
-        if bool(self.kendaraan) and bool(self.tanggal_kasbon):
+        if bool(self.kendaraan) and bool(self.tanggal_kasbon_start) and bool(self.tanggal_kasbon_finish):
             list_uang_jalan = self.env['uang.jalan'].sudo().search([
                 ('kendaraan', '=', self.kendaraan.id),
-                ('create_date', '>=', self.tanggal_kasbon),
-                ('create_date', '<=', self.tanggal_kasbon),
+                ('create_date', '>=', self.tanggal_kasbon_start),
+                ('create_date', '<=', self.tanggal_kasbon_finish),
             ])
 
             if bool(list_uang_jalan):
