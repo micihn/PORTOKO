@@ -316,12 +316,8 @@ class AccountInvoicePayment(models.TransientModel):
                 journal_entry_total_pengeluaran.action_post()
 
             # This will close uang jalan
-            for line in setoran.detail_order:
-                for uang_jalan in line.order_pengiriman.uang_jalan:
-                    uang_jalan.order_disetor += 1
-
-                    if uang_jalan.order_disetor == uang_jalan.lines_count:
-                        uang_jalan.state = 'closed'
+            for uj in setoran.list_uang_jalan:
+                uj.uang_jalan_name.state = 'closed'
 
             # Block dibawah akan mengurangi saldo uang jalan gantung
             for line in setoran.detail_order:

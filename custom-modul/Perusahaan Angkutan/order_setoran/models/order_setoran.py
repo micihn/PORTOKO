@@ -151,18 +151,26 @@ class OrderSetoran(models.Model):
 
     @api.onchange('kendaraan', 'tanggal_kasbon_start', 'tanggal_kasbon_finish')
     def set_driver_and_kenek(self):
-        self.sopir = self.kendaraan.sopir_id.id
-        self.kenek = self.kendaraan.kenek_id.id
-
         if bool(self.kendaraan) and bool(self.tanggal_kasbon_start) and bool(self.tanggal_kasbon_finish):
+            self.sopir = False
+            self.kenek = False
+            self.list_uang_jalan = [(5, 0, 0)]
+
             list_uang_jalan = self.env['uang.jalan'].sudo().search([
                 ('kendaraan', '=', self.kendaraan.id),
                 ('create_date', '>=', self.tanggal_kasbon_start),
                 ('create_date', '<=', self.tanggal_kasbon_finish),
+                ('state', 'in', ['to_submit', 'submitted', 'validated']),
             ])
 
             if bool(list_uang_jalan):
                 for uang_jalan in list_uang_jalan:
+                    if bool(self.sopir) == False:
+                        self.sopir = uang_jalan.sopir.id
+
+                    if bool(self.kenek) == False:
+                        self.kenek = uang_jalan.kenek.id
+
                     self.list_uang_jalan.create({
                         'order_setoran': self.id,
                         'uang_jalan_name': uang_jalan.id,
@@ -348,15 +356,8 @@ class OrderSetoran(models.Model):
                 record.button_draft()
                 record.button_cancel()
 
-        # This will close uang jalan
-        try:
-            for line in self.relatable_uang_jalan:
-                line.uang_jalan_name.order_disetor -= 1
-
-                if line.uang_jalan_name.order_disetor != line.uang_jalan_name.lines_count:
-                    line.uang_jalan_name.state = 'paid'
-        except:
-            pass
+        for uj in self.list_uang_jalan:
+            uj.uang_jalan_name.state = 'to_submit'
 
         self.state = 'cancel'
 
