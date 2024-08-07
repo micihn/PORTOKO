@@ -160,7 +160,7 @@ class OrderSetoran(models.Model):
                 ('kendaraan', '=', self.kendaraan.id),
                 ('create_date', '>=', self.tanggal_kasbon_start),
                 ('create_date', '<=', self.tanggal_kasbon_finish),
-                ('state', 'in', ['to_submit', 'submitted', 'validated']),
+                ('state', 'in', ['paid']),
             ])
 
             if bool(list_uang_jalan):
