@@ -9,3 +9,5 @@ access_tabung_komisi_user,access_tabung_komisi_user,model_tabung_komisi,pembayar
 access_bayar_komisi_user,access_bayar_komisi_user,model_bayar_komisi,pembayaran_komisi.group_klaim_komisi,1,1,1,0
 
 access_expense_komisi_user,access_expense_komisi_user,hr_expense.model_hr_expense,pembayaran_komisi.group_klaim_komisi,1,0,1,0
+
+access_konfigurasi_komisi,access_konfigurasi_komisi,pembayaran_komisi.model_konfigurasi_komisi,pembayaran_komisi.group_klaim_komisi,1,1,1,1

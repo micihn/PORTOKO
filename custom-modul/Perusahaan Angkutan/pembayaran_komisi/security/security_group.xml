@@ -32,5 +32,14 @@
 	            <field name="model_id" ref="pembayaran_komisi.model_bayar_komisi"/>
 	            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
 	        </record>
+
+		    <!-- Record rules -->
+			<!-- Multi-company : Komisi Configuration Multi-Company rule -->
+				<record model="ir.rule" id="fleet_service_configuration_multicompany_rule">
+					<field name="name">Komisi Configuration Multi-Company rule</field>
+					<field name="model_id" search="[('model','=','konfigurasi.komisi')]" model="ir.model"/>
+					<field name="domain_force">[('company_id', 'in', company_ids)]</field>
+				</record>
+
 	</data>
 </odoo>

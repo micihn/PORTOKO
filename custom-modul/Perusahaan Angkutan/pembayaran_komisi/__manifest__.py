@@ -19,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'order_setoran'],
+    'depends': ['base', 'order_setoran', 'om_account_accountant'],
 
     # always loaded
     'data': [
@@ -30,8 +30,10 @@
         'views/hr_employee.xml',
         'views/bayar_komisi.xml',
         'views/tabung_komisi.xml',
+        'views/konfigurasi.xml',
         'views/menu.xml',
     ],
+    'post_init_hook': 'post_init_hook',
     # only loaded in demonstration mode
     'demo': [],
 }
