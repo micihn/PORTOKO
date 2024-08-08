@@ -78,6 +78,7 @@ class TabungKomisi(models.Model):
 					'state': 'diproses',
 				}).id
 
+				account_settings = self.env['konfigurasi.komisi'].search([('company_id', '=', self.env.company.id)])
 				journal_kas_1 = account_settings.journal_kas_1
 				journal_kas_2 = account_settings.journal_kas_2
 				account_kas_1 = account_settings.account_kas_1
