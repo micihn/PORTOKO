@@ -62,22 +62,8 @@ class TabungKomisi(models.Model):
 
 	def action_submit(self):
 		for rec in self:
-			# Ubah status komisi
-			for komisi in rec.komisi_ids:
-				komisi.state = 'diproses'
-
-			# Ubah staus ptu
-			rec.state = 'selesai'
-
 			# Tabung sisanya
 			if rec.total_disimpan > 0:
-				rec.ptu_line_id = self.env['hr.employee.ptu_line'].create({
-					'employee_id': rec.employee_id.id,
-					'tipe': 'pemasukan',
-					'nominal': rec.total_disimpan,
-					'state': 'diproses',
-				}).id
-
 				account_settings = self.env['konfigurasi.komisi'].search([('company_id', '=', self.env.company.id)])
 				journal_kas_1 = account_settings.journal_kas_1
 				journal_kas_2 = account_settings.journal_kas_2
@@ -89,6 +75,15 @@ class TabungKomisi(models.Model):
 
 				if not journal_kas_1 or not journal_kas_2 or not account_kas_1 or not account_kas_2 or not hutang_komisi or not piutang_komisi or not expense_komisi:
 					raise ValidationError("Anda belum melakukan konfigurasi account pada menu Komisi > Konfigurasi.")
+
+
+				rec.ptu_line_id = self.env['hr.employee.ptu_line'].create({
+					'employee_id': rec.employee_id.id,
+					'tipe': 'pemasukan',
+					'nominal': rec.total_disimpan,
+					'state': 'diproses',
+				}).id
+
 
 				# ORM untuk membuat account.move yang berdasarkan Total Komisi
 				journal_entry_total_komisi = self.env['account.move'].sudo().create({
@@ -166,7 +161,12 @@ class TabungKomisi(models.Model):
 				})
 				journal_entry_ptu.action_post()
 
+			# Ubah status komisi
+			for komisi in rec.komisi_ids:
+				komisi.state = 'diproses'
 
+			# Ubah staus ptu
+			rec.state = 'selesai'
 
 			# # Buat pembayaran
 			# if rec.jumlah > 0:
