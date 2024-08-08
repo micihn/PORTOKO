@@ -1,5 +1,5 @@
 from odoo import api, models, fields
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 class BayarKomisi(models.Model):
 	_name = "bayar.komisi"
@@ -21,7 +21,8 @@ class BayarKomisi(models.Model):
 		'dibayar': [('readonly', True)]
 	})
 	ptu_line_id = fields.Many2one("hr.employee.ptu_line", ondelete="set null", readonly=True)
-	expense_id = fields.Many2one("hr.expense", ondelete="set null", readonly=True)
+	# expense_id = fields.Many2one("hr.expense", ondelete="set null", readonly=True)
+	account_move_id = fields.Many2one("account.move", ondelete="set null", readonly=True)
 	state = fields.Selection([
 		('dibuat', 'Dibuat'),
 		('selesai', 'Selesai'),
@@ -50,7 +51,7 @@ class BayarKomisi(models.Model):
 				raise UserError("Jumlah tidak bisa kurang atau sama dengan 0.")
 				
 			# Ubah staus ptu
-			rec.state = 'selesai'
+			rec.state = 'dibayar'
 
 			# Buat pembayaran
 			if not rec.ptu_line_id:
@@ -60,20 +61,55 @@ class BayarKomisi(models.Model):
 					'tipe': 'pengeluaran',
 					'state': 'pending',
 				}).id
-			if not rec.expense_id:
-				rec.expense_id = self.env['hr.expense'].create({
-					'name': 'Pembayaran Komisi %s' % rec.employee_id.display_name,
-					'product_id': self.env.ref('pembayaran_komisi.produk_komisi').id,
-					'total_amount': rec.jumlah,
-					'employee_id': rec.employee_id.id,
-					'reference': rec.kode_pembayaran,
-					'payment_mode': 'company_account',
-					'bayar_komisi_id': rec.id,
-				}).id
 
-			return {
-				'type': 'ir.actions.act_window',
-				'res_model': 'hr.expense',
-				'res_id': rec.expense_id.id,
-				'view_mode': 'form',
-			}
+			# if not rec.expense_id:
+				# rec.expense_id = self.env['hr.expense'].create({
+				# 	'name': 'Pembayaran Komisi %s' % rec.employee_id.display_name,
+				# 	'product_id': self.env.ref('pembayaran_komisi.produk_komisi').id,
+				# 	'total_amount': rec.jumlah,
+				# 	'employee_id': rec.employee_id.id,
+				# 	'reference': rec.kode_pembayaran,
+				# 	'payment_mode': 'company_account',
+				# 	'bayar_komisi_id': rec.id,
+				# }).id
+
+			if not rec.account_move_id:
+				account_settings = self.env['konfigurasi.komisi'].search([('company_id', '=', self.env.company.id)])
+				journal_id = account_settings.journal_komisi
+				account_komisi = account_settings.account_komisi
+
+				if bool(journal_id) == False or bool(account_komisi) == False:
+					raise ValidationError("Anda belum melakukan konfigurasi account pada menu Komisi > Konfigurasi.")
+
+				journal_entry_bayar_komisi = self.env['account.move'].sudo().create({
+					'company_id': self.env.company.id,
+					'move_type': 'entry',
+					'date': fields.Datetime.now(),
+					'journal_id': journal_id.id,
+					'ref': str(self.kode_pembayaran) + str(" - Klaim Komisi " + self.employee_id.name),
+					'line_ids': [
+						(0, 0, {
+							'name': self.kode_pembayaran,
+							'date': fields.Datetime.now(),
+							'account_id': journal_id.default_account_id.id,
+							'company_id': self.env.company.id,
+							'debit': rec.jumlah,
+						}),
+
+						(0, 0, {
+							'name': self.kode_pembayaran,
+							'date': fields.Datetime.now(),
+							'account_id': account_komisi.id,
+							'company_id': self.env.company.id,
+							'credit': rec.jumlah,
+						}),
+					],
+				})
+				journal_entry_bayar_komisi.action_post()
+
+			# return {
+			# 	'type': 'ir.actions.act_window',
+			# 	'res_model': 'hr.expense',
+			# 	'res_id': rec.expense_id.id,
+			# 	'view_mode': 'form',
+			# }

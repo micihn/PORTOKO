@@ -15,7 +15,6 @@
                 <field name="company_id" readonly="1"/>
                 <field name="journal_komisi" string="Journal Komisi" optional="show"/>
                 <field name="account_komisi" string="Account Komisi" optional="show"/>
-                <field name="account_cash" string="Account Cash/Bank" optional="show"/>
             </tree>
         </field>
     </record>
