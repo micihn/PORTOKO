@@ -75,23 +75,28 @@ class BayarKomisi(models.Model):
 
 			if not rec.account_move_id:
 				account_settings = self.env['konfigurasi.komisi'].search([('company_id', '=', self.env.company.id)])
-				journal_id = account_settings.journal_komisi
-				account_komisi = account_settings.account_komisi
+				journal_kas_1 = account_settings.journal_kas_1
+				journal_kas_2 = account_settings.journal_kas_2
+				account_kas_1 = account_settings.account_kas_1
+				account_kas_2 = account_settings.account_kas_2
+				hutang_komisi = account_settings.hutang_komisi
+				piutang_komisi = account_settings.piutang_komisi
+				expense_komisi = account_settings.expense_komisi
 
-				if bool(journal_id) == False or bool(account_komisi) == False:
+				if not journal_kas_1 or not journal_kas_2 or not account_kas_1 or not account_kas_2 or not hutang_komisi or not piutang_komisi or not expense_komisi:
 					raise ValidationError("Anda belum melakukan konfigurasi account pada menu Komisi > Konfigurasi.")
 
 				journal_entry_bayar_komisi = self.env['account.move'].sudo().create({
 					'company_id': self.env.company.id,
 					'move_type': 'entry',
 					'date': fields.Datetime.now(),
-					'journal_id': journal_id.id,
+					'journal_id': journal_kas_2.id,
 					'ref': str(self.kode_pembayaran) + str(" - Klaim Komisi " + self.employee_id.name),
 					'line_ids': [
 						(0, 0, {
 							'name': self.kode_pembayaran,
 							'date': fields.Datetime.now(),
-							'account_id': journal_id.default_account_id.id,
+							'account_id': piutang_komisi.id,
 							'company_id': self.env.company.id,
 							'debit': rec.jumlah,
 						}),
@@ -99,7 +104,7 @@ class BayarKomisi(models.Model):
 						(0, 0, {
 							'name': self.kode_pembayaran,
 							'date': fields.Datetime.now(),
-							'account_id': account_komisi.id,
+							'account_id': account_kas_2.id,
 							'company_id': self.env.company.id,
 							'credit': rec.jumlah,
 						}),
