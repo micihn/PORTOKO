@@ -173,6 +173,11 @@ class PenjualanPTULine(models.Model):
         for line in self:
             line.satuan = line.barang.product_tmpl_id.uom_id.id
 
+    @api.onchange('barang')
+    def set_saleprice(self):
+        for line in self:
+            line.harga = line.barang.product_tmpl_id.list_price
+
     @api.depends('satuan', 'harga')
     def compute_subtotal(self):
         for line in self:
