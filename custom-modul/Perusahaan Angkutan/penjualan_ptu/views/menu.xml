@@ -1,0 +1,7 @@
+<odoo>
+	<data>
+		<menuitem id="penjualan_ptu_root_menu" name="Penjualan PTU" groups="penjualan_ptu.group_penjualan_ptu"/>
+		<menuitem id="penjualan_ptu_menu" parent="penjualan_ptu.penjualan_ptu_root_menu" name="Penjualan PTU" action="penjualan_ptu_action" sequence="10"/>
+		<menuitem id="konfigurasi" parent="penjualan_ptu.penjualan_ptu_root_menu" name="Konfigurasi" action="konfigurasi_penjualan_ptu_action" sequence="20"/>
+	</data>
+</odoo>
