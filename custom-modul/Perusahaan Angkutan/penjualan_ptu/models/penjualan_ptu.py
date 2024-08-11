@@ -178,7 +178,7 @@ class PenjualanPTULine(models.Model):
         for line in self:
             line.harga = line.barang.product_tmpl_id.list_price
 
-    @api.depends('satuan', 'harga')
+    @api.depends('qty', 'harga')
     def compute_subtotal(self):
         for line in self:
             line.subtotal = line.qty * line.harga
