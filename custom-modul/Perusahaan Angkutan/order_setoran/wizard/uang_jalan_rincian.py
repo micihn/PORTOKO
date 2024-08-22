@@ -46,7 +46,7 @@ class UangJalanRinci(models.TransientModel):
 
 				if uj.tipe_uang_jalan == 'standar':
 					for line in uj.uang_jalan_line:
-						values.update({
+						values = {
 							'create_date': uj.create_date.strftime("%d %B %Y"),
 							'uang_jalan_name': uj.uang_jalan_name,
 							'sopir': uj.sopir.display_name if uj.sopir else "",
@@ -59,7 +59,7 @@ class UangJalanRinci(models.TransientModel):
 							'muat': line.muat.display_name if line.muat else "",
 							'bongkar': line.bongkar.display_name if line.bongkar else "",
 							'keterangan': line.keterangan if line.keterangan else "",
-						})
+						}
 						docs.append(values)
 				else:
 					for line in uj.uang_jalan_nominal_tree:
@@ -87,4 +87,5 @@ class UangJalanRinci(models.TransientModel):
 				'date_from': i.date_from,
 				'date_to': i.date_to,
 			}
+
 			return self.env.ref('order_setoran.report_uang_jalan_rincian').report_action([], data=data)

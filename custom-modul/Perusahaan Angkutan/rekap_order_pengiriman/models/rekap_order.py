@@ -112,6 +112,7 @@ class RekapOrderSudah(models.Model):
 	_inherit = "rekap.order.item"
 	_description = "Order Rekap Sudah Rekap"
 
+	company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 	inverse_id = fields.Many2one("rekap.order.belum_rekap", ondelete="cascade", readonly=True)
 
 	def toggle_state(self):
@@ -143,6 +144,7 @@ class RekapOrderBelum(models.Model):
 	_description = "Order Rekap Belum"
 
 	inverse_id = fields.Many2one("rekap.order.sudah_rekap", ondelete="cascade", readonly=True)
+	company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 
 	def toggle_state(self):
 		for i in self:
