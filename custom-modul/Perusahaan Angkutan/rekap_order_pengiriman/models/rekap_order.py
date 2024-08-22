@@ -35,7 +35,7 @@ class RekapOrder(models.Model):
 	def populate_item(self):
 		for i in self:
 			if i.tanggal_awal and i.tanggal_akhir and i.customer_id and i.kode_rekap:
-				order_ids = self.env['order.pengiriman'].search([('jenis_order', '=', i.tipe_order), ('create_date', '>=', datetime.combine(i.tanggal_awal, datetime.min.time())), ('create_date', '<=', datetime.combine(i.tanggal_akhir, datetime.max.time())), ('masuk_rekap', '=', False)])
+				order_ids = self.env['order.pengiriman'].search([('customer', '=', i.customer_id.id), ('jenis_order', '=', i.tipe_order), ('create_date', '>=', datetime.combine(i.tanggal_awal, datetime.min.time())), ('create_date', '<=', datetime.combine(i.tanggal_akhir, datetime.max.time())), ('masuk_rekap', '=', False)])
 				values = []
 				for order in order_ids:
 					setoran_line = self.env['detail.order'].search([('order_pengiriman', '=', order.id)], limit=1)
@@ -94,11 +94,18 @@ class RekapOrderItem(models.Model):
 	def _get_invoice(self):
 		for i in self:
 			if i.order_id:
-				detail_order = self.env['detail.order'].sudo().search([('order_pengiriman', '=', i.order_id.id)])
-				invoices = self.env['account.move'].sudo().search([('nomor_setoran', '=', detail_order.order_setoran.kode_order_setoran), ('move_type', '=', 'out_invoice')])
-				i.faktur = [(6, 0, invoices.ids)]
+				detail_orders = self.env['detail.order'].sudo().search([('order_pengiriman', '=', i.order_id.id)])
+				invoice_ids = []
+				for detail_order in detail_orders:
+					invoices = self.env['account.move'].sudo().search([
+						('nomor_setoran', '=', detail_order.order_setoran.kode_order_setoran),
+						('move_type', '=', 'out_invoice')
+					])
+					invoice_ids.extend(invoices.ids)
+				i.faktur = [(6, 0, invoice_ids)] if invoice_ids else [(5, 0, 0)]
 			else:
-				i.faktur = [(5, 0 ,0)]
+				i.faktur = [(5, 0, 0)]
+
 
 class RekapOrderSudah(models.Model):
 	_name = 'rekap.order.sudah_rekap'
