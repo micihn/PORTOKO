@@ -34,7 +34,7 @@ class UangJalanRinci(models.TransientModel):
 				}
 
 				# Get setoran
-				setoran = self.env['order.setoran'].search([('relatable_uang_jalan', 'in', [uj.id])])
+				setoran = self.env['order.setoran'].search([('list_uang_jalan', 'in', [uj.id])])
 				if setoran:
 					values['setoran'] = ", ".join([s.display_name for s in setoran])
 

@@ -1,7 +1,7 @@
 <odoo>
     <data>
         <record id="rincian_uang_jalan_act" model="ir.actions.act_window">
-            <field name="name">Report Uang Jalan Gantung</field>
+            <field name="name">Rincian Uang Jalan</field>
             <field name="res_model">uang.jalan.rincian</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
