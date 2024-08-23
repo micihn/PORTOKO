@@ -14,7 +14,7 @@
 				<div class="page">
 					<div class="row">
 						<div class="col-12">
-							<table class="table table-bordered table-sm" style="font-size:0.75em">
+							<table class="table table-bordered table-sm" style="font-size:10px">
 								<thead>
 									<tr>
 										<td><b>Tanggal</b></td>
@@ -33,31 +33,31 @@
 									</tr>
 								</thead>
 								<tbody>
-									<t t-set="total" t-value="0"/>
+									<t t-set="total" t-value="0" style="font-size:10px"/>
 									<t t-set="sisa_kas_cadangan" t-value="0"/>
 									<t t-set="kas_cadangan" t-value="0"/>
 									<t t-set="biaya_lain" t-value="0"/>
 									<t t-set="total_uj" t-value="0"/>
 									<tr t-foreach="data" t-as="line" style="page-break-inside: avoid">
-										<td><span t-out="line['create_date']"/></td>
-										<td><span t-out="line['uang_jalan_name']"/></td>
-										<td><span t-out="line['sopir']"/></td>
-										<td><span t-out="line['kenek']"/></td>
-										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['nominal_uang_jalan'])"/></td>
-										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['sisa_kas_cadangan'])"/></td>
-										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['kas_cadangan'])"/></td>
-										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['biaya_lain'])"/></td>
-										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['total'])"/></td>
-										<td><span t-out="line['setoran']"/></td>
-										<td><span t-out="line['muat']"/></td>
-										<td><span t-out="line['bongkar']"/></td>
-										<td><span t-out="line['keterangan']"/></td>
+										<td><span t-out="line['create_date']" style="font-size:10px"/></td>
+										<td><span t-out="line['uang_jalan_name']" style="font-size:10px"/></td>
+										<td><span t-out="line['sopir']" style="font-size:10px"/></td>
+										<td><span t-out="line['kenek']" style="font-size:10px"/></td>
+										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['nominal_uang_jalan'])" style="font-size:10px"/></td>
+										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['sisa_kas_cadangan'])" style="font-size:10px"/></td>
+										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['kas_cadangan'])" style="font-size:10px"/></td>
+										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['biaya_lain'])" style="font-size:10px"/></td>
+										<td class="text-end"><span t-out="'Rp. {:,}'.format(line['total'])" style="font-size:10px"/></td>
+										<td><span t-out="line['setoran']" style="font-size:10px"/></td>
+										<td><span t-out="line['muat']" style="font-size:10px"/></td>
+										<td><span t-out="line['bongkar']" style="font-size:10px"/></td>
+										<td><span t-out="line['keterangan']" style="font-size:10px"/></td>
 
-										<t t-set="total" t-value="total + line['nominal_uang_jalan']"/>
-										<t t-set="sisa_kas_cadangan" t-value="sisa_kas_cadangan + line['sisa_kas_cadangan']"/>
-										<t t-set="kas_cadangan" t-value="kas_cadangan + line['kas_cadangan']"/>
-										<t t-set="biaya_lain" t-value="biaya_lain + line['biaya_lain']"/>
-										<t t-set="total_uj" t-value="total_uj + line['total']"/>
+										<t t-set="total" t-value="total + line['nominal_uang_jalan']" style="font-size:10px"/>
+										<t t-set="sisa_kas_cadangan" t-value="sisa_kas_cadangan + line['sisa_kas_cadangan']" style="font-size:10px"/>
+										<t t-set="kas_cadangan" t-value="kas_cadangan + line['kas_cadangan']" style="font-size:10px"/>
+										<t t-set="biaya_lain" t-value="biaya_lain + line['biaya_lain']" style="font-size:10px"/>
+										<t t-set="total_uj" t-value="total_uj + line['total']" style="font-size:10px"/>
 									</tr>
 								</tbody>
 								<tfoot>

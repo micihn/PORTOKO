@@ -1121,6 +1121,7 @@ class OrderSetoran(models.Model):
             'created_from_setoran': True,
             'order_setoran_id': self.id,
             'default_jenis_order': 'regular',
+            'default_kendaraan_id': self.kendaraan.id,
         }
 
         return {
@@ -1137,6 +1138,7 @@ class OrderSetoran(models.Model):
             'created_from_setoran': True,
             'order_setoran_id': self.id,
             'default_jenis_order': 'do',
+            'default_kendaraan_id': self.kendaraan.id,
         }
 
         return {

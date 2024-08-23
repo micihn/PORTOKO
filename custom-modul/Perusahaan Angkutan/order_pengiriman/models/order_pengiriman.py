@@ -22,6 +22,7 @@ class OrderPengiriman(models.Model):
 
     active = fields.Boolean('Archive', default=True, tracking=True)
 
+    kendaraan_id = fields.Many2one('fleet.vehicle', string="Kendaraan")
 
     is_sudah_disetor = fields.Boolean()
     is_uang_jalan_terbit = fields.Boolean()

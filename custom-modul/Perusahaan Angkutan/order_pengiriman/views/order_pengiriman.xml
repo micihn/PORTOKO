@@ -152,6 +152,7 @@
                     </div>
                     <group>
                         <group>
+                            <field name="kendaraan_id" />
                             <field name="customer" />
                             <field name="plant" options="{'not_delete': True}" attrs="{'invisible': [('jenis_order', '=', 'do')]}" />
                             <field name="alamat_muat" />

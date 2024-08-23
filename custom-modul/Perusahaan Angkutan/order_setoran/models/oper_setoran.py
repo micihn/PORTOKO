@@ -208,6 +208,7 @@ class OperSetoran(models.Model):
             'created_from_oper_setoran': True,
             'oper_setoran_id': self.id,
             'default_jenis_order': 'regular',
+            'default_kendaraan_id': self.kendaraan.id,
         }
 
         return {
@@ -224,6 +225,7 @@ class OperSetoran(models.Model):
             'created_from_oper_setoran': True,
             'oper_setoran_id': self.id,
             'default_jenis_order': 'do',
+            'default_kendaraan_id': self.kendaraan.id,
         }
 
         return {
