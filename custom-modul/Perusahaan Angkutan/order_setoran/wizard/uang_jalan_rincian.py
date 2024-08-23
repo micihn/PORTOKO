@@ -17,67 +17,85 @@ class UangJalanRinci(models.TransientModel):
 			docs = []
 
 			for uj in uang_jalan:
-				values = {
-					'create_date': "",
-					'uang_jalan_name': "",
-					'sopir': "",
-					'kenek': "",
-					'nominal_uang_jalan': 0,
-					'sisa_kas_cadangan': 0,
-					'kas_cadangan': 0,
-					'biaya_lain': 0,
-					'total': 0,
-					'setoran': "",
-					'muat': "",
-					'bongkar': "",
-					'keterangan': "",
-				}
+				# values = {
+				# 	'create_date': "",
+				# 	'uang_jalan_name': "",
+				# 	'sopir': "",
+				# 	'kenek': "",
+				# 	'nominal_uang_jalan': 0,
+				# 	'sisa_kas_cadangan': 0,
+				# 	'kas_cadangan': 0,
+				# 	'biaya_lain': 0,
+				# 	'total': 0,
+				# 	'setoran': "",
+				# 	'muat': "",
+				# 	'bongkar': "",
+				# 	'keterangan': "",
+				# }
 
-				# Get setoran
-				setoran = self.env['order.setoran'].search([('list_uang_jalan', 'in', [uj.id])])
-				if setoran:
-					values['setoran'] = ", ".join([s.display_name for s in setoran])
+				values = {}
 
-				# Get sisa_kas_cadangan
-				prev_uj = self.env['uang.jalan'].search([('id', '<', uj.id), ('kendaraan', '=', uj.kendaraan.id)], limit=1, order="id desc")
-				sisa_kas_cadangan = 0
-				if prev_uj:
-					sisa_kas_cadangan = -(prev_uj.kas_cadangan)
 
-				if uj.tipe_uang_jalan == 'standar':
-					for line in uj.uang_jalan_line:
-						values = {
-							'create_date': uj.create_date.strftime("%d %B %Y"),
-							'uang_jalan_name': uj.uang_jalan_name,
-							'sopir': uj.sopir.display_name if uj.sopir else "",
-							'kenek': uj.kenek.display_name if uj.kenek else "",
-							'nominal_uang_jalan': line.nominal_uang_jalan,
-							'sisa_kas_cadangan': sisa_kas_cadangan,
-							'kas_cadangan': uj.kas_cadangan,
-							'biaya_lain': uj.biaya_tambahan,
-							'total': line.nominal_uang_jalan + sisa_kas_cadangan + uj.kas_cadangan + uj.biaya_tambahan,
-							'muat': line.muat.display_name if line.muat else "",
-							'bongkar': line.bongkar.display_name if line.bongkar else "",
-							'keterangan': line.keterangan if line.keterangan else "",
-						}
-						docs.append(values)
-				else:
-					for line in uj.uang_jalan_nominal_tree:
-						values.update({
-							'create_date': uj.create_date.strftime("%d %B %Y"),
-							'uang_jalan_name': uj.uang_jalan_name,
-							'sopir': uj.sopir.display_name if uj.sopir else "",
-							'kenek': uj.kenek.display_name if uj.kenek else "",
-							'nominal_uang_jalan': line.nominal_uang_jalan,
-							'sisa_kas_cadangan': sisa_kas_cadangan,
-							'kas_cadangan': uj.kas_cadangan,
-							'biaya_lain': uj.biaya_tambahan,
-							'total': line.nominal_uang_jalan + sisa_kas_cadangan + uj.kas_cadangan + uj.biaya_tambahan,
-							'muat': line.muat.display_name if line.muat else "",
-							'bongkar': line.bongkar.display_name if line.bongkar else "",
-							'keterangan': line.keterangan if line.keterangan else "",
-						})
-						docs.append(values)
+				# if uj.tipe_uang_jalan == 'standar':
+				# 	for line in uj.uang_jalan_line:
+				# 		values = {
+				# 			'create_date': uj.create_date.strftime("%d %B %Y"),
+				# 			'uang_jalan_name': uj.uang_jalan_name,
+				# 			'sopir': uj.sopir.display_name if uj.sopir else "",
+				# 			'kenek': uj.kenek.display_name if uj.kenek else "",
+				# 			'nominal_uang_jalan': line.nominal_uang_jalan,
+				# 			'sisa_kas_cadangan': uj.sisa_kas_cadangan,
+				# 			'kas_cadangan': uj.kas_cadangan,
+				# 			'biaya_lain': uj.biaya_tambahan,
+				# 			'total': line.nominal_uang_jalan if line.nominal_uang_jalan else 0,
+				# 			'muat': line.muat.display_name if line.muat else "",
+				# 			'bongkar': line.bongkar.display_name if line.bongkar else "",
+				# 			'keterangan': line.keterangan if line.keterangan else "",
+				# 		}
+				# 		docs.append(values)
+				# else:
+				# 	for line in uj.uang_jalan_nominal_tree:
+				# 		values.update({
+				# 			'create_date': uj.create_date.strftime("%d %B %Y"),
+				# 			'uang_jalan_name': uj.uang_jalan_name,
+				# 			'sopir': uj.sopir.display_name if uj.sopir else "",
+				# 			'kenek': uj.kenek.display_name if uj.kenek else "",
+				# 			'nominal_uang_jalan': line.nominal_uang_jalan,
+				# 			'sisa_kas_cadangan': uj.sisa_kas_cadangan,
+				# 			'kas_cadangan': uj.kas_cadangan,
+				# 			'biaya_lain': uj.biaya_tambahan,
+				# 			'total': line.nominal_uang_jalan if line.nominal_uang_jalan else 0,
+				# 			'muat': line.muat.display_name if line.muat else "",
+				# 			'bongkar': line.bongkar.display_name if line.bongkar else "",
+				# 			'keterangan': line.keterangan if line.keterangan else "",
+				# 		})
+
+				for line in uj.uang_jalan_nominal_tree:
+					values.update({
+						'create_date': uj.create_date.strftime("%d %B %Y"),
+						'uang_jalan_name': uj.uang_jalan_name,
+						'sopir': uj.sopir.display_name if uj.sopir else "",
+						'kenek': uj.kenek.display_name if uj.kenek else "",
+						'nominal_uang_jalan': line.nominal_uang_jalan,
+						'sisa_kas_cadangan': uj.sisa_kas_cadangan,
+						'kas_cadangan': uj.kas_cadangan,
+						'biaya_lain': uj.biaya_tambahan,
+						'total': line.nominal_uang_jalan if line.nominal_uang_jalan else 0,
+						'muat': line.muat.display_name if line.muat else "",
+						'bongkar': line.bongkar.display_name if line.bongkar else "",
+						'keterangan': line.keterangan if line.keterangan else "",
+					})
+
+					# Get setoran
+					setoran = self.env['order.setoran'].search([('list_uang_jalan', 'in', [uj.id])])
+					if setoran:
+						values['setoran'] = ", ".join([s.display_name for s in setoran])
+					else:
+						values['setoran'] = ""
+
+					docs.append(values)
+
+					values = {}
 
 			data = {
 				'doc_ids': uang_jalan.ids,
