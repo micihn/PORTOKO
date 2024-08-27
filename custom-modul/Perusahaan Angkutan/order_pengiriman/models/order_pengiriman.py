@@ -711,7 +711,7 @@ class DetailOrderDO(models.Model):
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
-    nama_barang = fields.Text('Nama Barang')
+    nama_barang = fields.Text('Nama Barang', required=True)
     keterangan_barang = fields.Text('Keterangan')
     ongkos_per_kg = fields.Float('Ongkos/Kg', digits=(6, 3))
     jumlah_per_kg = fields.Float('Jumlah(Kg)', digits=(6, 3))
@@ -729,7 +729,7 @@ class DetailOrderReguler(models.Model):
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
-    nama_barang = fields.Text('Nama Barang')
+    nama_barang = fields.Text('Nama Barang', required=True)
     keterangan_barang = fields.Text('Keterangan')
     panjang_barang = fields.Float('Panjang', digits=(6, 3))
     lebar_barang = fields.Float('Lebar', digits=(6, 3))
@@ -749,7 +749,7 @@ class BiayaPembelian(models.Model):
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
     supplier = fields.Many2one('res.partner', 'Supplier', ondelete='restrict')
-    nama_barang = fields.Char('Nama Barang')
+    nama_barang = fields.Char('Nama Barang', required=True)
     ukuran = fields.Text('Ukuran')
     nominal = fields.Float('Nominal', digits=(6, 0))
 
