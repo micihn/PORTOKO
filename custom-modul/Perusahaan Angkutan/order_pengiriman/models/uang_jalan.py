@@ -1,5 +1,6 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from datetime import datetime, date
 
 class UangJalan(models.Model):
     _name = 'uang.jalan'
@@ -10,9 +11,9 @@ class UangJalan(models.Model):
     active = fields.Boolean('Archive', default=True, tracking=True)
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     tipe_uang_jalan = fields.Selection([
-        ('standar', "Standar"),
+        # ('standar', "Standar"),
         ('nominal_saja', "Nominal Saja"),
-    ], required=True, default='standar', states={
+    ], required=True, default='nominal_saja', states={
         'to_submit': [('readonly', False)],
         'submitted': [('readonly', True)],
         'validated': [('readonly', True)],
@@ -23,6 +24,7 @@ class UangJalan(models.Model):
     lines_count = fields.Integer(compute='compute_total_line')
     order_disetor = fields.Integer()
     can_use_all_balance = fields.Boolean(default=True)
+    nomor_setoran = fields.Char()
 
     @api.depends('uang_jalan_line', 'uang_jalan_nominal_tree')
     def compute_total_line(self):
@@ -45,6 +47,20 @@ class UangJalan(models.Model):
     })
 
     kas_gantung = fields.Float(digits=(6, 0), copy=False, compute="compute_kas_gantung_kendaraan")
+    kas_cadangan = fields.Float(digits=(6, 0), copy=False, states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
+    })
+    sisa_kas_cadangan = fields.Float(digits=(6, 0), copy=False, states={
+        'to_submit': [('readonly', False)],
+        'submitted': [('readonly', True)],
+        'validated': [('readonly', True)],
+        'paid': [('readonly', True)],
+        'closed': [('readonly', True)],
+    })
 
     @api.depends('kendaraan')
     def compute_kas_gantung_kendaraan(self):
@@ -108,7 +124,21 @@ class UangJalan(models.Model):
         'closed': [('readonly', True)],
     })
 
+    biaya_tambahan = fields.Float("Biaya Tambahan", compute="compute_biaya_tambahan", store=True)
+
+    @api.depends("tipe_uang_jalan", "biaya_tambahan_standar", "biaya_tambahan_nominal_saja")
+    def compute_biaya_tambahan(self):
+        for i in self:
+            if i.tipe_uang_jalan == 'standar':
+                i.biaya_tambahan = i.biaya_tambahan_standar
+            else:
+                i.biaya_tambahan = i.biaya_tambahan_nominal_saja
+
     total_uang_jalan_standar = fields.Float('Total', compute='_compute_total_uang_jalan_standar', default=0, digits=(6, 0))
+
+    nomor_uang_jalan_selesai = fields.Char(readonly=True, copy=False)
+    tanggal_tutup = fields.Date(readonly=True, copy=False)
+    keterangan_tutup = fields.Text(readonly=True, copy=False)
 
     state = fields.Selection([
         ('to_submit', "To Submit"),
@@ -141,6 +171,13 @@ class UangJalan(models.Model):
             vals['uang_jalan_name'] = self.env['ir.sequence'].with_company(self.company_id.id).next_by_code('uang.jalan.sequence') or 'New'
         result = super(UangJalan, self).create(vals)
         return result
+
+    @api.onchange('kendaraan')
+    def get_available_kas_cadangan(self):
+        if bool(self.kendaraan.kas_cadangan):
+            self.sisa_kas_cadangan = self.kendaraan.kas_cadangan
+        else:
+            self.sisa_kas_cadangan = 0
 
     @api.model
     def terbilang(self, bil):
@@ -236,6 +273,12 @@ class UangJalan(models.Model):
         journal_uang_jalan = account_settings.journal_uang_jalan
         account_kas = account_settings.account_kas
 
+        if bool(self.kas_cadangan):
+            self.kendaraan.kas_cadangan += self.kas_cadangan
+
+        if bool(self.sisa_kas_cadangan):
+            self.kendaraan.kas_cadangan -= self.sisa_kas_cadangan
+
         if bool(account_uang_jalan) == False:
             raise ValidationError("Konfigurasi Account belum diisi")
 
@@ -249,6 +292,7 @@ class UangJalan(models.Model):
                     uang_jalan_list.append((6, 0, [uang_jalan.id]))
 
             for record in self.uang_jalan_line:
+                # Update order pengiriman
                 record.sudo().order_pengiriman.write({
                     'is_uang_jalan_terbit': True,
                     'state': 'dalam_perjalanan',
@@ -261,7 +305,6 @@ class UangJalan(models.Model):
                 })
 
                 # Buat Pengurangan Kas Pada Journal Entry
-
                 message = "Uang jalan untuk pengiriman ini telah terbit dengan nomor " + str(self.uang_jalan_name)
                 record.sudo().order_pengiriman.message_post(body=message)
 
@@ -460,13 +503,10 @@ class UangJalan(models.Model):
                 'nominal_close': self.balance_uang_jalan * -1,
             })
 
-
-
             self.state = 'cancel'
 
     def hitung_ulang_nominal_uj(self):
         for record in self.uang_jalan_line:
-
             nominal_uang_jalan = self.env['konfigurasi.uang.jalan'].sudo().search([
                 ('tipe_muatan', '=', int(record.tipe_muatan.id)),
                 ('lokasi_muat', '=', int(record.sudo().muat.id)),
@@ -478,18 +518,24 @@ class UangJalan(models.Model):
             if nominal_uang_jalan:
                 record.sudo().nominal_uang_jalan = nominal_uang_jalan
 
-    @api.depends('uang_jalan_line.nominal_uang_jalan', 'biaya_tambahan_standar')
+    @api.depends('uang_jalan_line.nominal_uang_jalan', 'biaya_tambahan_standar', 'kas_cadangan', 'sisa_kas_cadangan', 'tipe_uang_jalan')
     def _compute_total_uang_jalan_standar(self):
         for record in self:
-            uang_jalan_line = record.sudo().uang_jalan_line
-            record.total_uang_jalan_standar = sum(uang_jalan_line.mapped('nominal_uang_jalan')) + record.biaya_tambahan_standar
+            if record.tipe_uang_jalan == 'standar':
+                uang_jalan_line = record.sudo().uang_jalan_line
+                record.total_uang_jalan_standar = sum(uang_jalan_line.mapped('nominal_uang_jalan')) + record.biaya_tambahan_standar + record.kas_cadangan - record.sisa_kas_cadangan
+            else:
+                record.total_uang_jalan_standar = 0
 
-    @api.depends('uang_jalan_nominal_tree.nominal_uang_jalan', 'biaya_tambahan_nominal_saja')
+    @api.depends('uang_jalan_nominal_tree.nominal_uang_jalan', 'biaya_tambahan_nominal_saja', 'kas_cadangan', 'sisa_kas_cadangan', 'tipe_uang_jalan')
     def _compute_total_nominal_uang_jalan_saja(self):
         for record in self:
-            uang_jalan_nominal_tree = record.sudo().uang_jalan_nominal_tree
-            record.total_uang_jalan_nominal_saja = sum(
-                uang_jalan_nominal_tree.mapped('nominal_uang_jalan')) + record.biaya_tambahan_nominal_saja
+            if record.tipe_uang_jalan == 'nominal_saja':
+                uang_jalan_nominal_tree = record.sudo().uang_jalan_nominal_tree
+                record.total_uang_jalan_nominal_saja = sum(
+                uang_jalan_nominal_tree.mapped('nominal_uang_jalan')) + record.biaya_tambahan_nominal_saja + record.kas_cadangan - record.sisa_kas_cadangan
+            else:
+                record.total_uang_jalan_nominal_saja = 0
 
     @api.depends('total_uang_jalan_standar', 'total_uang_jalan_nominal_saja')
     def _compute_total(self):
@@ -571,6 +617,17 @@ class UangJalanNominalSaja(models.Model):
     muat = fields.Many2one('konfigurasi.lokasi', 'Muat')
     bongkar = fields.Many2one('konfigurasi.lokasi', 'Bongkar')
     nominal_uang_jalan = fields.Float('Nominal UJ', default=0, digits=(6, 0))
+    customer_id = fields.Many2one('res.partner', 'Customer')
+    tipe_muatan = fields.Many2one('konfigurasi.tipe.muatan', 'Tipe Muatan', required=True)
+    keterangan = fields.Text('Keterangan')
+
+    @api.onchange('customer_id', 'muat', 'bongkar', 'tipe_muatan')
+    def _get_default_value(self):
+        for i in self:
+            if i.customer_id and i.muat and i.bongkar and i.tipe_muatan:
+                konfigurasi = self.env['konfigurasi.uang.jalan'].sudo().search([('customer_id', '=', i.customer_id.id), ('tipe_muatan', '=', i.tipe_muatan.id), ('lokasi_muat', '=', i.muat.id), ('lokasi_bongkar', '=', i.bongkar.id)], limit=1)
+                if konfigurasi:
+                    i.nominal_uang_jalan = konfigurasi.uang_jalan
 
 class UangJalanBalanceHistory(models.Model):
     _name = 'uang.jalan.balance.history'

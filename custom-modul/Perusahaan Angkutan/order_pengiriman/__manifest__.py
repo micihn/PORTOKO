@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
-    'name': 'Order Pengiriman',
+    'name': 'Uang Jalan',
     'author': 'Altela Software',
     'version': '0.2',
     'summary': 'Pencatatan serta tracking pengiriman',
@@ -20,6 +20,8 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'data/ir_sequence.xml',
+        'data/report_paperformat.xml',
         'views/order_pengiriman.xml',
         'views/konfigurasi_lokasi.xml',
         'views/konfigurasi_tipe_muatan.xml',
@@ -33,11 +35,11 @@
         'views/fleet_vehicle.xml',
         'views/uang_jalan.xml',
         'report/report_uang_jalan.xml',
+        'report/report_uang_jalan_tutup.xml',
         'report/report_uang_jalan_action.xml',
         'report/report_uang_jalan_gantung.xml',
         'report/report_uang_jalan_gantung_action.xml',
         'views/menu.xml',
-
     ],
     'demo': [],
     'post_init_hook': 'post_init_hook',

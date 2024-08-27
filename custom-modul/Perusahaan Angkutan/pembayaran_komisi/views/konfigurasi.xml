@@ -1,0 +1,27 @@
+<odoo>
+	<data>
+		<record id="konfigurasi_act" model="ir.actions.act_window">
+			<field name="name">Konfigurasi</field>
+			<field name="res_model">konfigurasi.komisi</field>
+			<field name="view_mode">tree</field>
+		</record>
+
+	<record id="konfigurasi_komisi_tree_view" model="ir.ui.view">
+        <field name="name">konfigurasi.komisi.tree</field>
+        <field name="model">konfigurasi.komisi</field>
+        <field name="arch" type="xml">
+            <tree create="0" delete="0" editable="bottom">
+                <field name="name" />
+                <field name="company_id" readonly="1"/>
+                <field name="journal_kas_1" optional="show"/>
+                <field name="journal_kas_2" optional="show"/>
+                <field name="account_kas_1" optional="show"/>
+                <field name="account_kas_2" optional="show"/>
+                <field name="hutang_komisi" optional="show"/>
+                <field name="piutang_komisi" optional="show"/>
+                <field name="expense_komisi" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    </data>
+</odoo>

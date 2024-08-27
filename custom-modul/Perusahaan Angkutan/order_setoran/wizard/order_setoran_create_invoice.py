@@ -32,7 +32,7 @@ class AccountInvoicePayment(models.TransientModel):
                 'pembayaran': pembayaran,
                 'nominal_invoice': record.jumlah,
                 'bayar_dimuka': record.bayar_dimuka,
-                'tanggal_surat_jalan': record.tanggal_surat_jalan,
+                'tanggal_order': record.tanggal_order,
             }))
 
         default_vals['invoice'] = list_invoice
@@ -59,7 +59,6 @@ class AccountInvoicePayment(models.TransientModel):
             return product_id
 
         for setoran in self.env['order.setoran'].browse(self._context.get('active_ids', [])):
-
             account_settings = self.env['konfigurasi.account.setoran'].search([('company_id', '=', setoran.company_id.id)])
             account_kas = account_settings.account_kas
             account_piutang = account_settings.account_piutang
@@ -106,8 +105,8 @@ class AccountInvoicePayment(models.TransientModel):
                 self.env['account.move'].sudo().create({
                     'company_id': self.env.company.id,
                     'move_type': 'out_invoice',
-                    'invoice_date': order.tanggal_surat_jalan,
-                    'date': order.tanggal_surat_jalan,
+                    'invoice_date': order.tanggal_order,
+                    'date': order.tanggal_order,
                     'partner_id': order.customer.id,
                     'currency_id': self.env.user.company_id.currency_id.id,
                     'invoice_origin': order.order_pengiriman.order_pengiriman_name,
@@ -124,7 +123,7 @@ class AccountInvoicePayment(models.TransientModel):
 
             # Membuat Vendor Bill (List Pembelian)
             if setoran.total_pembelian > 0:
-                for bill in setoran.relatable_list_pembelian.order_pengiriman:
+                for bill in setoran.list_pembelian.order_pengiriman:
                     for purchase in bill.biaya_pembelian:
                         self.env['account.move'].sudo().create({
                             'company_id': self.env.company.id,
@@ -145,40 +144,34 @@ class AccountInvoicePayment(models.TransientModel):
                             ],
                         })
 
+            # Membuat Vendor Bill (Biaya Fee)
+            if setoran.total_biaya_fee > 0:
+                for fee in setoran.biaya_fee:
+                    self.env['account.move'].sudo().create({
+                        'company_id': self.env.company.id,
+                        'move_type': 'in_invoice',
+                        'invoice_date': setoran.tanggal_st,
+                        'date': setoran.tanggal_st,
+                        'partner_id': fee.fee_contact.id,
+                        'currency_id': self.env.user.company_id.currency_id.id,
+                        'ref': fee.order_pengiriman.order_pengiriman_name,
+                        'nomor_setoran': setoran.kode_order_setoran,
+                        'invoice_line_ids': [
+                            (0, 0, {
+                                'product_id': find_master_pembelian(self),
+                                'name': 'Jasa Pengiriman',
+                                'price_unit': fee.nominal,
+                                'tax_ids': None,
+                            })
+                        ],
+                    })
+
             tanggal_uang_jalan = []
-            for rec in setoran.relatable_uang_jalan:
-                tanggal_uang_jalan.append(rec.create_date)
+            for rec in setoran.list_uang_jalan:
+                tanggal_uang_jalan.append(rec.tanggal)
 
             formatted_dates = [date.strftime('%d/%m/%Y') for date in tanggal_uang_jalan]
             formatted_dates_str = ', '.join(formatted_dates)
-
-            # Buat Komisi Sopir
-            if setoran.komisi_sopir > 0 and setoran.sisa > 0:
-                self.env['hr.expense'].sudo().create({
-                    'company_id': self.env.company.id,
-                    'name': f"Komisi Sopir {setoran.sopir.name} {formatted_dates_str}",
-                    'employee_id': setoran.sopir.id,
-                    'product_id': find_master_jasa_pengiriman(setoran),
-                    'quantity': 1,
-                    'total_amount': setoran.komisi_sopir,
-                    'payment_mode': 'company_account',
-                    'tax_ids': None,
-                    'reference': setoran.kode_order_setoran,
-                })
-
-            # Buat Komisi Kenek
-            if setoran.komisi_kenek > 0 and setoran.sisa > 0:
-                self.env['hr.expense'].sudo().create({
-                    'company_id': self.env.company.id,
-                    'name': f"Komisi Kenek {setoran.kenek.name} {formatted_dates_str}",
-                    'employee_id': setoran.kenek.id,
-                    'product_id': find_master_jasa_pengiriman(setoran),
-                    'quantity': 1,
-                    'total_amount': setoran.komisi_kenek,
-                    'payment_mode': 'company_account',
-                    'tax_ids': None,
-                    'reference': setoran.kode_order_setoran,
-                })
 
             # Buat dan Validate Journal Entry pencatatan pengeluaran
             # Jika 'Total Pengeluaran' > 'Total Uang Jalan', maka hasil pengurangan akan dibuatkan journal
@@ -323,12 +316,8 @@ class AccountInvoicePayment(models.TransientModel):
                 journal_entry_total_pengeluaran.action_post()
 
             # This will close uang jalan
-            for line in setoran.detail_order:
-                for uang_jalan in line.order_pengiriman.uang_jalan:
-                    uang_jalan.order_disetor += 1
-
-                    if uang_jalan.order_disetor == uang_jalan.lines_count:
-                        uang_jalan.state = 'closed'
+            for uj in setoran.list_uang_jalan:
+                uj.uang_jalan_name.state = 'closed'
 
             # Block dibawah akan mengurangi saldo uang jalan gantung
             for line in setoran.detail_order:
@@ -360,5 +349,5 @@ class AccountInvoicePaymentLine(models.TransientModel):
         ('dp', 'DP (Down Payment)'),
     ], required=True)
     nominal_invoice = fields.Float('Total Tagihan', digits=(6, 0))
-    tanggal_surat_jalan = fields.Date('Tanggal Surat Jalan')
+    tanggal_order = fields.Date('Tanggal Order')
     bayar_dimuka = fields.Float('Bayar Dimuka', digits=(6, 0))

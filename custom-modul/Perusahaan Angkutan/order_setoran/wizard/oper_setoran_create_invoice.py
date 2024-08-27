@@ -31,7 +31,7 @@ class AccountOperInvoicePayment(models.TransientModel):
                 'pembayaran': pembayaran,
                 'nominal_invoice': record.jumlah,
                 'bayar_dimuka': record.bayar_dimuka,
-                'tanggal_surat_jalan': record.tanggal_surat_jalan,
+                'tanggal_surat_jalan': record.tanggal_order,
             }))
 
         default_vals['invoice'] = list_invoice
@@ -39,7 +39,6 @@ class AccountOperInvoicePayment(models.TransientModel):
         return default_vals
 
     def create_invoice(self):
-
         def find_master_delivery_service(self):
             # Mengambil ID Database Produk berdasarkan external ID
             external_id = self.env.ref('order_setoran.product_vendor_service_delivery')
@@ -71,7 +70,6 @@ class AccountOperInvoicePayment(models.TransientModel):
             return product_id
 
         for setoran in self.env['oper.setoran'].browse(self._context.get('active_ids', [])):
-
             # Write Nomor Surat Jalan
             for record in setoran.detail_order:
                 record.order_pengiriman.write({
@@ -117,7 +115,7 @@ class AccountOperInvoicePayment(models.TransientModel):
 
             # Pembuatan Invoice Biaya Fee
             if setoran.total_biaya_fee > 0 :
-                for biaya in setoran.biaya_fee_setoran.order_pengiriman:
+                for biaya in setoran.biaya_fee.order_pengiriman:
                     for fee in biaya.biaya_fee:
                         self.env['account.move'].sudo().create({
                             'move_type': 'in_invoice',
@@ -140,7 +138,7 @@ class AccountOperInvoicePayment(models.TransientModel):
 
             # Membuat Vendor Bill (List Pembelian)
             if setoran.total_list_pembelian > 0:
-                for bill in setoran.list_pembelian_setoran.order_pengiriman:
+                for bill in setoran.list_pembelian.order_pengiriman:
                     for purchase in bill.biaya_pembelian:
                         self.env['account.move'].sudo().create({
                             'move_type': 'in_invoice',
@@ -161,23 +159,23 @@ class AccountOperInvoicePayment(models.TransientModel):
                             ],
                         })
 
-            # Membuat Vendor Bill (Pembayaran Oper Kiriman)
+            # Membuat Vendor Bill (Total Oper Order)
             if setoran.total_oper_order > 0:
-                for order in setoran.list_oper_order:
+                for order in setoran.detail_order:
                     self.env['account.move'].sudo().create({
                         'move_type': 'in_invoice',
                         'invoice_date': order.create_date,
                         'date': order.create_date,
                         'partner_id': setoran.vendor_pa.id,
                         'currency_id': self.env.user.company_id.currency_id.id,
-                        'ref': order.oper_order.oper_order_name,
+                        'ref': order.display_name,
                         'nomor_setoran': setoran.kode_oper_setoran,
                         'company_id': self.env.company.id,
                         'invoice_line_ids': [
                             (0, 0, {
                                 'product_id': find_master_delivery_service(self),
                                 'name': 'Jasa Pengiriman',
-                                'price_unit': order.jumlah_oper_order,
+                                'price_unit': setoran.total_oper_order,
                                 'tax_ids': None,
                             })
                         ],
@@ -191,7 +189,12 @@ class AccountOperInvoicePayment(models.TransientModel):
                     'nomor_surat_jalan': detail.nomor_surat_jalan or None,
                 })
 
-            setoran.state = 'done'
+            self.env.cr.execute("""
+                UPDATE oper_setoran
+                SET state = 'done'
+                WHERE id = %s
+            """, (setoran.id,))
+
 
 class AccountInvoicePaymentLine(models.TransientModel):
     _name = "account.invoice.oper.payment.line"

@@ -1,0 +1,74 @@
+<odoo>
+	<data>
+		<record id="penjualan_ptu_action" model="ir.actions.act_window">
+			<field name="name">Penjualan PTU</field>
+			<field name="res_model">penjualan.ptu</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<record id="penjualan_ptu_tree" model="ir.ui.view">
+			<field name="name">penjualan_tree_ptu</field>
+			<field name="model">penjualan.ptu</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="name"/>
+					<field name="date"/>
+					<field name="karyawan"/>
+					<field name="state" widget="badge" decoration-success="state=='paid'" decoration-info="state=='draft'"/>
+				</tree>
+			</field>
+		</record>
+
+		<record id="penjualan_ptu_form" model="ir.ui.view">
+			<field name="name">penjualan_ptu_form</field>
+			<field name="model">penjualan.ptu</field>
+			<field name="arch" type="xml">
+				<form duplicate="1">
+					<header>
+						<button string="Validate" type="object" name="validate" class="oe_highlight" states="draft"/>
+						<button string="Cancel" type="object" name="cancel" states="paid"/>
+						<field name="state" widget="statusbar"/>
+					</header>
+					<sheet>
+						<div class="oe_title">
+							<h1><field name="name"/></h1>
+						</div>
+						<group>
+							<group>
+								<field name="date" />
+								<field name="karyawan" />
+								<field name="stock_location" />
+								<field name="keterangan" />
+							</group>
+						</group>
+
+						<notebook>
+							<page string="Penjualan PTU">
+								<field name="penjualan_ptu">
+									<tree editable="bottom">
+										<field name="barang" />
+										<field name="qty" />
+										<field name="satuan" />
+										<field name="harga" />
+										<field name="subtotal" />
+									</tree>
+								</field>
+
+								<div class="oe_right" >
+									<!-- Total Biaya Fee -->
+									<div class="oe_total_label" style="display: inline-block; margin-right: 50px; color:#000000">
+										<label for="total_penjualan" string="Total Penjualan : "/>
+									</div>
+									<div class="oe_total_field" style="display: inline-block;">
+										<field name="total_penjualan" style="text-align:right"/>
+									</div>
+								</div>
+
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+	</data>
+</odoo>

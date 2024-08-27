@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Group Category -->
+    <record model="ir.module.category" id="penjualan_ptu.module_penjualan_ptu">
+        <field name="name">Penjualan PTU</field>
+        <field name="sequence">17</field>
+    </record>
+
+    <!-- Group -->
+        <!-- Penjualan PTU Full -->
+            <record model="res.groups" id ="group_penjualan_ptu">
+                <field name="name">Kelola Penjualan PTU</field>
+                <field name="category_id" ref="penjualan_ptu.module_penjualan_ptu"/>
+            </record>
+
+</odoo>

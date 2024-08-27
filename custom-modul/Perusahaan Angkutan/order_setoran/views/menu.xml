@@ -38,5 +38,10 @@
         action="action_konfigurasi_account_setoran"
         parent="order_setoran.menu_konfigurasi">
     </menuitem>
-
+    
+    <menuitem id="menu_detail_uang_jalan"
+      name="Laporan Rinci Uang Jalan"
+      action="rincian_uang_jalan_act"
+      parent="order_pengiriman.menu_report_main">
+    </menuitem>
 </odoo>

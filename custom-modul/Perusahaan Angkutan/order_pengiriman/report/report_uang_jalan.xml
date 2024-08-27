@@ -102,7 +102,7 @@
 
                     <t t-if="total_line % 3 != 0 and total_line != len(o.uang_jalan_line)">
                         <t t-call="order_pengiriman.uang_jalan_footer" />
-                        <div style="page-break-before:always;" />
+<!--                        <div style="page-break-before:always;" />-->
                     </t>
 
                     <t t-else="">
@@ -221,16 +221,32 @@
                 </div>
 
                 <div style="float: left; text-align: left; width: 48%; white-space: nowrap; margin-top:5px">
-                    Total Nominal :
+                    Kas Cadangan :
                 </div>
 
                 <div style="float: right; text-align: right; width: 48%; white-space: nowrap; margin-top:5px">
-                        Rp<t t-esc="'{:,}'.format(int(nominal_uang_jalan + o.biaya_tambahan_standar + o.biaya_tambahan_nominal_saja)).replace(',', '.')"/>
+                        Rp<t t-esc="'{:,}'.format(int(o.kas_cadangan)).replace(',', '.')"/>
                 </div>
 
-                <div style="text-align: left; width: 100%; margin-top: 50px; font-size:13px; font-style: italic;">
+                <div style="float: left; text-align: left; width: 48%; white-space: nowrap; margin-top:5px">
+                    Sisa Kas Cadangan :
+                </div>
+
+                <div style="float: right; text-align: right; width: 48%; white-space: nowrap; margin-top:5px">
+                        - Rp<t t-esc="'{:,}'.format(int(o.sisa_kas_cadangan)).replace(',', '.')"/>
+                </div>
+
+                <div style="float: left; text-align: left; width: 48%; white-space: nowrap; margin-top:5px">
+                    Total :
+                </div>
+
+                <div style="float: right; text-align: right; width: 48%; white-space: nowrap; margin-top:5px">
+                        Rp<t t-esc="'{:,}'.format(int(o.total)).replace(',', '.')"/>
+                </div>
+
+                <div style="text-align: left; width: 100%; margin-top: 100px; font-size:13px; font-style: italic;">
                     <t t-if="nominal_tambahan == 0">
-                        Terbilang : <t t-esc="o.env['uang.jalan'].terbilang(int(nominal_uang_jalan + o.biaya_tambahan_standar + o.biaya_tambahan_nominal_saja))"/>Rupiah
+                        Terbilang : <t t-esc="o.env['uang.jalan'].terbilang(int(nominal_uang_jalan + o.biaya_tambahan_standar + o.biaya_tambahan_nominal_saja + o.kas_cadangan - o.sisa_kas_cadangan))"/>Rupiah
                     </t>
                     <t t-else="">
                         Terbilang : <t t-esc="o.env['uang.jalan'].terbilang(int(nominal_uang_jalan))"/>0 Rupiah

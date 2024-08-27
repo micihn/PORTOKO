@@ -1,0 +1,92 @@
+<odoo>
+	<data>
+		<template id="kontra_bon_template">
+			<t t-call="web.html_container">
+				<t t-call="web.basic_layout">
+					<t t-foreach="docs" t-as="o">
+						<div class="header">
+							<div class="row">
+								<div class="col-6">
+									<h4><b>KONTRA BON</b></h4>
+								</div>
+								<div class="col-6 text-end">
+									<t t-out="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y - %H:%M:%S')"/>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-6">
+									Nomor Kontra: <span t-field="o.name"/><br/>
+									Tanggal Jatuh Tempo: <span t-field="o.due_date"/><br/>
+								</div>
+								<div class="col-6 text-end">
+									Customer: <span t-field="o.partner_id"/>
+								</div>
+							</div>
+						</div>
+						<div class="page">
+							<div class="row">
+								<div class="col-12">
+									<table class="table table-bordered my-5">
+										<thead>
+											<tr>
+												<th class="text-center">NO</th>
+												<th>NOMOR FAKTUR</th>
+												<th>TGL FAKTUR</th>
+												<th class="text-end">JUMLAH</th>
+												<th>STATUS</th>
+											</tr>
+										</thead>
+										<tbody>
+											<t t-set="seq" t-value="1"/>
+											<tr t-foreach="o.invoice_ids" t-as="invoice">
+												<td class="text-center"><t t-out="seq"/><t t-set="seq" t-value="seq+1"/></td>
+												<td><span t-out="invoice.display_name"/></td>
+												<td><span t-field="invoice.invoice_date"/></td>
+												<td class="text-end"><t t-out="invoice.amount_total"/></td>
+												<td><span t-field="invoice.state"/></td>
+											</tr>
+										</tbody>
+										<tfoot>
+											<tr>
+												<td colspan="3" class="text-end">TOTAL</td>
+												<td class="text-end"><t t-out="sum([invoice.amount_total for invoice in o.invoice_ids])"/></td>
+												<td/>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
+							</div>
+							<div class="row my-5">
+								<div class="col-2"/>
+								<div class="col-3 text-center">
+									<div>Yang Menerima</div>
+									<div class="border-bottom" style="height: 2cm"/>
+								</div>
+								<div class="col-2"/>
+								<div class="col-3 text-center">
+									<div>Yang Menyerahkan</div>
+									<div class="border-bottom" style="height: 2cm"/>
+								</div>
+								<div class="col-2"/>
+							</div>
+						</div>
+						<div class="footer">
+							<div class="text-center">
+								<span class="page"/> / <span class="topage"/>
+							</div>
+						</div>
+					</t>
+				</t>
+			</t>
+		</template>
+
+		<report
+			id="kontra_bon_report"
+			model="kontra.bon"
+			string="Kontra Bon"
+			name="kontra_bon.kontra_bon_template"
+			file="kontra_bon.kontra_bon_template"
+			paperformat="custom_reports.continuous_paper_format"
+			report_type="qweb-pdf"/>
+	</data>
+</odoo>

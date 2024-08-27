@@ -6,9 +6,20 @@
             <field name="model">fleet.vehicle</field>
             <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='driver_id']" position="after">
+                    <field name="sopir_id" />
+                    <field name="kenek_id" />
+                </xpath>
+
+                <xpath expr="//field[@name='driver_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
                 <xpath expr="//field[@name='horsepower_tax']" position="after">
                     <separator string="Uang Kas Gantung" />
                     <field name="kas_gantung_vehicle" force_save="1" readonly="1"/>
+                    <separator string="Uang Kas Cadangan" />
+                    <field name="kas_cadangan" force_save="1" readonly="1"/>
                 </xpath>
             </field>
         </record>

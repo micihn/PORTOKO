@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <template id="rekap_order_pengiriman_template">
+            <t t-call="web.html_container">
+                <t t-call="web.basic_layout">
+                    <t t-foreach="docs" t-as="o">
+                        <div class="page">
+                            <h3>REKAP ORDER - <span t-field="o.kode_rekap"/></h3>
+                            <div class="row">
+                                <div class="col-12">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td>Customer</td>
+                                            <td><span t-field="o.customer_id"/></td>
+                                            <td>Tipe Order</td>
+                                            <td><span t-field="o.tipe_order"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tanggal</td>
+                                            <td><span t-field="o.tanggal_awal"/> - <span t-field="o.tanggal_akhir"/></td>
+                                            <td>Jatuh Tempo</td>
+                                            <td><span t-field="o.jatuh_tempo"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <h4 class="mt-5">SUDAH REKAP</h4>
+                            <div class="row">
+                                <div class="col-12">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>ORDER</th>
+                                                <th>TANGGAL</th>
+                                                <th>SURAT JALAN</th>
+                                                <th>PLANT</th>
+                                                <th>KENDARAAN</th>
+                                                <th>TUJUAN</th>
+                                                <th>ONGKOS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-set="total" t-value="0"/>
+                                            <tr t-foreach="o.sudah_rekap_ids" t-as="line">
+                                                <td><span t-field="line.order_id"/></td>
+                                                <td><span t-field="line.tanggal"/></td>
+                                                <td><span t-field="line.no_surat_jalan"/></td>
+                                                <td><span t-field="line.plant"/></td>
+                                                <td><span t-field="line.nomor_kendaraan"/></td>
+                                                <td>
+                                                    <span t-field="line.alamat_muat"/>
+                                                    <i class="fa fa-long-arrow-right"/>
+                                                    <span t-field="line.alamat_bongkar"/>
+                                                </td>
+                                                <td>
+                                                    <span t-field="line.subtotal_ongkos" t-options='{"widget": "monetary", "display_currency": env.company.currency_id}'/>
+                                                    <t t-set="total" t-value="total + line.subtotal_ongkos"/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="6" class="text-right"><strong>Total:</strong></td>
+                                                <td><strong t-esc="total" t-options='{"widget": "monetary", "display_currency": env.company.currency_id}'/></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="footer">
+                            <div class="text-center">
+                                <span class="page"/> / <span class="topage"/>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+        <report
+            id="rekap_order_pengiriman_report"
+            model="rekap.order"
+            string="Rekap Order"
+            name="rekap_order_pengiriman.rekap_order_pengiriman_template"
+            file="rekap_order_pengiriman.rekap_order_pengiriman_template"
+            report_type="qweb-pdf"/>
+    </data>
+</odoo>

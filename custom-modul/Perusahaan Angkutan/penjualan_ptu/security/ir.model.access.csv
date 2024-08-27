@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_penjualan_ptu,access.penjualan.ptu,penjualan_ptu.model_penjualan_ptu,group_penjualan_ptu,1,1,1,1
+access_penjualan_ptu_line,access.penjualan.ptu.line,penjualan_ptu.model_penjualan_ptu_line,group_penjualan_ptu,1,1,1,1
+access_konfigurasi_penjualan_ptu,access.konfigurasi.penjualan.ptu,penjualan_ptu.model_konfigurasi_penjualan_ptu,group_penjualan_ptu,1,1,1,1

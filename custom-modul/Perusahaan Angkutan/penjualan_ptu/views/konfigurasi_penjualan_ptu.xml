@@ -1,0 +1,29 @@
+<odoo>
+	<data>
+		<record id="konfigurasi_penjualan_ptu_action" model="ir.actions.act_window">
+			<field name="name">Konfigurasi</field>
+			<field name="res_model">konfigurasi.penjualan.ptu</field>
+			<field name="view_mode">tree</field>
+		</record>
+
+	<record id="konfigurasi_penjualan_ptu_tree_view" model="ir.ui.view">
+        <field name="name">konfigurasi.penjualan.ptu.tree</field>
+        <field name="model">konfigurasi.penjualan.ptu</field>
+        <field name="arch" type="xml">
+            <tree create="0" delete="0" editable="bottom">
+                <field name="name" readonly="1"/>
+                <field name="company_id" readonly="1"/>
+                <field name="journal_sparepart" optional="show"/>
+                <field name="account_piutang_komisi" optional="show"/>
+                <field name="account_persediaan_sparepart" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.rule" id="konfigurasi_penjualan_multicompany_rule">
+        <field name="name">Konfigurasi Penjualan Multi-Company rule</field>
+        <field name="model_id" ref="penjualan_ptu.model_konfigurasi_penjualan_ptu"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    </data>
+</odoo>

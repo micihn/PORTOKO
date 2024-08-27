@@ -22,6 +22,7 @@ class OrderPengiriman(models.Model):
 
     active = fields.Boolean('Archive', default=True, tracking=True)
 
+    kendaraan_id = fields.Many2one('fleet.vehicle', string="Kendaraan")
 
     is_sudah_disetor = fields.Boolean()
     is_uang_jalan_terbit = fields.Boolean()
@@ -67,6 +68,13 @@ class OrderPengiriman(models.Model):
         'dalam_perjalanan': [('readonly', False)],
         'selesai': [('readonly', False)],
         'sudah_setor': [('readonly', False)],
+    })
+
+    tanggal_order = fields.Date(string='Tanggal Order', tracking=True, digits=(6, 0), default=fields.Date.today(), states={
+        'order_baru': [('readonly', False)],
+        'dalam_perjalanan': [('readonly', True)],
+        'selesai': [('readonly', True)],
+        'sudah_setor': [('readonly', True)],
     })
 
     tanggal_estimasi_bongkar = fields.Date(string='Estimasi Tanggal Bongkar', tracking=True, digits=(6, 0), states={
@@ -594,6 +602,54 @@ class OrderPengiriman(models.Model):
 
         result = super(OrderPengiriman, self).create(vals)
 
+        context = self.env.context
+
+        if 'created_from_setoran' in context:
+            self.env['detail.order'].sudo().create({
+                'order_setoran': context['order_setoran_id'],
+                'order_pengiriman': result.id,
+                'customer': vals['customer'],
+                'tanggal_order': fields.Datetime.now(),
+                'nomor_surat_jalan': vals['nomor_surat_jalan'] if 'nomor_surat_jalan' in vals else False,
+                'plant': vals['plant'] if 'plant' in vals else False,
+                'jumlah': float(vals['total_ongkos_reguler']) + float(vals['total_ongkos_do']),
+            })
+
+            if 'biaya_pembelian' in vals:
+                self.env.cr.execute("""
+                    INSERT INTO biaya_pembelian_order_setoran_rel (order_setoran_id, biaya_pembelian_id)
+                    SELECT %s, id FROM biaya_pembelian WHERE order_pengiriman = %s
+                """, (context['order_setoran_id'], result.id))
+
+            if 'biaya_fee' in vals:
+                self.env.cr.execute("""
+                    INSERT INTO biaya_fee_order_setoran_rel (order_setoran_id, biaya_fee_id)
+                    SELECT %s, id FROM biaya_fee WHERE order_pengiriman = %s
+                """, (context['order_setoran_id'], result.id))
+
+        if 'created_from_oper_setoran' in context:
+            self.env['detail.order.setoran'].sudo().create({
+                'oper_setoran': context['oper_setoran_id'],
+                'order_pengiriman': result.id,
+                'customer': vals['customer'],
+                'tanggal_order': fields.Datetime.now(),
+                'nomor_surat_jalan': vals['nomor_surat_jalan'] if 'nomor_surat_jalan' in vals else False,
+                'plant': vals['plant'] if 'plant' in vals else False,
+                'jumlah': float(vals['total_ongkos_reguler']) + float(vals['total_ongkos_do']),
+            })
+
+            if 'biaya_pembelian' in vals:
+                self.env.cr.execute("""
+                    INSERT INTO biaya_pembelian_oper_setoran_rel (oper_setoran_id, biaya_pembelian_id)
+                    SELECT %s, id FROM biaya_pembelian WHERE order_pengiriman = %s
+                """, (context['oper_setoran_id'], result.id))
+
+            if 'biaya_fee' in vals:
+                self.env.cr.execute("""
+                    INSERT INTO biaya_fee_oper_setoran_rel (oper_setoran_id, biaya_fee_id)
+                    SELECT %s, id FROM biaya_fee WHERE order_pengiriman = %s
+                """, (context['oper_setoran_id'], result.id))
+
         return result
 
     # Method untuk menampilkan kanban
@@ -651,10 +707,11 @@ class OrderPengiriman(models.Model):
 class DetailOrderDO(models.Model):
     _name = 'detail.order.do'
     _description = 'Detail Order DO'
+    _rec_name = 'nama_barang'
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
-    nama_barang = fields.Text('Nama Barang')
+    nama_barang = fields.Text('Nama Barang', required=True)
     keterangan_barang = fields.Text('Keterangan')
     ongkos_per_kg = fields.Float('Ongkos/Kg', digits=(6, 3))
     jumlah_per_kg = fields.Float('Jumlah(Kg)', digits=(6, 3))
@@ -668,10 +725,11 @@ class DetailOrderDO(models.Model):
 class DetailOrderReguler(models.Model):
     _name = 'detail.order.reguler'
     _description = 'Detail Order Reguler'
+    _rec_name = 'nama_barang'
 
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
-    nama_barang = fields.Text('Nama Barang')
+    nama_barang = fields.Text('Nama Barang', required=True)
     keterangan_barang = fields.Text('Keterangan')
     panjang_barang = fields.Float('Panjang', digits=(6, 3))
     lebar_barang = fields.Float('Lebar', digits=(6, 3))
@@ -691,7 +749,7 @@ class BiayaPembelian(models.Model):
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_pengiriman = fields.Many2one('order.pengiriman', invisible=True)
     supplier = fields.Many2one('res.partner', 'Supplier', ondelete='restrict')
-    nama_barang = fields.Char('Nama Barang')
+    nama_barang = fields.Char('Nama Barang', required=True)
     ukuran = fields.Text('Ukuran')
     nominal = fields.Float('Nominal', digits=(6, 0))
 

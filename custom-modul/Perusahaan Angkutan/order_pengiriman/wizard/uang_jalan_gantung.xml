@@ -12,7 +12,7 @@
                     <field name="kendaraan" attrs="{'invisible': ['|', ('cari_semua_kendaraan', '=', True), ('cari_seluruh_uang_gantung', '=', True)]}"/>
                     <field name="tanggal_start" attrs="{'invisible': [('cari_seluruh_uang_gantung', '=', True)]}"/>
                     <field name="tanggal_finish" attrs="{'invisible': [('cari_seluruh_uang_gantung', '=', True)]}"/>
-                    <field name="uang_jalan_tree" invisible="0"/>
+                    <field name="uang_jalan_tree" invisible="1"/>
                 </group>
                 <footer>
                     <button name="generate_report" string="Print" type="object" class="btn-primary" data-hotkey="q"/>

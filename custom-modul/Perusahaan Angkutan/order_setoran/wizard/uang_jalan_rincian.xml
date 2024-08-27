@@ -1,0 +1,35 @@
+<odoo>
+    <data>
+        <record id="rincian_uang_jalan_act" model="ir.actions.act_window">
+            <field name="name">Rincian Uang Jalan</field>
+            <field name="res_model">uang.jalan.rincian</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        <record id="rincian_uang_jalan_form" model="ir.ui.view">
+            <field name="name">rincian_uang_jalan_form</field>
+            <field name="model">uang.jalan.rincian</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <label for="date_from"/>
+                                <div class="o_row">
+                                    <span><field name="date_from"/></span>
+                                    <span>-</span>
+                                    <span><field name="date_to"/></span>
+                                </div>
+                                <field name="kendaraan"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="open_report" string="Unduh Laporan" type="object" class="btn-primary"/>
+                        <button string="Cancel" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

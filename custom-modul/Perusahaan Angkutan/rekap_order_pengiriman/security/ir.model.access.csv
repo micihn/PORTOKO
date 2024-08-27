@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rekap_order,access_rekap_order,model_rekap_order,order_pengiriman.group_order_pengiriman,1,1,1,1
+access_rekap_order_item,access_rekap_order_item,model_rekap_order_item,order_pengiriman.group_order_pengiriman,1,1,1,1
+access_rekap_order_sudah_rekap,access_rekap_order_sudah_rekap,model_rekap_order_sudah_rekap,order_pengiriman.group_order_pengiriman,1,1,1,1
+access_rekap_order_belum_rekap,access_rekap_order_belum_rekap,model_rekap_order_belum_rekap,order_pengiriman.group_order_pengiriman,1,1,1,1

@@ -1,0 +1,77 @@
+<odoo>
+	<data>
+		<template id="penerimaan_piutang_template">
+			<t t-call="web.html_container">
+				<t t-call="web.basic_layout">
+					<t t-foreach="docs" t-as="o">
+						<div class="page" t-if="o.move_type!='out_invoice'">
+							<div class="text-center">
+								<i>Maaf, Bukti Penerimaan Piutang tidak diperuntukkan untuk <span t-field="o.display_name"/>.</i>
+							</div>
+						</div>
+						<div class="page" t-else="">
+							<h3>PENERIMAAN PIUTANG</h3>
+							<p>Customer: <span t-field="o.partner_id"/> Tanggal: <t t-out="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></p>
+							<t t-set="payments" t-value="o.sudo().invoice_payments_widget and o.sudo().invoice_payments_widget['content'] or []"/>
+							<div class="row">
+								<div class="col-12">
+									<table class="table table-bordered">
+										<tr>
+											<th class="text-start">TANGGAL</th>
+											<th class="text-start">NOMOR FAKTUR</th>
+											<th class="text-end">JUMLAH BAYAR</th>
+										</tr>
+										<tr>
+											<th class="text-start"><span t-field="o.invoice_date"/></th>
+											<th class="text-start"><span t-field="o.display_name"/></th>
+											<th class="text-end"><span t-out="sum([payment['amount'] for payment in payments])"/></th>
+										</tr>
+									</table>
+								</div>
+							</div>
+							<h3 class="mt-5">PEMBAYARAN</h3>
+							<div class="row">
+								<div class="col-12">
+									<table class="table table-bordered">
+										<tr>
+											<th class="text-start">CARA BAYAR</th>
+											<th class="text-end">JUMLAH BAYAR</th>
+											<th class="text-start">BANK TUJUAN - NO. GIRO</th>
+											<th class="text-start">TGL GIRO</th>
+										</tr>
+										<t t-set="total_payment" t-value="0"/>
+										<tr t-foreach="payments" t-as="payment">
+											<td><span t-out="payment['payment_method_name']"/></td>
+											<td class="text-end"><span t-out="payment['amount']"/><t t-set="total_payment" t-value="total_payment+payment['amount']"/></td>
+											<td><span t-out="payment['bank_dest_name']"/> - <span t-out="payment['bank_account_number']"/></td>
+											<td><span t-out="payment['date']"/></td>
+										</tr>
+										<tr>
+											<td>TOTAL</td>
+											<td class="text-end"><t t-out="total_payment"/></td>
+											<td colspan="2"/>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="footer">
+							<div class="text-center">
+								<span class="page"/> / <span class="topage"/>
+							</div>
+						</div>
+					</t>
+				</t>
+			</t>
+		</template>
+
+		<report
+			id="penerimaan_piutang_report"
+			model="account.move"
+			string="Penerimaan Piutang"
+			name="custom_reports.penerimaan_piutang_template"
+			file="custom_reports.penerimaan_piutang_template"
+			paperformat="custom_reports.continuous_paper_format"
+			report_type="qweb-pdf"/>
+	</data>
+</odoo>

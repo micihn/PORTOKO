@@ -1,0 +1,15 @@
+<odoo>
+	<data>
+		<record id="produk_komisi" model="product.product">
+            <field name="name">Komisi</field>
+            <field name="description">Pembayaran komisi.</field>
+            <field name="standard_price">0.0</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="default_code">KMS</field>
+            <field name="can_be_expensed" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="False"/>
+        </record>
+	</data>
+</odoo>

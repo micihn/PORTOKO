@@ -11,7 +11,7 @@ class OrderSetoran(models.Model):
     _inherit = ['mail.thread']
     _rec_name = 'kode_order_setoran'
 
-    kode_order_setoran = fields.Char(readonly=True, required=True, copy=False, default='New')
+    kode_order_setoran = fields.Char(readonly=True, required=True, copy=False, string="No. Setoran", default='New')
     total_jumlah = fields.Float('Total', compute='_compute_total', digits=(6, 0))
     total_bayar_dimuka = fields.Float('Bayar Dimuka', compute='_compute_total_bayar_dimuka', digits=(6, 0))
     total_uang_jalan = fields.Float(compute='_compute_total_uang_jalan', digits=(6, 0))
@@ -25,7 +25,7 @@ class OrderSetoran(models.Model):
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     fetch_order_automatic = fields.Boolean()
 
-    kendaraan = fields.Many2one('fleet.vehicle', 'Kendaraan', tracking=True, states={
+    kendaraan = fields.Many2one('fleet.vehicle', 'No. Truk', tracking=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
@@ -43,7 +43,19 @@ class OrderSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
-    tanggal_st = fields.Date('Tanggal ST', tracking=True, required=True, states={
+    tanggal_st = fields.Date('Tgl. Setor', tracking=True, default=fields.Date.today(), required=True, states={
+        'draft': [('readonly', True)],
+        'done': [('readonly', True)],
+        'cancel': [('readonly', True)],
+    })
+
+    tanggal_kasbon_start = fields.Date('Tgl. Kasbon (Start)', tracking=True, required=True, states={
+        'draft': [('readonly', False)],
+        'done': [('readonly', True)],
+        'cancel': [('readonly', True)],
+    })
+
+    tanggal_kasbon_finish = fields.Date('Tgl. Kasbon (Finish)', tracking=True, required=True, states={
         'draft': [('readonly', False)],
         'done': [('readonly', True)],
         'cancel': [('readonly', True)],
@@ -106,10 +118,13 @@ class OrderSetoran(models.Model):
         'done': [('readonly', True)],
     })
 
-    # list_uang_jalan = fields.One2many('detail.list.uang.jalan', 'order_setoran', states={
-    #     'draft': [('readonly', False)],
-    #     'done': [('readonly', True)],
-    # })
+    list_uang_jalan = fields.One2many('detail.list.uang.jalan', 'order_setoran', states={
+        'draft': [('readonly', False)],
+        'done': [('readonly', True)],
+    })
+
+    list_pembelian = fields.Many2many('biaya.pembelian')
+    biaya_fee = fields.Many2many('biaya.fee')
 
     # list_pembelian = fields.One2many('detail.list.pembelian', 'order_setoran', states={
     #     'draft': [('readonly', False)],
@@ -121,57 +136,84 @@ class OrderSetoran(models.Model):
     #     'done': [('readonly', False)],
     # })
 
-    relatable_uang_jalan = fields.Many2many('uang.jalan', compute="compute_relatable_uang_jalan", string='No. Uang Jalan', copy=False)
+    # relatable_uang_jalan = fields.Many2many('uang.jalan', compute="_compute_total_uang_jalan", string='No. Uang Jalan', copy=False)
 
-    @api.depends('detail_order.order_pengiriman')
-    def compute_relatable_uang_jalan(self):
-        for rec in self:
-            list_uang_jalan = []
-            for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
-                if detail.order_pengiriman:
-                    for uj in detail.order_pengiriman.uang_jalan:
-                        list_uang_jalan.append((4, uj.id))  # Using (4, id) to add records to Many2many field
+    # @api.depends('detail_order.order_pengiriman')
+    # def compute_relatable_uang_jalan(self):
+    #     for rec in self:
+    #         list_uang_jalan = []
+    #         for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
+    #             if detail.order_pengiriman:
+    #                 for uj in detail.order_pengiriman.uang_jalan:
+    #                     list_uang_jalan.append(uj.id)  # Using (4, id) to add records to Many2many field
 
-            rec.relatable_uang_jalan = [(5, 0, 0)] + list_uang_jalan  # Clear existing records, then add new ones
+    #         rec.relatable_uang_jalan = [(6, 0, list_uang_jalan)]  # Clear existing records, then add new ones
 
-    relatable_list_pembelian = fields.Many2many('biaya.pembelian', compute="compute_relatable_biaya_pembelian", copy=False)
-    @api.depends('detail_order.order_pengiriman')
-    def compute_relatable_biaya_pembelian(self):
-        for rec in self:
-            list_biaya_pembelian = []
-            for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
-                if detail.order_pengiriman:
-                    for pembelian in detail.order_pengiriman.biaya_pembelian:
-                        list_biaya_pembelian.append((4, pembelian.id))  # Using (4, id) to add records to Many2many field
+    @api.onchange('kendaraan', 'tanggal_kasbon_start', 'tanggal_kasbon_finish')
+    def set_driver_and_kenek(self):
+        if bool(self.kendaraan) and bool(self.tanggal_kasbon_start) and bool(self.tanggal_kasbon_finish):
+            self.sopir = False
+            self.kenek = False
+            self.list_uang_jalan = [(5, 0, 0)]
 
-            rec.relatable_list_pembelian = [(5, 0, 0)] + list_biaya_pembelian  # Clear existing records, then add new ones
+            list_uang_jalan = self.env['uang.jalan'].sudo().search([
+                ('kendaraan', '=', self.kendaraan.id),
+                ('create_date', '>=', self.tanggal_kasbon_start),
+                ('create_date', '<=', self.tanggal_kasbon_finish),
+                ('state', 'in', ['paid']),
+            ])
 
-    relatable_list_pembelian = fields.Many2many('biaya.pembelian', compute="compute_relatable_biaya_pembelian", copy=False)
-    @api.depends('detail_order.order_pengiriman')
-    def compute_relatable_biaya_pembelian(self):
-        for rec in self:
-            list_biaya_pembelian = []
-            for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
-                if detail.order_pengiriman:
-                    for pembelian in detail.order_pengiriman.biaya_pembelian:
-                        list_biaya_pembelian.append((4, pembelian.id))  # Using (4, id) to add records to Many2many field
+            if bool(list_uang_jalan):
+                for uang_jalan in list_uang_jalan:
+                    if bool(self.sopir) == False:
+                        self.sopir = uang_jalan.sopir.id
 
-            rec.relatable_list_pembelian = [(5, 0, 0)] + list_biaya_pembelian  # Clear existing records, then add new ones
+                    if bool(self.kenek) == False:
+                        self.kenek = uang_jalan.kenek.id
 
-    relatable_biaya_fee = fields.Many2many('biaya.fee', compute="compute_relatable_biaya_fee", copy=False)
-    @api.depends('detail_order.order_pengiriman')
-    def compute_relatable_biaya_fee(self):
-        for rec in self:
-            list_biaya_fee = []
-            for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
-                if detail.order_pengiriman:
-                    for biaya_fee in detail.order_pengiriman.biaya_fee:
-                        list_biaya_fee.append((4, biaya_fee.id))  # Using (4, id) to add records to Many2many field
+                    self.list_uang_jalan.create({
+                        'order_setoran': self.id,
+                        'uang_jalan_name': uang_jalan.id,
+                        'tanggal': uang_jalan.create_date.date() if uang_jalan.create_date else False,
+                    })
+            else:
+                self.list_uang_jalan.unlink()
 
-            rec.relatable_biaya_fee = [(5, 0, 0)] + list_biaya_fee  # Clear existing records, then add new ones
+    # relatable_list_pembelian = fields.Many2many('biaya.pembelian', compute="compute_relatable_biaya_pembelian", copy=False)
+    # @api.depends('detail_order.order_pengiriman')
+    # def compute_relatable_biaya_pembelian(self):
+    #     for rec in self:
+    #         list_biaya_pembelian = []
+    #         for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
+    #             if detail.order_pengiriman:
+    #                 for pembelian in detail.order_pengiriman.biaya_pembelian:
+    #                     list_biaya_pembelian.append((4, pembelian.id))  # Using (4, id) to add records to Many2many field
+    #
+    #         rec.relatable_list_pembelian = [(5, 0, 0)] + list_biaya_pembelian  # Clear existing records, then add new ones
 
+    # relatable_list_pembelian = fields.Many2many('biaya.pembelian', compute="compute_relatable_biaya_pembelian", copy=False)
+    # @api.depends('detail_order.order_pengiriman')
+    # def compute_relatable_biaya_pembelian(self):
+    #     for rec in self:
+    #         list_biaya_pembelian = []
+    #         for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
+    #             if detail.order_pengiriman:
+    #                 for pembelian in detail.order_pengiriman.biaya_pembelian:
+    #                     list_biaya_pembelian.append((4, pembelian.id))  # Using (4, id) to add records to Many2many field
+    #
+    #         rec.relatable_list_pembelian = [(5, 0, 0)] + list_biaya_pembelian  # Clear existing records, then add new ones
 
-
+    # relatable_biaya_fee = fields.Many2many('biaya.fee', copy=False)
+    # @api.depends('detail_order.order_pengiriman')
+    # def compute_relatable_biaya_fee(self):
+    #     for rec in self:
+    #         list_biaya_fee = []
+    #         for detail in rec.detail_order:  # Assuming detail_order is a One2many or Many2many field
+    #             if detail.order_pengiriman:
+    #                 for biaya_fee in detail.order_pengiriman.biaya_fee:
+    #                     list_biaya_fee.append((4, biaya_fee.id))  # Using (4, id) to add records to Many2many field
+    #
+    #         rec.relatable_biaya_fee = [(5, 0, 0)] + list_biaya_fee  # Clear existing records, then add new ones
 
     expense_count = fields.Integer(compute='_compute_expense_count')
     invoice_count = fields.Integer(compute='_compute_invoice_count')
@@ -232,20 +274,20 @@ class OrderSetoran(models.Model):
             }
         }
 
-    def action_get_expenses_view(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Expenses',
-            'view_mode': 'tree,form',
-            'res_model': 'hr.expense',
-            'domain': [('reference', '=', str(self.kode_order_setoran))],
-            'context': {
-                'create': False,
-                'edit': False,  # Prevent record editing
-                'delete': False
-            }
-        }
+    # def action_get_expenses_view(self):
+    #     self.ensure_one()
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': 'Expenses',
+    #         'view_mode': 'tree,form',
+    #         'res_model': 'hr.expense',
+    #         'domain': [('reference', '=', str(self.kode_order_setoran))],
+    #         'context': {
+    #             'create': False,
+    #             'edit': False,  # Prevent record editing
+    #             'delete': False
+    #         }
+    #     }
 
     def unlink(self):
         if any(record.state not in ('draft', 'cancel') for record in self):
@@ -277,9 +319,6 @@ class OrderSetoran(models.Model):
         for order in self.detail_order:
             if order.nomor_surat_jalan == False:
                 raise ValidationError('Nomor Surat Jalan belum terisi ' + str(order.order_pengiriman.order_pengiriman_name))
-
-            if order.tanggal_surat_jalan == False:
-                raise ValidationError('Tanggal Surat Jalan belum terisi! ' + str(order.order_pengiriman.order_pengiriman_name))
 
         return {
             'type': 'ir.actions.act_window',
@@ -317,15 +356,8 @@ class OrderSetoran(models.Model):
                 record.button_draft()
                 record.button_cancel()
 
-        # This will close uang jalan
-        try:
-            for line in self.relatable_uang_jalan:
-                line.uang_jalan_name.order_disetor -= 1
-
-                if line.uang_jalan_name.order_disetor != line.uang_jalan_name.lines_count:
-                    line.uang_jalan_name.state = 'paid'
-        except:
-            pass
+        for uj in self.list_uang_jalan:
+            uj.uang_jalan_name.state = 'to_submit'
 
         self.state = 'cancel'
 
@@ -349,20 +381,35 @@ class OrderSetoran(models.Model):
         for record in self:
             record.sisa = record.total_ongkos_calculated - record.total_pengeluaran - record.total_pembelian - record.total_biaya_fee
 
-    @api.depends('relatable_biaya_fee.nominal')
+    @api.depends('biaya_fee.nominal')
     def _compute_biaya_fee(self):
         for record in self:
-            record.total_biaya_fee = sum(record.relatable_biaya_fee.mapped('nominal'))
+            record.total_biaya_fee = sum(record.biaya_fee.mapped('nominal'))
 
-    @api.depends('relatable_list_pembelian.nominal')
+    @api.depends('list_pembelian.nominal')
     def _compute_total_pembelian(self):
         for record in self:
-            record.total_pembelian = sum(record.relatable_list_pembelian.mapped('nominal'))
+            record.total_pembelian = sum(record.list_pembelian.mapped('nominal'))
 
-    @api.depends('relatable_uang_jalan.total')
+    @api.depends('list_uang_jalan.total')
     def _compute_total_uang_jalan(self):
-        for record in self:
-            record.total_uang_jalan = sum(record.relatable_uang_jalan.mapped('total'))
+        total = 0
+        for record in self.list_uang_jalan:
+            total += record.total
+
+        self.total_uang_jalan = total
+
+        # for record in self:
+        #     list_uang_jalan = []
+        #     total_uj = 0
+        #     for detail in record.detail_order:  # Assuming detail_order is a One2many or Many2many field
+        #         if detail.order_pengiriman:
+        #             for uj in detail.order_pengiriman.uang_jalan:
+        #                 list_uang_jalan.append(uj.id)  # Using (4, id) to add records to Many2many field
+        #                 total_uj += uj.total
+        #
+        #     record.relatable_uang_jalan = [(6, 0, list_uang_jalan)]  # Clear existing records, then add new ones
+        #     record.total_uang_jalan = total_uj
 
     @api.depends('total_ongkos')
     def _compute_total_ongkos_calculated(self):
@@ -393,148 +440,148 @@ class OrderSetoran(models.Model):
             else:
                 record.total_pengeluaran = 0
 
-    def ambil_order_pengiriman(self):
-        if bool(self.kendaraan) == False:
-            raise ValidationError('Kendaraan Belum Diisi!')
-
-        if bool(self.sopir) == False:
-            raise ValidationError('Sopir Belum Diisi!')
-
-        if bool(self.kenek) == False:
-            raise ValidationError('Sopir Belum Diisi!')
-
-        self.fetch_order_automatic = True
-
-        # list utama untuk membuat record pada tiap notebook
-        detail_order = []
-        # list_uang_jalan = []
-        # list_pembelian = []
-        # list_biaya_fee = []
-        # record_uang_jalan = [] # List untuk menghindari double input pada setoran
-
-        for record in self.env['order.pengiriman'].search([('kendaraan', '=', self.kendaraan.id), ('sopir','=', self.sopir.id), ('kenek','=', self.kenek.id), ('state', '=', 'selesai'), ('company_id', '=', int(self.env.company))]):
-            # Untuk membantu proses perubahan atau update biaya fee (jika ada)
-            record.nomor_setoran = self.kode_order_setoran
-
-            # Fase 1 : Membuat Dictionary List
-            # Membuat Dictionary-List Detail Order
-            detail_order_dict = {
-                'order_pengiriman': record.id,
-                'create_date': record.create_date,
-                'jenis_order': record.jenis_order,
-                'customer_id': record.customer.id,
-                'plant': record.plant.id if record.plant else None,
-                'total_ongkos': record.total_ongkos_do or record.total_ongkos_reguler
-            }
-            detail_order.append(detail_order_dict)
-
-            # # Membuat Dictionary-List Uang Jalan
-            # for uang_jalan in record.uang_jalan:
-            #     if uang_jalan.id not in record_uang_jalan:
-            #         list_uang_jalan_dict = {
-            #             'tanggal': uang_jalan.create_date,
-            #             'uang_jalan_name': uang_jalan.id,
-            #             'total': uang_jalan.total,
-            #             'keterangan': uang_jalan.keterangan,
-            #         }
-            #         list_uang_jalan.append(list_uang_jalan_dict)
-            #         record_uang_jalan.append(int(uang_jalan.id))
-
-            # # Membuat Dictionary-List Pembelian
-            # if record.biaya_pembelian:
-            #     for item in record.biaya_pembelian:
-            #         detail_list_pembelian_dict = {
-            #             'order_pengiriman': item.order_pengiriman.id,
-            #             'supplier': item.supplier.id,
-            #             'nama_barang': item.nama_barang,
-            #             'ukuran': item.ukuran,
-            #             'nominal': item.nominal,
-            #         }
-            #
-            #         list_pembelian.append(detail_list_pembelian_dict)
-
-            # Membuat Dictionary-List Fee
-            # if record.biaya_fee:
-            #     for item in record.biaya_fee:
-            #         detail_list_biaya_fee_dict = {
-            #             'order_pengiriman': item.order_pengiriman.id,
-            #             'fee_contact': item.fee_contact.id,
-            #             'nominal': item.nominal,
-            #         }
-            #
-            #         list_biaya_fee.append(detail_list_biaya_fee_dict)
-
-            # Membuat detail list uang jalan
-            # for item in list_uang_jalan:
-            #     self.env['detail.list.uang.jalan'].create([{
-            #         'company_id': self.env.company.id,
-            #         'order_setoran': self.id,
-            #         'tanggal': item['tanggal'],
-            #         'uang_jalan_name': item['uang_jalan_name'],
-            #         'total': item['total'],
-            #         'keterangan': item['keterangan'],
-            #     }])
-
-            # # Membuat list pembelian
-            # for item in list_pembelian:
-            #     self.env['detail.list.pembelian'].create([{
-            #         'company_id': self.env.company.id,
-            #         'order_setoran': self.id,
-            #         'order_pengiriman': item['order_pengiriman'],
-            #         'supplier': item['supplier'],
-            #         'nama_barang': item['nama_barang'],
-            #         'ukuran': item['ukuran'],
-            #         'nominal': item['nominal'],
-            #     }])
-
-            # Membuat list biaya fee
-            # for item in list_biaya_fee:
-            #     self.env['detail.biaya.fee'].create([{
-            #         'company_id': self.env.company.id,
-            #         'order_setoran': self.id,
-            #         'order_pengiriman': item['order_pengiriman'],
-            #         'fee_contact': item['fee_contact'],
-            #         'nominal': item['nominal'],
-            #     }])
-
-            order_pengiriman_model = self.env['order.pengiriman'].search([
-                ('kendaraan', '=', self.kendaraan.id),
-                ('sopir', '=', self.sopir.id),
-                ('kenek', '=', self.kenek.id),
-                ('state', '=', 'selesai'),
-                ('company_id', '=', int(self.env.company.id))
-            ])
-
-            if not order_pengiriman_model:
-                self.env.user.notify_warning(
-                    message='Order pengiriman dengan kriteria kendaraan, sopir, dan kenek yang Anda pilih tidak ditemukan. Pastikan Order Pengiriman ada dan berstatus "Selesai".',
-                    sticky=True,
-                    title='Setoran ' + str(self.kode_order_setoran) + ' : Detail Order Tidak Ditemukan')
-            else:
-                pass
-
-        # Fase 2 : Duplicate Order Clean Up
-        unique_list = []
-        seen_ids = set()
-        for item in detail_order:
-            order_id = item['order_pengiriman']
-            if order_id not in seen_ids:
-                unique_list.append(item)
-                seen_ids.add(order_id)
-
-        # Fase 3 : Mengeksekusi Create Record
-        # Membuat detail order
-        for item in unique_list:
-            self.env['detail.order'].create([{
-                'company_id': self.env.company.id,
-                'order_setoran': self.id,
-                'order_pengiriman': item['order_pengiriman'],
-                'tanggal_order': item['create_date'],
-                'jenis_order': item['jenis_order'],
-                'customer': item['customer_id'],
-                'plant': item['plant'],
-                'jumlah': item['total_ongkos'],
-            }])
+    # def ambil_order_pengiriman(self):
+    #     if bool(self.kendaraan) == False:
+    #         raise ValidationError('Kendaraan Belum Diisi!')
+    #
+    #     if bool(self.sopir) == False:
+    #         raise ValidationError('Sopir Belum Diisi!')
+    #
+    #     if bool(self.kenek) == False:
+    #         raise ValidationError('Sopir Belum Diisi!')
+    #
+    #     self.fetch_order_automatic = True
+    #
+    #     # list utama untuk membuat record pada tiap notebook
+    #     detail_order = []
+    #     # list_uang_jalan = []
+    #     # list_pembelian = []
+    #     # list_biaya_fee = []
+    #     # record_uang_jalan = [] # List untuk menghindari double input pada setoran
+    #
+    #     for record in self.env['order.pengiriman'].search([('kendaraan', '=', self.kendaraan.id), ('sopir','=', self.sopir.id), ('kenek','=', self.kenek.id), ('state', '=', 'selesai'), ('company_id', '=', int(self.env.company))]):
+    #         # Untuk membantu proses perubahan atau update biaya fee (jika ada)
+    #         record.nomor_setoran = self.kode_order_setoran
+    #
+    #         # Fase 1 : Membuat Dictionary List
+    #         # Membuat Dictionary-List Detail Order
+    #         detail_order_dict = {
+    #             'order_pengiriman': record.id,
+    #             'create_date': record.create_date,
+    #             'jenis_order': record.jenis_order,
+    #             'customer_id': record.customer.id,
+    #             'plant': record.plant.id if record.plant else None,
+    #             'total_ongkos': record.total_ongkos_do or record.total_ongkos_reguler
+    #         }
+    #         detail_order.append(detail_order_dict)
+    #
+    #         # # Membuat Dictionary-List Uang Jalan
+    #         # for uang_jalan in record.uang_jalan:
+    #         #     if uang_jalan.id not in record_uang_jalan:
+    #         #         list_uang_jalan_dict = {
+    #         #             'tanggal': uang_jalan.create_date,
+    #         #             'uang_jalan_name': uang_jalan.id,
+    #         #             'total': uang_jalan.total,
+    #         #             'keterangan': uang_jalan.keterangan,
+    #         #         }
+    #         #         list_uang_jalan.append(list_uang_jalan_dict)
+    #         #         record_uang_jalan.append(int(uang_jalan.id))
+    #
+    #         # # Membuat Dictionary-List Pembelian
+    #         # if record.biaya_pembelian:
+    #         #     for item in record.biaya_pembelian:
+    #         #         detail_list_pembelian_dict = {
+    #         #             'order_pengiriman': item.order_pengiriman.id,
+    #         #             'supplier': item.supplier.id,
+    #         #             'nama_barang': item.nama_barang,
+    #         #             'ukuran': item.ukuran,
+    #         #             'nominal': item.nominal,
+    #         #         }
+    #         #
+    #         #         list_pembelian.append(detail_list_pembelian_dict)
+    #
+    #         # Membuat Dictionary-List Fee
+    #         # if record.biaya_fee:
+    #         #     for item in record.biaya_fee:
+    #         #         detail_list_biaya_fee_dict = {
+    #         #             'order_pengiriman': item.order_pengiriman.id,
+    #         #             'fee_contact': item.fee_contact.id,
+    #         #             'nominal': item.nominal,
+    #         #         }
+    #         #
+    #         #         list_biaya_fee.append(detail_list_biaya_fee_dict)
+    #
+    #         # Membuat detail list uang jalan
+    #         # for item in list_uang_jalan:
+    #         #     self.env['detail.list.uang.jalan'].create([{
+    #         #         'company_id': self.env.company.id,
+    #         #         'order_setoran': self.id,
+    #         #         'tanggal': item['tanggal'],
+    #         #         'uang_jalan_name': item['uang_jalan_name'],
+    #         #         'total': item['total'],
+    #         #         'keterangan': item['keterangan'],
+    #         #     }])
+    #
+    #         # # Membuat list pembelian
+    #         # for item in list_pembelian:
+    #         #     self.env['detail.list.pembelian'].create([{
+    #         #         'company_id': self.env.company.id,
+    #         #         'order_setoran': self.id,
+    #         #         'order_pengiriman': item['order_pengiriman'],
+    #         #         'supplier': item['supplier'],
+    #         #         'nama_barang': item['nama_barang'],
+    #         #         'ukuran': item['ukuran'],
+    #         #         'nominal': item['nominal'],
+    #         #     }])
+    #
+    #         # Membuat list biaya fee
+    #         # for item in list_biaya_fee:
+    #         #     self.env['detail.biaya.fee'].create([{
+    #         #         'company_id': self.env.company.id,
+    #         #         'order_setoran': self.id,
+    #         #         'order_pengiriman': item['order_pengiriman'],
+    #         #         'fee_contact': item['fee_contact'],
+    #         #         'nominal': item['nominal'],
+    #         #     }])
+    #
+    #         order_pengiriman_model = self.env['order.pengiriman'].search([
+    #             ('kendaraan', '=', self.kendaraan.id),
+    #             ('sopir', '=', self.sopir.id),
+    #             ('kenek', '=', self.kenek.id),
+    #             ('state', '=', 'selesai'),
+    #             ('company_id', '=', int(self.env.company.id))
+    #         ])
+    #
+    #         if not order_pengiriman_model:
+    #             self.env.user.notify_warning(
+    #                 message='Order pengiriman dengan kriteria kendaraan, sopir, dan kenek yang Anda pilih tidak ditemukan. Pastikan Order Pengiriman ada dan berstatus "Selesai".',
+    #                 sticky=True,
+    #                 title='Setoran ' + str(self.kode_order_setoran) + ' : Detail Order Tidak Ditemukan')
+    #         else:
+    #             pass
+    #
+    #     # Fase 2 : Duplicate Order Clean Up
+    #     unique_list = []
+    #     seen_ids = set()
+    #     for item in detail_order:
+    #         order_id = item['order_pengiriman']
+    #         if order_id not in seen_ids:
+    #             unique_list.append(item)
+    #             seen_ids.add(order_id)
+    #
+    #     # Fase 3 : Mengeksekusi Create Record
+    #     # Membuat detail order
+    #     for item in unique_list:
+    #         self.env['detail.order'].create([{
+    #             'company_id': self.env.company.id,
+    #             'order_setoran': self.id,
+    #             'order_pengiriman': item['order_pengiriman'],
+    #             'tanggal_order': item['create_date'],
+    #             'jenis_order': item['jenis_order'],
+    #             'customer': item['customer_id'],
+    #             'plant': item['plant'],
+    #             'jumlah': item['total_ongkos'],
+    #         }])
 
     @api.model
     def create(self, vals):
@@ -726,9 +773,9 @@ class OrderSetoran(models.Model):
         #     pass
 
         return result
-
-    def write(self, vals):
-        res = super(OrderSetoran, self).write(vals)
+    #
+    # def write(self, vals):
+    #     res = super(OrderSetoran, self).write(vals)
 
         # if 'detail_order' in vals:
         #     for uang_jalan in self.list_uang_jalan:
@@ -1028,7 +1075,80 @@ class OrderSetoran(models.Model):
         #             'nominal': item['nominal'],
         #         })
 
-        return res
+        # return res
+
+
+    def write(self, vals):
+        if 'detail_order' in vals:
+            if 'detail_order' in vals:
+                # Retrieve existing detail_order records and their order_pengiriman before the update
+                existing_detail_orders = self.mapped('detail_order')
+                existing_detail_orders_dict = {rec.id: rec.order_pengiriman.id for rec in existing_detail_orders}
+
+                # Call the super method to perform the write
+                result = super(OrderSetoran, self).write(vals)
+
+                # Retrieve updated detail_order records and their order_pengiriman after the update
+                updated_detail_orders = self.mapped('detail_order')
+                updated_detail_orders_dict = {rec.id: rec.order_pengiriman.id for rec in updated_detail_orders}
+
+                # Determine deleted detail_order records by comparing the sets
+                deleted_detail_orders = set(existing_detail_orders_dict.keys()) - set(updated_detail_orders_dict.keys())
+                deleted_order_pengiriman_ids = [existing_detail_orders_dict[rec_id] for rec_id in deleted_detail_orders]
+                # print("Deleted order_pengiriman IDs:", deleted_order_pengiriman_ids)
+
+                # Now you can handle the deleted records as needed
+                # For example, logging or performing additional actions
+                for line in self.list_pembelian:
+                    if line.order_pengiriman.id in deleted_order_pengiriman_ids:
+                        line.unlink()
+
+                for line in self.biaya_fee:
+                    if line.order_pengiriman.id in deleted_order_pengiriman_ids:
+                        line.unlink()
+
+                for order_pengiriman_id in deleted_order_pengiriman_ids:
+                    self.env['order.pengiriman'].search([('id', '=', order_pengiriman_id)]).unlink()
+
+                return result
+            else:
+                return super(OrderSetoran, self).write(vals)
+
+        return super(OrderSetoran, self).write(vals)
+
+    def create_regular_op(self):
+        context = {
+            'created_from_setoran': True,
+            'order_setoran_id': self.id,
+            'default_jenis_order': 'regular',
+            'default_kendaraan_id': self.kendaraan.id,
+        }
+
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'view_id': self.env.ref('order_pengiriman.order_pengiriman_form_view').id,
+            'res_model': 'order.pengiriman',
+            'target': 'new',
+            'context': context,
+        }
+
+    def create_do_op(self):
+        context = {
+            'created_from_setoran': True,
+            'order_setoran_id': self.id,
+            'default_jenis_order': 'do',
+            'default_kendaraan_id': self.kendaraan.id,
+        }
+
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'view_id': self.env.ref('order_pengiriman.order_pengiriman_form_view').id,
+            'res_model': 'order.pengiriman',
+            'target': 'new',
+            'context': context,
+        }
 
 class DetailOrder(models.Model):
     _name = 'detail.order'
@@ -1037,20 +1157,18 @@ class DetailOrder(models.Model):
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     order_setoran = fields.Many2one('order.setoran', invisible=True)
     order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
-    tanggal_order = fields.Datetime('Tanggal Order')
-    customer = fields.Many2one('res.partner', 'Customer', required=True, tracking=True)
-    plant = fields.Many2one('konfigurasi.plant', 'PLANT', tracking=True)
-    nomor_surat_jalan = fields.Char('No Surat Jalan')
-    tanggal_surat_jalan = fields.Date('Tanggal Surat Jalan')
-    jumlah = fields.Float('Jumlah', digits=(6, 0))
+    tanggal_order = fields.Datetime('Tanggal')
+    customer = fields.Many2one('res.partner', 'Customer', tracking=True, related="order_pengiriman.customer")
+    plant = fields.Many2one('konfigurasi.plant', 'PLANT', tracking=True, related="order_pengiriman.plant")
+    nomor_surat_jalan = fields.Char('Nomor')
+    jumlah = fields.Float('Jumlah', digits=(6, 0), related="order_pengiriman.total_ongkos")
     bayar_dimuka = fields.Float('Bayar Dimuka', digits=(6, 0))
     jenis_order = fields.Selection([
         ('do', 'DO'),
         ('regular', 'Regular'),
-    ], required=True, tracking=True)
+    ], required=True, string="Jenis", tracking=True, related="order_pengiriman.jenis_order")
 
     @api.constrains('bayar_dimuka', 'jumlah')
-
     def _check_bayar_dimuka(self):
         for record in self:
             if record.bayar_dimuka > record.jumlah:
@@ -1066,17 +1184,17 @@ class DetailOrder(models.Model):
             self.plant = order.plant
             self.jumlah = order.total_ongkos
 
-# class ListUangJalan(models.Model):
-#     _name = 'detail.list.uang.jalan'
-#     _description = 'List Uang Jalan'
-#
-#     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
-#     order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
-#     order_setoran = fields.Many2one('order.setoran', invisible=True)
-#     tanggal = fields.Date('Tanggal')
-#     uang_jalan_name = fields.Many2one('uang.jalan', 'No Uang Jalan')
-#     total = fields.Float('Total', digits=(6, 0))
-#     keterangan = fields.Text('Keterangan')
+class ListUangJalan(models.Model):
+    _name = 'detail.list.uang.jalan'
+    _description = 'List Uang Jalan'
+
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
+    # order_pengiriman = fields.Many2one('order.pengiriman', 'No. Order')
+    order_setoran = fields.Many2one('order.setoran', invisible=True)
+    tanggal = fields.Date('Tanggal')
+    uang_jalan_name = fields.Many2one('uang.jalan', 'No Uang Jalan')
+    total = fields.Float('Total', digits=(6, 0), related="uang_jalan_name.total")
+    keterangan = fields.Text('Keterangan', related="uang_jalan_name.keterangan")
 
 # class ListPembelian(models.Model):
 #     _name = 'detail.list.pembelian'

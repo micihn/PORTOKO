@@ -1,0 +1,13 @@
+<odoo>
+	<data>
+		<record id="kontra_bon_sequence" model="ir.sequence">
+			<field name="name">Nomor Kontra Bon</field>
+			<field name="implementation">standard</field>
+			<field name="code">kontra.bon</field>
+			<field name="prefix">KB</field>
+			<field name="padding">6</field>
+			<field name="number_increment">1</field>
+			<field name="company_id" eval="False"/>
+		</record>
+	</data>
+</odoo>
