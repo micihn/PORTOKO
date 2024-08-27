@@ -62,104 +62,100 @@ class TabungKomisi(models.Model):
 
 	def action_submit(self):
 		for rec in self:
-			# Tabung sisanya
-			if rec.total_disimpan > 0:
-				account_settings = self.env['konfigurasi.komisi'].search([('company_id', '=', self.env.company.id)])
-				journal_kas_1 = account_settings.journal_kas_1
-				journal_kas_2 = account_settings.journal_kas_2
-				account_kas_1 = account_settings.account_kas_1
-				account_kas_2 = account_settings.account_kas_2
-				hutang_komisi = account_settings.hutang_komisi
-				piutang_komisi = account_settings.piutang_komisi
-				expense_komisi = account_settings.expense_komisi
+			account_settings = self.env['konfigurasi.komisi'].search([('company_id', '=', self.env.company.id)])
+			journal_kas_1 = account_settings.journal_kas_1
+			journal_kas_2 = account_settings.journal_kas_2
+			account_kas_1 = account_settings.account_kas_1
+			account_kas_2 = account_settings.account_kas_2
+			hutang_komisi = account_settings.hutang_komisi
+			piutang_komisi = account_settings.piutang_komisi
+			expense_komisi = account_settings.expense_komisi
 
-				if not journal_kas_1 or not journal_kas_2 or not account_kas_1 or not account_kas_2 or not hutang_komisi or not piutang_komisi or not expense_komisi:
-					raise ValidationError("Anda belum melakukan konfigurasi account pada menu Komisi > Konfigurasi.")
+			if not journal_kas_1 or not journal_kas_2 or not account_kas_1 or not account_kas_2 or not hutang_komisi or not piutang_komisi or not expense_komisi:
+				raise ValidationError("Anda belum melakukan konfigurasi account pada menu Komisi > Konfigurasi.")
 
+			rec.ptu_line_id = self.env['hr.employee.ptu_line'].create({
+				'employee_id': rec.employee_id.id,
+				'tipe': 'pemasukan',
+				'nominal': rec.total_disimpan,
+				'state': 'diproses',
+			}).id
 
-				rec.ptu_line_id = self.env['hr.employee.ptu_line'].create({
-					'employee_id': rec.employee_id.id,
-					'tipe': 'pemasukan',
-					'nominal': rec.total_disimpan,
-					'state': 'diproses',
-				}).id
+			# ORM untuk membuat account.move yang berdasarkan Total Komisi
+			journal_entry_total_komisi = self.env['account.move'].sudo().create({
+				'company_id': self.env.company.id,
+				'move_type': 'entry',
+				'date': fields.Datetime.now(),
+				'journal_id': journal_kas_1.id,
+				'ref': str(self.kode_ptu) + str(" - Hutang Komisi " + self.employee_id.name),
+				'line_ids': [
+					# Account Hutang Komisi
+					(0, 0, {
+						'name': self.kode_ptu,
+						'date': fields.Datetime.now(),
+						'account_id': hutang_komisi.id,
+						'company_id': self.env.company.id,
+						'debit': rec.total_komisi,
+					}),
 
+					# Account Kas 1
+					(0, 0, {
+						'name': self.kode_ptu,
+						'date': fields.Datetime.now(),
+						'account_id':  account_kas_1.id,
+						'company_id': self.env.company.id,
+						'credit': rec.total_komisi,
+					}),
 
-				# ORM untuk membuat account.move yang berdasarkan Total Komisi
-				journal_entry_total_komisi = self.env['account.move'].sudo().create({
-					'company_id': self.env.company.id,
-					'move_type': 'entry',
-					'date': fields.Datetime.now(),
-					'journal_id': journal_kas_1.id,
-					'ref': str(self.kode_ptu) + str(" - Hutang Komisi " + self.employee_id.name),
-					'line_ids': [
-						# Account Hutang Komisi
-						(0, 0, {
-							'name': self.kode_ptu,
-							'date': fields.Datetime.now(),
-							'account_id': hutang_komisi.id,
-							'company_id': self.env.company.id,
-							'debit': rec.total_komisi,
-						}),
+					# Expense Komisi Supir
+					(0, 0, {
+						'name': self.kode_ptu,
+						'date': fields.Datetime.now(),
+						'account_id': expense_komisi.id,
+						'company_id': self.env.company.id,
+						'debit': rec.total_komisi,
+					}),
 
-						# Account Kas 1
-						(0, 0, {
-							'name': self.kode_ptu,
-							'date': fields.Datetime.now(),
-							'account_id':  account_kas_1.id,
-							'company_id': self.env.company.id,
-							'credit': rec.total_komisi,
-						}),
+					# Hutang Komisi
+					(0, 0, {
+						'name': self.kode_ptu,
+						'date': fields.Datetime.now(),
+						'account_id': hutang_komisi.id,
+						'company_id': self.env.company.id,
+						'credit': rec.total_komisi,
+					}),
+				],
+			})
+			journal_entry_total_komisi.action_post()
 
-						# Expense Komisi Supir
-						(0, 0, {
-							'name': self.kode_ptu,
-							'date': fields.Datetime.now(),
-							'account_id': expense_komisi.id,
-							'company_id': self.env.company.id,
-							'debit': rec.total_komisi,
-						}),
+			# ORM Menyimpan uang ke PTU
+			journal_entry_ptu = self.env['account.move'].sudo().create({
+				'company_id': self.env.company.id,
+				'move_type': 'entry',
+				'date': fields.Datetime.now(),
+				'journal_id': journal_kas_1.id,
+				'ref': str(self.kode_ptu) + str(" - PTU Komisi " + self.employee_id.name),
+				'line_ids': [
+					# Account Hutang Komisi
+					(0, 0, {
+						'name': self.kode_ptu,
+						'date': fields.Datetime.now(),
+						'account_id': account_kas_1.id,
+						'company_id': self.env.company.id,
+						'debit': rec.total_disimpan,
+					}),
 
-						# Hutang Komisi
-						(0, 0, {
-							'name': self.kode_ptu,
-							'date': fields.Datetime.now(),
-							'account_id': hutang_komisi.id,
-							'company_id': self.env.company.id,
-							'credit': rec.total_komisi,
-						}),
-					],
-				})
-				journal_entry_total_komisi.action_post()
-
-				# ORM Menyimpan uang ke PTU
-				journal_entry_ptu = self.env['account.move'].sudo().create({
-					'company_id': self.env.company.id,
-					'move_type': 'entry',
-					'date': fields.Datetime.now(),
-					'journal_id': journal_kas_1.id,
-					'ref': str(self.kode_ptu) + str(" - PTU Komisi " + self.employee_id.name),
-					'line_ids': [
-						# Account Hutang Komisi
-						(0, 0, {
-							'name': self.kode_ptu,
-							'date': fields.Datetime.now(),
-							'account_id': account_kas_1.id,
-							'company_id': self.env.company.id,
-							'debit': rec.total_disimpan,
-						}),
-
-						# Account Kas 1
-						(0, 0, {
-							'name': self.kode_ptu,
-							'date': fields.Datetime.now(),
-							'account_id':  piutang_komisi.id,
-							'company_id': self.env.company.id,
-							'credit': rec.total_disimpan,
-						}),
-					],
-				})
-				journal_entry_ptu.action_post()
+					# Account Kas 1
+					(0, 0, {
+						'name': self.kode_ptu,
+						'date': fields.Datetime.now(),
+						'account_id':  piutang_komisi.id,
+						'company_id': self.env.company.id,
+						'credit': rec.total_disimpan,
+					}),
+				],
+			})
+			journal_entry_ptu.action_post()
 
 			# Ubah status komisi
 			for komisi in rec.komisi_ids:
