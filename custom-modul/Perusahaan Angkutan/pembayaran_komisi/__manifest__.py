@@ -28,6 +28,7 @@
         'data/ir_sequence.xml',
         'data/product_product.xml',
         'views/hr_employee.xml',
+        'views/tabungan_ptu.xml',
         'views/bayar_komisi.xml',
         'views/tabung_komisi.xml',
         'views/konfigurasi.xml',
