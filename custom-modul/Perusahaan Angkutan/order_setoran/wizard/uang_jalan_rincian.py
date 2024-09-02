@@ -31,6 +31,29 @@ class UangJalanRinci(models.TransientModel):
                     values['sisa_kas_cadangan'] = uj.sisa_kas_cadangan * -1 if uang_jalan_name == False else 0
                     values['biaya_lain'] = uj.biaya_tambahan
                     values['nominal_uang_jalan'] = 0
+                    values['total'] = uj.sisa_kas_cadangan + uj.kas_cadangan
+                    values['muat'] = False
+                    values['bongkar'] = False
+                    values['keterangan'] = False
+
+                    if setoran:
+                        values['setoran'] = ", ".join([s.display_name for s in setoran])
+                    else:
+                        values['setoran'] = " "
+
+                    uang_jalan_name = uj.uang_jalan_name
+                    docs.append(values)
+
+                elif bool(uj.uang_jalan_nominal_tree) == False and uj.kas_cadangan == 0:
+                    values = {}
+                    values['create_date'] = uj.create_date.strftime("%d %B %Y")
+                    values['uang_jalan_name'] = uj.uang_jalan_name
+                    values['sopir'] = uj.sopir.display_name if uj.sopir else ""
+                    values['kenek'] = uj.kenek.display_name if uj.kenek else ""
+                    values['kas_cadangan'] = uj.kas_cadangan if uang_jalan_name == False else 0
+                    values['sisa_kas_cadangan'] = uj.sisa_kas_cadangan * -1 if uang_jalan_name == False else 0
+                    values['biaya_lain'] = uj.biaya_tambahan
+                    values['nominal_uang_jalan'] = 0
                     values['total'] = 0
                     values['muat'] = False
                     values['bongkar'] = False
@@ -68,13 +91,13 @@ class UangJalanRinci(models.TransientModel):
                         uang_jalan_name = uj.uang_jalan_name
                         docs.append(values)
 
-        data = {
-            'doc_ids': uang_jalan.ids,
-            'doc_model': 'uang.jalan',
-            'data': docs,
-            'kendaraan': i.kendaraan.license_plate,
-            'date_from': i.date_from,
-            'date_to': i.date_to,
-        }
+            data = {
+                'doc_ids': uang_jalan.ids,
+                'doc_model': 'uang.jalan',
+                'data': docs,
+                'kendaraan': i.kendaraan.license_plate,
+                'date_from': i.date_from,
+                'date_to': i.date_to,
+            }
 
-        return self.env.ref('order_setoran.report_uang_jalan_rincian').report_action([], data=data)
+            return self.env.ref('order_setoran.report_uang_jalan_rincian').report_action([], data=data)
