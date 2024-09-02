@@ -32,7 +32,7 @@
                             <field name="kode" readonly="1" force_save="1"/>
                             <field name="karyawan" attrs="{'readonly': [('state', '=', 'paid')]}"/>
                             <field name="tanggal" attrs="{'readonly': [('state', '=', 'paid')]}"/>
-                            <field name="saldo" attrs="{'readonly': [('state', '=', 'paid')]}"/>
+                            <field name="saldo" />
                             <field name="nominal_ptu" attrs="{'readonly': [('state', '=', 'paid')]}"/>
                         </group>
                     </sheet>
