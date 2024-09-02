@@ -50,7 +50,7 @@ class BayarKomisi(models.Model):
 	def action_submit(self):
 		for rec in self:
 			# if rec.jumlah <= 0:
-			# 	raise UserError("Jumlah tidak bisa kurang atau sama dengan 0.")
+			# raise UserError("Jumlah tidak bisa kurang atau sama dengan 0.")
 
 			# Ubah staus ptu
 			rec.state = 'dibayar'
@@ -88,58 +88,31 @@ class BayarKomisi(models.Model):
 				if not journal_kas_1 or not journal_kas_2 or not account_kas_1 or not account_kas_2 or not hutang_komisi or not piutang_komisi or not expense_komisi:
 					raise ValidationError("Anda belum melakukan konfigurasi account pada menu Komisi > Konfigurasi.")
 
-				if self.saldo > self.jumlah:
-					journal_entry_bayar_komisi = self.env['account.move'].sudo().create({
-						'company_id': self.env.company.id,
-						'move_type': 'entry',
-						'date': fields.Datetime.now(),
-						'journal_id': journal_kas_2.id,
-						'ref': str(self.kode_pembayaran) + str(" - Klaim Komisi " + self.employee_id.name),
-						'line_ids': [
-							(0, 0, {
-								'name': self.kode_pembayaran,
-								'date': fields.Datetime.now(),
-								'account_id': piutang_komisi.id,
-								'company_id': self.env.company.id,
-								'debit': rec.jumlah,
-							}),
+				journal_entry_bayar_komisi = self.env['account.move'].sudo().create({
+					'company_id': self.env.company.id,
+					'move_type': 'entry',
+					'date': fields.Datetime.now(),
+					'journal_id': journal_kas_2.id,
+					'ref': str(self.kode_pembayaran) + str(" - Klaim Komisi " + self.employee_id.name),
+					'line_ids': [
+						(0, 0, {
+							'name': self.kode_pembayaran,
+							'date': fields.Datetime.now(),
+							'account_id': piutang_komisi.id,
+							'company_id': self.env.company.id,
+							'debit': rec.jumlah,
+						}),
 
-							(0, 0, {
-								'name': self.kode_pembayaran,
-								'date': fields.Datetime.now(),
-								'account_id': account_kas_2.id,
-								'company_id': self.env.company.id,
-								'credit': rec.jumlah,
-							}),
-						],
-					})
-					journal_entry_bayar_komisi.action_post()
-				elif self.jumlah > self.saldo:
-					journal_entry_bayar_komisi = self.env['account.move'].sudo().create({
-						'company_id': self.env.company.id,
-						'move_type': 'entry',
-						'date': fields.Datetime.now(),
-						'journal_id': journal_kas_2.id,
-						'ref': str(self.kode_pembayaran) + str(" - Klaim Komisi " + self.employee_id.name),
-						'line_ids': [
-							(0, 0, {
-								'name': self.kode_pembayaran,
-								'date': fields.Datetime.now(),
-								'account_id': piutang_komisi.id,
-								'company_id': self.env.company.id,
-								'debit': rec.jumlah,
-							}),
-
-							(0, 0, {
-								'name': self.kode_pembayaran,
-								'date': fields.Datetime.now(),
-								'account_id': account_kas_2.id,
-								'company_id': self.env.company.id,
-								'credit': rec.jumlah,
-							}),
-						],
-					})
-					journal_entry_bayar_komisi.action_post()
+						(0, 0, {
+							'name': self.kode_pembayaran,
+							'date': fields.Datetime.now(),
+							'account_id': account_kas_2.id,
+							'company_id': self.env.company.id,
+							'credit': rec.jumlah,
+						}),
+					],
+				})
+				journal_entry_bayar_komisi.action_post()
 
 # return {
 # 	'type': 'ir.actions.act_window',
