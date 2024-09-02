@@ -1,6 +1,7 @@
 from odoo import api, models, fields
 from odoo.exceptions import UserError, ValidationError
 
+
 class BayarKomisi(models.Model):
 	_name = "bayar.komisi"
 	_description = "Pembayaran Komisi"
@@ -28,7 +29,8 @@ class BayarKomisi(models.Model):
 		('selesai', 'Selesai'),
 		('dibayar', 'Dibayar'),
 	], default="dibuat")
-	company_id = fields.Many2one("res.company", ondelete="cascade", default=lambda self: self.env.context['allowed_company_ids'][0])
+	company_id = fields.Many2one("res.company", ondelete="cascade",
+								 default=lambda self: self.env.context['allowed_company_ids'][0])
 
 	@api.model
 	def create(self, vals_list):
@@ -37,19 +39,19 @@ class BayarKomisi(models.Model):
 			rec.kode_pembayaran = self.env['ir.sequence'].next_by_code('bayar.komisi') or 'New'
 		return records
 
-	@api.onchange("saldo", "jumlah")
-	def _validate_jumlah(self):
-		for rec in self:
-			if rec.employee_id and rec.saldo <= 0:
-				raise UserError("Saldo PTU karyawan 0.")
-			if rec.employee_id and rec.jumlah > rec.saldo:
-				raise UserError("Jumlah komisi yang diambil tidak bisa lebih dari saldo tabungan.")
+	# @api.onchange("saldo", "jumlah")
+	# def _validate_jumlah(self):
+	# 	for rec in self:
+	# 		if rec.employee_id and rec.saldo <= 0:
+	# 			raise UserError("Saldo PTU karyawan 0.")
+	# 		if rec.employee_id and rec.jumlah > rec.saldo:
+	# 			raise UserError("Jumlah komisi yang diambil tidak bisa lebih dari saldo tabungan.")
 
 	def action_submit(self):
 		for rec in self:
-			if rec.jumlah <= 0:
-				raise UserError("Jumlah tidak bisa kurang atau sama dengan 0.")
-				
+			# if rec.jumlah <= 0:
+			# raise UserError("Jumlah tidak bisa kurang atau sama dengan 0.")
+
 			# Ubah staus ptu
 			rec.state = 'dibayar'
 
@@ -63,15 +65,15 @@ class BayarKomisi(models.Model):
 				}).id
 
 			# if not rec.expense_id:
-				# rec.expense_id = self.env['hr.expense'].create({
-				# 	'name': 'Pembayaran Komisi %s' % rec.employee_id.display_name,
-				# 	'product_id': self.env.ref('pembayaran_komisi.produk_komisi').id,
-				# 	'total_amount': rec.jumlah,
-				# 	'employee_id': rec.employee_id.id,
-				# 	'reference': rec.kode_pembayaran,
-				# 	'payment_mode': 'company_account',
-				# 	'bayar_komisi_id': rec.id,
-				# }).id
+			# rec.expense_id = self.env['hr.expense'].create({
+			# 	'name': 'Pembayaran Komisi %s' % rec.employee_id.display_name,
+			# 	'product_id': self.env.ref('pembayaran_komisi.produk_komisi').id,
+			# 	'total_amount': rec.jumlah,
+			# 	'employee_id': rec.employee_id.id,
+			# 	'reference': rec.kode_pembayaran,
+			# 	'payment_mode': 'company_account',
+			# 	'bayar_komisi_id': rec.id,
+			# }).id
 
 			if not rec.account_move_id:
 				account_settings = self.env['konfigurasi.komisi'].search([('company_id', '=', self.env.company.id)])
@@ -112,9 +114,9 @@ class BayarKomisi(models.Model):
 				})
 				journal_entry_bayar_komisi.action_post()
 
-			# return {
-			# 	'type': 'ir.actions.act_window',
-			# 	'res_model': 'hr.expense',
-			# 	'res_id': rec.expense_id.id,
-			# 	'view_mode': 'form',
-			# }
+# return {
+# 	'type': 'ir.actions.act_window',
+# 	'res_model': 'hr.expense',
+# 	'res_id': rec.expense_id.id,
+# 	'view_mode': 'form',
+# }
