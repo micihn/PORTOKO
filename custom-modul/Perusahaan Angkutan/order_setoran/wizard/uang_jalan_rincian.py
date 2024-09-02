@@ -25,16 +25,16 @@ class UangJalanRinci(models.TransientModel):
                 uang_jalan_name = False
                 setoran = self.env['order.setoran'].search([('list_uang_jalan', 'in', [uj.id])])
 
-                if not uj.uang_jalan_nominal_tree and uj.kas_cadangan > 0 and uj.total < 0:
+                if not uj.uang_jalan_nominal_tree and uj.biaya_tambahan > 0:
                     values = {
                         'create_date': uj.create_date.strftime("%d %B %Y"),
                         'uang_jalan_name': uj.uang_jalan_name,
                         'sopir': uj.sopir.display_name if uj.sopir else "",
                         'kenek': uj.kenek.display_name if uj.kenek else "",
                         'kas_cadangan': uj.kas_cadangan if not uang_jalan_name else 0,
-                        'sisa_kas_cadangan': uj.sisa_kas_cadangan * -1 if not uang_jalan_name else 0,
-                        'biaya_lain': uj.biaya_tambahan * -1,
-                        'nominal_uang_jalan': uj.total * -1,
+                        'sisa_kas_cadangan': uj.sisa_kas_cadangan if not uang_jalan_name else 0,
+                        'biaya_lain': uj.biaya_tambahan,
+                        'nominal_uang_jalan': uj.total,
                         'total': uj.total,
                         'muat': False,
                         'bongkar': False,
@@ -52,8 +52,8 @@ class UangJalanRinci(models.TransientModel):
                             'kenek': uj.kenek.display_name if uj.kenek else "",
                             'kas_cadangan': uj.kas_cadangan if not uang_jalan_name else 0,
                             'sisa_kas_cadangan': uj.sisa_kas_cadangan if not uang_jalan_name else 0,
-                            'biaya_lain': uj.biaya_tambahan,
-                            'nominal_uang_jalan': uj.total,
+                            'biaya_lain': uj.biaya_tambahan * -1,
+                            'nominal_uang_jalan': uj.total * -1,
                             'total': uj.total * -1,
                             'muat': False,
                             'bongkar': False,
@@ -62,7 +62,7 @@ class UangJalanRinci(models.TransientModel):
                         }
                         docs.append(values)
 
-                if not uj.uang_jalan_nominal_tree and uj.kas_cadangan > 0:
+                elif not uj.uang_jalan_nominal_tree and uj.kas_cadangan > 0:
                     values = {
                         'create_date': uj.create_date.strftime("%d %B %Y"),
                         'uang_jalan_name': uj.uang_jalan_name,
@@ -78,6 +78,7 @@ class UangJalanRinci(models.TransientModel):
                         'keterangan': False,
                         'setoran': ", ".join([s.display_name for s in setoran]) if setoran else " "
                     }
+
                     uang_jalan_name = uj.uang_jalan_name
                     docs.append(values)
 
@@ -87,7 +88,7 @@ class UangJalanRinci(models.TransientModel):
                             'uang_jalan_name': uj.uang_jalan_name,
                             'sopir': uj.sopir.display_name if uj.sopir else "",
                             'kenek': uj.kenek.display_name if uj.kenek else "",
-                            'kas_cadangan': uj.kas_cadangan if not uang_jalan_name else 0,
+                            'kas_cadangan': uj.kas_cadangan * -1,
                             'sisa_kas_cadangan': uj.sisa_kas_cadangan * -1 if not uang_jalan_name else 0,
                             'biaya_lain': uj.biaya_tambahan,
                             'nominal_uang_jalan': 0,
@@ -97,44 +98,6 @@ class UangJalanRinci(models.TransientModel):
                             'keterangan': "Kembali Kasbon",
                             'setoran': ", ".join([s.display_name for s in setoran]) if setoran else " "
                         }
-                        docs.append(values)
-
-                elif not uj.uang_jalan_nominal_tree and uj.kas_cadangan == 0:
-                    values = {
-                        'create_date': uj.create_date.strftime("%d %B %Y"),
-                        'uang_jalan_name': uj.uang_jalan_name,
-                        'sopir': uj.sopir.display_name if uj.sopir else "",
-                        'kenek': uj.kenek.display_name if uj.kenek else "",
-                        'kas_cadangan': uj.kas_cadangan if not uang_jalan_name else 0,
-                        'sisa_kas_cadangan': uj.sisa_kas_cadangan * -1 if not uang_jalan_name else 0,
-                        'biaya_lain': uj.biaya_tambahan,
-                        'nominal_uang_jalan': 0,
-                        'total': uj.total,
-                        'muat': False,
-                        'bongkar': False,
-                        'keterangan': False,
-                        'setoran': ", ".join([s.display_name for s in setoran]) if setoran else " "
-                    }
-                    uang_jalan_name = uj.uang_jalan_name
-                    docs.append(values)
-
-                    if uj.state == 'closed':
-                        values = {
-                            'create_date': uj.create_date.strftime("%d %B %Y"),
-                            'uang_jalan_name': uj.uang_jalan_name,
-                            'sopir': uj.sopir.display_name if uj.sopir else "",
-                            'kenek': uj.kenek.display_name if uj.kenek else "",
-                            'kas_cadangan': uj.kas_cadangan if not uang_jalan_name else 0,
-                            'sisa_kas_cadangan': uj.sisa_kas_cadangan * -1 if not uang_jalan_name else 0,
-                            'biaya_lain': uj.biaya_tambahan * -1,
-                            'nominal_uang_jalan': 0 * -1,
-                            'total': uj.total * -1,
-                            'muat': False,
-                            'bongkar': False,
-                            'keterangan': "Kembali Kasbon",
-                            'setoran': ", ".join([s.display_name for s in setoran]) if setoran else " "
-                        }
-
                         docs.append(values)
 
                 elif uj.uang_jalan_nominal_tree:
@@ -162,25 +125,6 @@ class UangJalanRinci(models.TransientModel):
 
                         uang_jalan_name = uj.uang_jalan_name
                         docs.append(values)
-
-                        if uj.state == 'closed':
-                            values = {
-                                'create_date': uj.create_date.strftime("%d %B %Y"),
-                                'uang_jalan_name': uj.uang_jalan_name,
-                                'sopir': uj.sopir.display_name if uj.sopir else "",
-                                'kenek': uj.kenek.display_name if uj.kenek else "",
-                                'nominal_uang_jalan': line.nominal_uang_jalan,
-                                'kas_cadangan': uj.kas_cadangan if not uang_jalan_name else 0,
-                                'sisa_kas_cadangan': uj.sisa_kas_cadangan * -1 if not uang_jalan_name else 0,
-                                'biaya_lain': uj.biaya_tambahan,
-                                'total': total * -1,
-                                'muat': line.muat.display_name,
-                                'bongkar': line.bongkar.display_name,
-                                'keterangan': "Kembali Kasbon",
-                                'setoran': ", ".join([s.display_name for s in setoran]) if setoran else " "
-                            }
-
-                            docs.append(values)
 
             data = {
                 'doc_ids': uang_jalan.ids,
