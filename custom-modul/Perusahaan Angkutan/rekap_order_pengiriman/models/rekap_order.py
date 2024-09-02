@@ -33,19 +33,35 @@ class RekapOrder(models.Model):
 					raise UserError("Kode Rekap sudah digunakan.")
 
 	def populate_item(self):
-		for i in self:
-			if i.tanggal_awal and i.tanggal_akhir and i.customer_id and i.kode_rekap:
-				order_ids = self.env['order.pengiriman'].search([('customer', '=', i.customer_id.id), ('jenis_order', '=', i.tipe_order), ('create_date', '>=', datetime.combine(i.tanggal_awal, datetime.min.time())), ('create_date', '<=', datetime.combine(i.tanggal_akhir, datetime.max.time())), ('masuk_rekap', '=', False)])
+		for rec in self:
+			if rec.tanggal_awal and rec.tanggal_akhir and rec.customer_id and rec.kode_rekap:
+				order_ids = self.env['order.pengiriman'].search([
+					('customer', '=', rec.customer_id.id),
+					('jenis_order', '=', rec.tipe_order),
+					('create_date', '>=', datetime.combine(rec.tanggal_awal, datetime.min.time())),
+					('create_date', '<=', datetime.combine(rec.tanggal_akhir, datetime.max.time())),
+					('masuk_rekap', '=', False)
+				])
 				values = []
 				for order in order_ids:
 					setoran_line = self.env['detail.order'].search([('order_pengiriman', '=', order.id)], limit=1)
-					if setoran_line and setoran_line.order_setoran.state == 'done':
+
+					# Check if order_id is already in belum_rekap_ids
+					if setoran_line and setoran_line.order_setoran.state == 'done' and not any(belum_rekap.order_id.id == order.id for belum_rekap in rec.belum_rekap_ids):
 						values.append((0, 0, {
-							'rekap_id': i.id,
+							'rekap_id': rec.id,
 							'order_id': order.id,
 						}))
+
+					oper_setoran_line = self.env['detail.order.setoran'].search([('order_pengiriman', '=', order.id)], limit=1)
+					if oper_setoran_line and oper_setoran_line.oper_setoran.state == 'done' and not any(belum_rekap.order_id.id == order.id for belum_rekap in rec.belum_rekap_ids):
+						values.append((0, 0, {
+							'rekap_id': rec.id,
+							'order_id': order.id,
+						}))
+
 				if len(values) > 0:
-					i.belum_rekap_ids = values
+					rec.belum_rekap_ids = values
 				else:
 					raise UserError("Tidak ada order yang dapat direkap. Pastikan setoran order telah divalidasi.")
 
