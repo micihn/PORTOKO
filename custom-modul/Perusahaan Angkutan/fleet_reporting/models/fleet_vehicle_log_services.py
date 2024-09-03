@@ -189,7 +189,7 @@ class ProductLine(models.Model):
 	service = fields.Many2one('fleet.vehicle.log.services', invisible=True)
 	product_id = fields.Many2one('product.product', copy=False)
 	product_qty = fields.Float()
-	available_qty = fields.Float("Qty Tersedia")
+	available_qty = fields.Float("Qty Tersedia", compute="get_available_qty")
 	product_return_limit = fields.Float()
 	cost = fields.Float()
 	total_cost = fields.Float(compute='_compute_total_cost', store=True, copy=False, default=0)
@@ -202,9 +202,12 @@ class ProductLine(models.Model):
 	@api.onchange('product_id')
 	def define_cost(self):
 		for rec in self:
-			fleet_settings = self.env['fleet.configuration.service'].search([('company_id', '=', self.env.company.id)], limit=1)
 			rec.cost = rec.product_id.product_tmpl_id.standard_price or 0
 
+	@api.depends('product_id')
+	def get_available_qty(self):
+		for rec in self:
+			fleet_settings = self.env['fleet.configuration.service'].search([('company_id', '=', self.env.company.id)], limit=1)
 			if rec.product_id.id and fleet_settings and fleet_settings.operation_type:
 				available_qty = self.env['stock.quant'].sudo()._get_available_quantity(
 					rec.product_id,
