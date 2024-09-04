@@ -6,6 +6,7 @@ class TabunganPTU(models.Model):
     _rec_name = 'kode'
 
     kode = fields.Char(string="Kode")
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     tanggal = fields.Datetime(string="Tanggal", default=fields.Datetime.now())
     karyawan = fields.Many2one('hr.employee', string="Karyawan")
     saldo = fields.Float(string="Saldo", compute="compute_saldo_tabungan")
@@ -39,5 +40,33 @@ class TabunganPTU(models.Model):
             'nominal': self.nominal_ptu,
             'state': 'diproses',
         })
+
+        account_settings = self.env['konfigurasi.komisi'].search([('company_id', '=', self.env.company.id)])
+
+        journal_entry_tabungan_ptu = self.env['account.move'].sudo().create({
+            'company_id': self.company_id.id,
+            'move_type': 'entry',
+            'date': self.tanggal,
+            'ref': str(self.kode) + str(" - " + self.karyawan.name),
+            'journal_id': account_settings.journal_kas_1.id,
+            'line_ids': [
+                (0, 0, {
+                    'name': self.kode,
+                    'date': self.tanggal,
+                    'account_id': account_settings.account_kas_1.id,
+                    'company_id': self.company_id.id,
+                    'debit': self.nominal_ptu,
+                }),
+
+                (0, 0, {
+                    'name': self.kode,
+                    'date': self.tanggal,
+                    'account_id': account_settings.piutang_komisi.id,
+                    'company_id': self.company_id.id,
+                    'credit': self.nominal_ptu,
+                }),
+            ],
+        })
+        journal_entry_tabungan_ptu.action_post()
 
         self.state = 'paid'

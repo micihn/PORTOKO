@@ -23,9 +23,18 @@
 		<record id="sequence_tabungan_ptu" model="ir.sequence">
 			<field name="name">Tabungan PTU Sequence</field>
 			<field name="code">tabungan.ptu.sequence</field>
-			<field name="prefix">KM</field>
-			<field name="padding">5</field>
+			<field name="prefix">KMM</field>
+			<field name="padding">6</field>
 			<field name="number_increment">1</field>
 		</record>
-	</data>
+
+        <!-- Record rules -->
+        <!-- Multi-company : Tabungan PTU -->
+        <record model="ir.rule" id="tabungan_ptu_multicompany_rule">
+            <field name="name">Tabungan PTU Multi-Company rule</field>
+            <field name="model_id" search="[('model','=','tabungan.ptu')]" model="ir.model"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+    </data>
 </odoo>
