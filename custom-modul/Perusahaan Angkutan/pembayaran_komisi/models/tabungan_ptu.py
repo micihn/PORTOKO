@@ -6,6 +6,7 @@ class TabunganPTU(models.Model):
     _rec_name = 'kode'
 
     kode = fields.Char(string="Kode")
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
     tanggal = fields.Datetime(string="Tanggal", default=fields.Datetime.now())
     karyawan = fields.Many2one('hr.employee', string="Karyawan")
     saldo = fields.Float(string="Saldo", compute="compute_saldo_tabungan")
