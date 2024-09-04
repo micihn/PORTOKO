@@ -41,4 +41,32 @@ class TabunganPTU(models.Model):
             'state': 'diproses',
         })
 
+        account_settings = self.env['konfigurasi.komisi'].search([('company_id', '=', self.env.company.id)])
+
+        journal_entry_tabungan_ptu = self.env['account.move'].sudo().create({
+            'company_id': self.company_id.id,
+            'move_type': 'entry',
+            'date': self.tanggal,
+            'ref': str(self.kode) + str(" - " + self.karyawan.name),
+            'journal_id': account_settings.journal_kas_1.id,
+            'line_ids': [
+                (0, 0, {
+                    'name': self.kode,
+                    'date': self.tanggal,
+                    'account_id': account_settings.account_kas_1.id,
+                    'company_id': self.company_id.id,
+                    'debit': self.nominal_ptu,
+                }),
+
+                (0, 0, {
+                    'name': self.kode,
+                    'date': self.tanggal,
+                    'account_id': account_settings.piutang_komisi.id,
+                    'company_id': self.company_id.id,
+                    'credit': self.nominal_ptu,
+                }),
+            ],
+        })
+        journal_entry_tabungan_ptu.action_post()
+
         self.state = 'paid'
