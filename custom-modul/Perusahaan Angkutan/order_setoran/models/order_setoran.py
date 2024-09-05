@@ -43,6 +43,28 @@ class OrderSetoran(models.Model):
         'cancel': [('readonly', True)],
     })
 
+    class HrEmployee(models.Model):
+        _inherit = 'hr.employee'
+
+        @api.model
+        def name_search(self, name='', args=None, operator='ilike', limit=100):
+            args = args or []
+            domain = []
+            if name:
+                domain = ['|', ('name', operator, name), ('identification_id', operator, name)]
+            employees = self.search(domain + args, limit=limit)
+            return employees.name_get()
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|', ('name', operator, name), ('identification_id', operator, name)]
+        employees = self.search(domain + args, limit=limit)
+        return employees.name_get()
+
+
     tanggal_st = fields.Date('Tgl. Setor', tracking=True, default=fields.Date.today(), required=True, states={
         'draft': [('readonly', True)],
         'done': [('readonly', True)],
