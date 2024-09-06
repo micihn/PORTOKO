@@ -91,12 +91,24 @@ class RekapOrderItem(models.Model):
     no_surat_jalan = fields.Char(related="order_id.nomor_surat_jalan", store=True)
     plant = fields.Many2one("konfigurasi.plant", related="order_id.plant", store=True)
     faktur = fields.Many2many("account.move", compute="_get_invoice", store=True)
-    nomor_kendaraan = fields.Many2one('fleet.vehicle', related="order_id.kendaraan_id", store=True)
+    nomor_kendaraan = fields.Char(compute="set_nomor_kendaraan")
     alamat_muat = fields.Many2one("konfigurasi.lokasi", related="order_id.alamat_muat", store=True)
     alamat_bongkar = fields.Many2one("konfigurasi.lokasi", related="order_id.alamat_bongkar", store=True)
 
     nama_barang = fields.Text(compute="_get_item_data", store=True)
     subtotal_ongkos = fields.Float(compute="_get_item_data", store=True)
+
+    @api.depends('order_id')
+    def set_nomor_kendaraan(self):
+        for record in self:
+            if record.order_id.nomor_setoran:
+                record.nomor_kendaraan = record.order_id.kendaraan_id.display_name
+            elif record.order_id.oper_setoran:
+                record.nomor_kendaraan = self.env['oper.setoran'].search([('id', '=', record.order_id.oper_setoran)]).kendaraan
+            else:
+                record.nomor_kendaraan = False
+
+
 
     @api.depends("order_id")
     def _get_item_data(self):

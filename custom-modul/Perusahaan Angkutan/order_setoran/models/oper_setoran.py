@@ -472,6 +472,11 @@ class OperSetoran(models.Model):
             if order.nomor_surat_jalan == False:
                 raise ValidationError('Nomor Surat Jalan belum terisi ' + str(order.order_pengiriman.order_pengiriman_name))
 
+            print("Lonte")
+            print(self.id)
+
+            order.order_pengiriman.oper_setoran = self.id
+
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'account.invoice.oper.payment',
