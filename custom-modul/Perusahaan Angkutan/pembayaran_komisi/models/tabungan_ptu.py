@@ -11,7 +11,27 @@ class TabunganPTU(models.Model):
     karyawan = fields.Many2one('hr.employee', string="Karyawan")
     saldo = fields.Float(string="Saldo", compute="compute_saldo_tabungan")
     nominal_ptu = fields.Float(string="Nominal PTU")
+    
+    class HrEmployee(models.Model):
+        _inherit = 'hr.employee'
 
+        @api.model
+        def name_search(self, name='', args=None, operator='ilike', limit=100):
+            args = args or []
+            domain = []
+            if name:
+                domain = ['|', ('name', operator, name), ('identification_id', operator, name)]
+            employees = self.search(domain + args, limit=limit)
+            return employees.name_get()
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|', ('name', operator, name), ('identification_id', operator, name)]
+        employees = self.search(domain + args, limit=limit)
+        return employees.name_get()
     state = fields.Selection([
         ('draft', "Draft"),
         ('paid', "Paid"),

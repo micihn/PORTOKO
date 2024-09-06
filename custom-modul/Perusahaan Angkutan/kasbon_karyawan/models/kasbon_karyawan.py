@@ -130,6 +130,17 @@ class KasbonKaryawan(models.Model):
             'view_id': self.env.ref('kasbon_karyawan.pelunasan_kasbon_karyawan_wizard_view').id,
         }
 
+class HrEmployee(models.Model):
+    _inherit = 'hr.employee'
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|', ('name', operator, name), ('identification_id', operator, name)]
+        employees = self.search(domain + args, limit=limit)
+        return employees.name_get()
 
 
 

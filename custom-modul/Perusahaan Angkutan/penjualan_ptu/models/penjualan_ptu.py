@@ -182,3 +182,15 @@ class PenjualanPTULine(models.Model):
     def compute_subtotal(self):
         for line in self:
             line.subtotal = line.qty * line.harga
+
+class HrEmployee(models.Model):
+    _inherit = 'hr.employee'
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|', ('name', operator, name), ('identification_id', operator, name)]
+        employees = self.search(domain + args, limit=limit)
+        return employees.name_get()

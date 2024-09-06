@@ -84,6 +84,27 @@ class UangJalan(models.Model):
         'closed': [('readonly', True)],
     })
 
+    class HrEmployee(models.Model):
+        _inherit = 'hr.employee'
+
+        @api.model
+        def name_search(self, name='', args=None, operator='ilike', limit=100):
+            args = args or []
+            domain = []
+            if name:
+                domain = ['|', ('name', operator, name), ('identification_id', operator, name)]
+            employees = self.search(domain + args, limit=limit)
+            return employees.name_get()
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|', ('name', operator, name), ('identification_id', operator, name)]
+        employees = self.search(domain + args, limit=limit)
+        return employees.name_get()
+
     keterangan = fields.Text('Keterangan', copy=False, states={
         'to_submit': [('readonly', False)],
         'submitted': [('readonly', True)],
