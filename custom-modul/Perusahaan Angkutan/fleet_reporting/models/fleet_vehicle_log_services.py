@@ -137,7 +137,8 @@ class FleetVehicleLogServiceProduct(models.Model):
                 })
                 stock_move._action_confirm()
                 stock_move._action_assign()
-
+                
+            line.product_return_limit = line.product_qty
             picking.fleet_service_id = self.id
             self.state_record = 'diminta'
 
