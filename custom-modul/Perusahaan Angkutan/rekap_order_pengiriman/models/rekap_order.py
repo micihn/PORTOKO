@@ -8,7 +8,7 @@ class RekapOrder(models.Model):
     _description = 'Rekap Order Kirim'
     _rec_name = "kode_rekap"
 
-    company_id = fields.Many2one('res.company', ondelete='cascade', default=lambda self: self.env.user.company_id)
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     kode_rekap = fields.Char(required=True, copy=False)
     keterangan = fields.Text(required=True, copy=False)
     tanggal_awal = fields.Date(required=True, copy=False)
