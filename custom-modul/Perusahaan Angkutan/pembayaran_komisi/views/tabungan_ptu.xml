@@ -1,0 +1,49 @@
+<odoo>
+        <record id="tabungan_ptu_tree_view" model="ir.ui.view">
+            <field name="name">tabungan.ptu.tree.view</field>
+            <field name="model">tabungan.ptu</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="kode"/>
+                    <field name="karyawan"/>
+                    <field name="tanggal"/>
+                    <field name="saldo"/>
+                    <field name="nominal_ptu"/>
+<!--                    <field name="state" widget="badge" decoration-success="state=='paid'"-->
+<!--                           decoration-info="state=='draft'"/>-->
+                </tree>
+            </field>
+        </record>
+
+        <record id="tabungan_ptu_form_view" model="ir.ui.view">
+            <field name="name">tabungan.ptu.form.view</field>
+            <field name="model">tabungan.ptu</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="create_ptu" string="Buat PTU" type="object" class="btn-primary" attrs="{'invisible': [('state', '=', 'paid')]}"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+
+
+
+                        <group>
+                            <field name="kode" readonly="1" force_save="1"/>
+                            <field name="karyawan" attrs="{'readonly': [('state', '=', 'paid')]}"/>
+                            <field name="tanggal" attrs="{'readonly': [('state', '=', 'paid')]}"/>
+                            <field name="saldo" />
+                            <field name="nominal_ptu" attrs="{'readonly': [('state', '=', 'paid')]}"/>
+                        </group>
+                    </sheet>
+                </form>
+
+            </field>
+        </record>
+
+        <record id="tabungan_ptu_action" model="ir.actions.act_window">
+            <field name="name">Tabungan PTU</field>
+            <field name="res_model">tabungan.ptu</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+</odoo>

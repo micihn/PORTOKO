@@ -2,6 +2,8 @@
 	<data>
 		<menuitem id="komisi_root_menu" name="Komisi" groups="pembayaran_komisi.group_klaim_komisi"/> 
 		<menuitem id="tabung_komisi_menu" parent="pembayaran_komisi.komisi_root_menu" name="Pembayaran Komisi" action="tabung_komisi_act" sequence="10"/>
+		<menuitem id="tabungan_ptu" parent="pembayaran_komisi.komisi_root_menu" name="Tabungan PTU" action="tabungan_ptu_action" sequence="20"/>
+
 		<menuitem id="bayar_komisi_menu" parent="pembayaran_komisi.komisi_root_menu" name="Pengambilan PTU" action="bayar_komisi_act" sequence="20"/>
 		<menuitem id="konfigurasi" parent="pembayaran_komisi.komisi_root_menu" name="Konfigurasi" action="konfigurasi_act" sequence="30"/>
 	</data>

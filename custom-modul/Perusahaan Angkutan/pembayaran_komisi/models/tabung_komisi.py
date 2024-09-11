@@ -11,6 +11,7 @@ class TabungKomisi(models.Model):
 		'selesai': [('readonly', True)],
 		'dibayar': [('readonly', True)]
 	})
+
 	komisi_ids = fields.Many2many("hr.employee.komisi.sejarah", string="List Komisi", domain="[('state', '=', 'tersimpan')]", states={
 		'selesai': [('readonly', True)],
 		'dibayar': [('readonly', True)]
@@ -183,3 +184,15 @@ class TabungKomisi(models.Model):
 				# 	'res_id': rec.expense_id.id,
 				# 	'view_mode': 'form',
 				# }
+# Extend hr.employee to search employees by name or identification_id
+class HrEmployee(models.Model):
+    _inherit = 'hr.employee'
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|', ('name', operator, name), ('identification_id', operator, name)]
+        employees = self.search(domain + args, limit=limit)
+        return employees.name_get()

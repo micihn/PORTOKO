@@ -84,6 +84,27 @@ class UangJalan(models.Model):
         'closed': [('readonly', True)],
     })
 
+    class HrEmployee(models.Model):
+        _inherit = 'hr.employee'
+
+        @api.model
+        def name_search(self, name='', args=None, operator='ilike', limit=100):
+            args = args or []
+            domain = []
+            if name:
+                domain = ['|', ('name', operator, name), ('identification_id', operator, name)]
+            employees = self.search(domain + args, limit=limit)
+            return employees.name_get()
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|', ('name', operator, name), ('identification_id', operator, name)]
+        employees = self.search(domain + args, limit=limit)
+        return employees.name_get()
+
     keterangan = fields.Text('Keterangan', copy=False, states={
         'to_submit': [('readonly', False)],
         'submitted': [('readonly', True)],
@@ -392,6 +413,14 @@ class UangJalan(models.Model):
     def cancel(self):
         if self.state == 'to_submit' or self.state == 'submitted' or self.state == 'validated':
             self.state = 'cancel'
+            self.sisa_kas_cadangan = 0
+            self.kas_gantung = 0
+        elif self.state == 'paid':
+            self.kendaraan.kas_cadangan = self.kendaraan.kas_cadangan - self.kas_cadangan
+            self.sisa_kas_cadangan = 0
+            self.state = 'cancel'
+            self.kas_gantung = 0
+
         else:
             account_settings = self.env['konfigurasi.account.uang.jalan'].search([('company_id', '=', self.company_id.id)])
             account_settings_setoran = self.env['konfigurasi.account.setoran'].search([('company_id', '=', self.company_id.id)])
