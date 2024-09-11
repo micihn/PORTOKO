@@ -37,13 +37,13 @@ class BayarKomisi(models.Model):
 			rec.kode_pembayaran = self.env['ir.sequence'].next_by_code('bayar.komisi') or 'New'
 		return records
 
-	@api.onchange("saldo", "jumlah")
-	def _validate_jumlah(self):
-		for rec in self:
-			if rec.employee_id and rec.saldo <= 0:
-				raise UserError("Saldo PTU karyawan 0.")
-			if rec.employee_id and rec.jumlah > rec.saldo:
-				raise UserError("Jumlah komisi yang diambil tidak bisa lebih dari saldo tabungan.")
+	# @api.onchange("saldo", "jumlah")
+	# def _validate_jumlah(self):
+	# 	for rec in self:
+	# 		if rec.employee_id and rec.saldo <= 0:
+	# 			raise UserError("Saldo PTU karyawan 0.")
+	# 		if rec.employee_id and rec.jumlah > rec.saldo:
+	# 			raise UserError("Jumlah komisi yang diambil tidak bisa lebih dari saldo tabungan.")
 
 	def action_submit(self):
 		for rec in self:

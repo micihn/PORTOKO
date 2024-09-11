@@ -41,16 +41,16 @@ class TabungKomisi(models.Model):
 			rec.kode_ptu = self.env['ir.sequence'].next_by_code('tabung.komisi') or 'New'
 		return records
 
-	@api.onchange("employee_id")
-	def _populate_komisi_list(self):
-		for rec in self:
-			if rec.employee_id:
-				komisi_list = self.env['hr.employee.komisi.sejarah'].search([('employee_id', '=', rec.employee_id.id), ('state', '=', 'pending')])
-				if not komisi_list:
-					raise UserError("Tidak ditemukan komisi untuk setoran yang belum dibayar.")
-				rec.komisi_ids = [(6, 0, komisi_list.ids)]
-			else:
-				rec.komisi_ids = [(5, 0, 0)]
+	# @api.onchange("employee_id")
+	# def _populate_komisi_list(self):
+	# 	for rec in self:
+	# 		if rec.employee_id:
+	# 			komisi_list = self.env['hr.employee.komisi.sejarah'].search([('employee_id', '=', rec.employee_id.id), ('state', '=', 'pending')])
+	# 			if not komisi_list:
+	# 				raise UserError("Tidak ditemukan komisi untuk setoran yang belum dibayar.")
+	# 			rec.komisi_ids = [(6, 0, komisi_list.ids)]
+	# 		else:
+	# 			rec.komisi_ids = [(5, 0, 0)]
 
 	@api.depends("komisi_ids.nominal", "total_disimpan")
 	def _compute_komisi(self):
