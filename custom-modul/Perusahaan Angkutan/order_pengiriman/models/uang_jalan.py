@@ -414,12 +414,13 @@ class UangJalan(models.Model):
         if self.state == 'to_submit' or self.state == 'submitted' or self.state == 'validated':
             self.state = 'cancel'
             self.sisa_kas_cadangan = 0
-            self.kas_gantung = 0
+            self.kas_gantung = self.kendaraan.kas_gantung_vehicle - self.sisa_kas_cadangan
+
         elif self.state == 'paid':
             self.kendaraan.kas_cadangan = self.kendaraan.kas_cadangan - self.kas_cadangan
+            self.kendaraan.kas_gantung_vehicle = self.kendaraan.kas_gantung_vehicle - self.total
             self.sisa_kas_cadangan = 0
             self.state = 'cancel'
-            self.kas_gantung = 0
 
         else:
             account_settings = self.env['konfigurasi.account.uang.jalan'].search([('company_id', '=', self.company_id.id)])

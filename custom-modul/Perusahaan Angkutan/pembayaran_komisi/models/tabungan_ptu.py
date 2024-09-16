@@ -41,8 +41,13 @@ class TabunganPTU(models.Model):
     def compute_saldo_tabungan(self):
         for record in self:
             if record.karyawan:
-                tabungan = self.env['hr.employee.ptu_line'].search([('employee_id', '=', record.karyawan.id)])
-                record.saldo = sum(tabungan.mapped('nominal'))
+                for tabungan in self.env['hr.employee.ptu_line'].search([('employee_id', '=', record.karyawan.id)]):
+                    if tabungan.tipe == 'pengeluaran':
+                        record.saldo += tabungan.nominal * -1
+                    elif tabungan.tipe == 'pemasukan':
+                        record.saldo += tabungan.nominal
+                    else:
+                        record.saldo = 0.0
             else:
                 record.saldo = 0.0
 

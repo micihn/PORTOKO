@@ -57,6 +57,29 @@ class ResCompanyPengirimanInherit(models.Model):
                 'number_increment': data['number_increment'],
             })
 
+    def create_sequence_tabungan_ptu(self, company):
+        sequence_data = [
+            {
+                'name' : 'Tabungan PTU Sequence - ',
+                'code': 'tabungan.ptu.sequence',
+                'implementation': 'standard',
+                'prefix': 'KMM',
+                'padding': 6,
+                'number_increment': 1,
+            }
+        ]
+
+        for data in sequence_data:
+            self.env['ir.sequence'].create({
+                'name': data['name'] + str(company.name),
+                'code': data['code'],
+                'implementation': data['implementation'],
+                'active': 'True',
+                'company_id': company.id,
+                'prefix': data['prefix'],
+                'padding': data['padding'],
+                'number_increment': data['number_increment'],
+            })
 
     @api.model
     def create(self, values):
@@ -64,9 +87,11 @@ class ResCompanyPengirimanInherit(models.Model):
 
         self.create_konfigurasi_komisi(company)
 
-        self.create_konfigurasi_komisi(company)
-
         self.create_sequence_bayar_komisi(company)
+
+        self.create_sequence_tabung_komisi(company)
+
+        self.create_sequence_tabungan_ptu(company)
 
         return company
 
