@@ -59,6 +59,66 @@ class AccountInvoicePayment(models.TransientModel):
             return product_id
 
         for setoran in self.env['order.setoran'].browse(self._context.get('active_ids', [])):
+            # Mencari konfigurasi komisi
+            komisi_settings = self.env['konfigurasi.komisi'].sudo().search([('company_id', '=', setoran.company_id.id)])
+
+            # Membuat journal entry komisi sopir
+            if setoran.komisi_sopir > 0:
+                journal_entry_komisi_sopir = self.env['account.move'].sudo().create({
+                    'company_id': self.env.company.id,
+                    'move_type': 'entry',
+                    'date': fields.Datetime.now(),
+                    'journal_id': komisi_settings.journal_komisi.id,
+                    'ref': str(setoran.kode_order_setoran + " - Komisi Sopir"),
+                    'line_ids': [
+                        (0, 0, {
+                            'name': str(setoran.kode_order_setoran + " - Komisi Sopir"),
+                            'date': fields.Datetime.now(),
+                            'account_id': komisi_settings.hutang_komisi.id,
+                            'company_id': self.env.company.id,
+                            'credit': setoran.komisi_sopir,
+                        }),
+
+                        (0, 0, {
+                            'name': str(setoran.kode_order_setoran + " - Komisi Sopir"),
+                            'date': fields.Datetime.now(),
+                            'account_id': komisi_settings.expense_komisi.id,
+                            'company_id': self.env.company.id,
+                            'debit': setoran.komisi_sopir,
+                        }),
+                    ],
+                })
+                journal_entry_komisi_sopir.action_post()
+
+            # Membuat journal entry komisi kenek
+            if setoran.komisi_kenek > 0:
+                journal_entry_komisi_kenek = self.env['account.move'].sudo().create({
+                    'company_id': self.env.company.id,
+                    'move_type': 'entry',
+                    'date': fields.Datetime.now(),
+                    'journal_id': komisi_settings.journal_komisi.id,
+                    'ref': str(setoran.kode_order_setoran + " - Komisi Kenek"),
+                    'line_ids': [
+                        (0, 0, {
+                            'name': str(setoran.kode_order_setoran + " - Komisi Kenek"),
+                            'date': fields.Datetime.now(),
+                            'account_id': komisi_settings.hutang_komisi.id,
+                            'company_id': self.env.company.id,
+                            'credit': setoran.komisi_kenek,
+                        }),
+
+                        (0, 0, {
+                            'name': str(setoran.kode_order_setoran + " - Komisi Kenek"),
+                            'date': fields.Datetime.now(),
+                            'account_id': komisi_settings.expense_komisi.id,
+                            'company_id': self.env.company.id,
+                            'debit': setoran.komisi_kenek,
+                        }),
+                    ],
+                })
+                journal_entry_komisi_kenek.action_post()
+
+            # Mencari konfigurasi setoran
             account_settings = self.env['konfigurasi.account.setoran'].search([('company_id', '=', setoran.company_id.id)])
             account_kas = account_settings.account_kas
             account_piutang = account_settings.account_piutang
@@ -102,7 +162,7 @@ class AccountInvoicePayment(models.TransientModel):
                 else:
                     price_unit = 0
 
-                self.env['account.move'].sudo().create({
+                invoice = self.env['account.move'].sudo().create({
                     'company_id': self.env.company.id,
                     'move_type': 'out_invoice',
                     'invoice_date': order.tanggal_order,
@@ -121,11 +181,13 @@ class AccountInvoicePayment(models.TransientModel):
                     ],
                 })
 
+                invoice.action_post()
+
             # Membuat Vendor Bill (List Pembelian)
             if setoran.total_pembelian > 0:
                 for bill in setoran.list_pembelian.order_pengiriman:
                     for purchase in bill.biaya_pembelian:
-                        self.env['account.move'].sudo().create({
+                        vendor_bill = self.env['account.move'].sudo().create({
                             'company_id': self.env.company.id,
                             'move_type': 'in_invoice',
                             'invoice_date': bill.create_date,
@@ -143,11 +205,12 @@ class AccountInvoicePayment(models.TransientModel):
                                 })
                             ],
                         })
+                        vendor_bill.action_post()
 
             # Membuat Vendor Bill (Biaya Fee)
             if setoran.total_biaya_fee > 0:
                 for fee in setoran.biaya_fee:
-                    self.env['account.move'].sudo().create({
+                    vendor_bill = self.env['account.move'].sudo().create({
                         'company_id': self.env.company.id,
                         'move_type': 'in_invoice',
                         'invoice_date': setoran.tanggal_st,
@@ -165,10 +228,11 @@ class AccountInvoicePayment(models.TransientModel):
                             })
                         ],
                     })
+                    vendor_bill.action_post()
 
             tanggal_uang_jalan = []
             for rec in setoran.list_uang_jalan:
-                tanggal_uang_jalan.append(rec.tanggal)
+                tanggal_uang_jalan.append(rec.create_date)
 
             formatted_dates = [date.strftime('%d/%m/%Y') for date in tanggal_uang_jalan]
             formatted_dates_str = ', '.join(formatted_dates)
@@ -177,13 +241,14 @@ class AccountInvoicePayment(models.TransientModel):
             # Jika 'Total Pengeluaran' > 'Total Uang Jalan', maka hasil pengurangan akan dibuatkan journal
             # entry tambahan
             if setoran.total_pengeluaran > setoran.total_uang_jalan:
+                setoran.jenis_pemakaian_uang = 'uang_sendiri'
                 # Journal Entry untuk selisih
                 journal_entry_selisih = self.env['account.move'].create({
                     'company_id': setoran.company_id.id,
                     'move_type': 'entry',
                     'journal_id': journal_setoran.id,
                     'date': setoran.create_date,
-                    'ref': setoran.kode_order_setoran,
+                    'ref': str("Selisih - ") + str(setoran.kode_order_setoran) + str(" - US"),
                     'line_ids': [
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
@@ -192,7 +257,6 @@ class AccountInvoicePayment(models.TransientModel):
                             'company_id': setoran.company_id.id,
                             'credit': setoran.total_pengeluaran - setoran.total_uang_jalan,
                         }),
-
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
@@ -203,7 +267,6 @@ class AccountInvoicePayment(models.TransientModel):
                     ],
                 })
                 journal_entry_selisih.action_post()
-
                 # Journal Entry untuk pemindahan account
                 journal_entry_total_pengeluaran = self.env['account.move'].create({
                     'company_id': setoran.company_id.id,
@@ -219,7 +282,6 @@ class AccountInvoicePayment(models.TransientModel):
                             'company_id': setoran.company_id.id,
                             'debit': setoran.total_pengeluaran,
                         }),
-
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
@@ -230,16 +292,17 @@ class AccountInvoicePayment(models.TransientModel):
                     ],
                 })
                 journal_entry_total_pengeluaran.action_post()
-
+            
             # Jika 'Total Uang Jalan' > 'Total Pengeluaran', maka kelebihan dana akan dibuatkan journal
             elif setoran.total_uang_jalan > setoran.total_pengeluaran:
+                setoran.jenis_pemakaian_uang = 'kas_lebih'
                 # Journal Entry untuk selisih
                 journal_entry_selisih = self.env['account.move'].create({
                     'company_id': setoran.company_id.id,
                     'move_type': 'entry',
                     'journal_id': journal_setoran.id,
                     'date': setoran.create_date,
-                    'ref': setoran.kode_order_setoran,
+                    'ref': str("Selisih - ") + str(setoran.kode_order_setoran) + str(" - KL"),
                     'line_ids': [
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
@@ -248,7 +311,6 @@ class AccountInvoicePayment(models.TransientModel):
                             'company_id': setoran.company_id.id,
                             'debit': setoran.total_uang_jalan - setoran.total_pengeluaran,
                         }),
-
                         (0, 0, {
                             'name': setoran.kode_order_setoran,
                             'date': setoran.create_date,
@@ -259,7 +321,7 @@ class AccountInvoicePayment(models.TransientModel):
                     ],
                 })
                 journal_entry_selisih.action_post()
-
+                
                 # Journal Entry untuk pemindahan account
                 journal_entry_total_pengeluaran = self.env['account.move'].create({
                     'company_id': setoran.company_id.id,
@@ -318,23 +380,13 @@ class AccountInvoicePayment(models.TransientModel):
             # This will close uang jalan
             for uj in setoran.list_uang_jalan:
                 uj.uang_jalan_name.state = 'closed'
+                uj.uang_jalan_name.nomor_setoran = setoran.kode_order_setoran
 
             # Block dibawah akan mengurangi saldo uang jalan gantung
-            for line in setoran.detail_order:
-                for uang_jalan in line.order_pengiriman.uang_jalan:
-                    if uang_jalan.balance_uang_jalan > 0:
-                        # Deakumulasi kas gantung kepada kendaraan
-                        setoran.kendaraan.kas_gantung_vehicle -= uang_jalan.balance_uang_jalan
-
-                        self.env['uang.jalan.balance.history'].create({
-                            'uang_jalan_id': uang_jalan.id,
-                            'company_id': setoran.company_id.id,
-                            'keterangan': "Penutupan Uang Jalan karena telah disetor " + str(setoran.kode_order_setoran),
-                            'tanggal_pencatatan': fields.Date.today(),
-                            'nominal_close': uang_jalan.balance_uang_jalan * -1,
-                        })
-
-                        uang_jalan.state = 'closed'
+            for uj in setoran.list_uang_jalan:
+                if uj.uang_jalan_name.balance_uang_jalan > 0:
+                    # Deakumulasi kas gantung kepada kendaraan
+                    setoran.kendaraan.kas_gantung_vehicle -= uj.uang_jalan_name.balance_uang_jalan
 
             setoran.state = 'done'
 
